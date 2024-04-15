@@ -24,13 +24,13 @@
                 <a
                   class="inline-flex p-2 text-xl font-bold uppercase tracking-wider text-white" 
                   @click="maindropdownOpen = !maindropdownOpen" @click.away = "maindropdownOpen = false"
-                  >MR</a
+                  >FGRN</a
                 >
             </button>
                 <div class="lg:absolute bg-white rounded-md p-2" :class="{'hidden':!maindropdownOpen, 'flex flex-col':maindropdownOpen}">
                         <ul class="space-y-2">
                             <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                                <a href="{% url 'fgrn_base' %}">FGRN</a>
+                                <a href="{% url 'mr_base' %}">MR</a>
                             </li> 
                             <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
                                 <a href="#">GRN</a>
