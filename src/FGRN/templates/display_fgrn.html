@@ -1,0 +1,69 @@
+{% extends 'fgrn_base.html' %}
+
+{% block content %}
+<div class="form-group pull-left">
+  <div style="margin-left: 200px;">
+    <strong>
+        <h2>Order Details</h2>
+      </strong>
+  </div>
+  <!-- <form action="/GRN/print_pr">
+    <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
+      <input type="text" name="PR_no" placeholder="PR No" class="form-control" style=" margin-top: 10px; ">
+      <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search Order</button></div>
+    </div>
+  </form> -->
+ 
+  <br>
+  <br>
+
+  <section class="intro">
+    <div class="gradient-custom h-100">
+      <div class="mask d-flex align-items-center h-100">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <div id="datatable">
+                <table class="table table-striped table-bordered" style="margin-left: 30px;">
+                    <tr>
+                      <th>FGRN Number</th>
+                      <th>Date</th>
+                      <th>Items </th>
+                      <th>Quantity</th>
+                    </tr>
+                    
+                    {% for order in my_order %}
+                    <tr>
+                      <td><a href="#" class="order-link" data-order-id="{{ order.FGRN_no }}">{{ order.FGRN_no }}</a></td>
+                      <td>{{ order.date }}</td>
+                      <td>
+                        {% for item in order.FGRN_items.all %}
+                            {{ item.item_name }}
+                            {% if not forloop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{% for item in order.FGRN_items.all %}
+                      {{ item.quantity }}
+                      {% if not forloop.last %}<br>{% endif %}
+                  {% endfor %}</td>
+                    
+                    </tr>
+                    {% endfor %}
+                    
+                  </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+  
+</div>
+
+<script src="../../static/js/fgrn/display_fgrn.js">
+ 
+</script>
+{% endblock %}

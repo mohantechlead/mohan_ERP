@@ -1,0 +1,270 @@
+{% extends 'grn_base.html' %}
+
+{% block content %}
+
+    <div class="form-group" style="margin-left: 0;">
+        <div style="display: flex; justify-content: center;">
+            <div style="display: flex;">
+                <!-- <img src="../static/new_logo.png" alt="" style="width: 150px;text-align: right;"> -->
+                <div class="mb-4">
+                    
+                    <div class="text-muted" style="text-align: center;">
+                       
+                            <img src="../../static/header mohan.PNG" alt="" style="margin: 0px; padding: 0px;width: max-content;">
+                      
+                  
+                        <!-- <h3 class="mb-1"> Mohan PLC</h3>
+                        <p class="mb-1" style="margin-left: 20px; text-align: center;">Addis Ababa, Ethiopia
+                            <br>Email: msk@mohanint.com <br>TEL.+251-116 62 03 29 <br> Website: http://www.mohanint.com
+                        </p> -->
+            
+                    </div>
+                    <h4 class="mb-1 text-muted" style="margin-left: 132px;">Purchase Order</h4>
+            
+                </div>
+            </div>
+                         </div>
+                        
+                            <div class="table-responsive " >
+                                <table class="table table-nowrap mb-0" style="margin-bottom: 0;margin-left: 0;">
+                                            <thead>
+                                              
+                                                <tr>
+                                                    <th style="width: 550px;">
+                                                         <div class="text-muted">
+                                                            <p class="mb-1" style="line-height: 1.9;font-size: small;">Bole Sub city, Kebele 02,House No. 393/2<br>
+                                                                Mohan Building, Mohan Block 
+                                                                ADDIS ABABA, ETHIOPIA <br>
+                                                                <i> TEL.+251-6620329 / + 251-6621848 </i>
+                                                                P.O.BOX : 1873 
+                                                             </p>
+                                
+                                                        </div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="col-sm-5" style="width: 100px;padding: 0;">
+                                                            <div class="text-muted text-sm-end">
+                                                                {%if my_order.country%}
+                                                                    <div>
+                                                                        <h5 class="font-size-15 mb-1">Order No:</h5>
+                                                                        
+                                                                        <p>{{my_order.order_no}}</p>
+                                                                    </div>
+                                                                    {%else%}
+                                                                    <p></p>
+                                                                    {%endif%}
+                                                                    <div class="mt-4">
+                                                                        <h5 class="font-size-15 mb-1">Invoice Date:</h5>
+                                                                        <p>{{my_order.date}}</p>
+                                                                    </div>
+                                
+                                
+                                                            </div>
+                                                        </div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="text-muted text-sm-end" style="width: 250px;padding: 0;">
+                                                            
+                                                            <div class="mt-4">
+                                                                {%if my_order.country%}
+                                                                    <div class="mt-4">
+                                                                        <h5 class="font-size-15 mb-1">Proforma Invoice No:</h5>
+                                                                        <p>{{my_order.PR_no}}</p>
+                                                                    </div>
+                                                                    {%else%}
+                                                                    <div class="mt-4">
+                                                                        <h5 class="font-size-15 mb-1">PR No:</h5>
+                                                                        <p>{{my_order.PR_no}}</p>
+                                                                    </div>
+                                                                    {% endif%}
+                                                                <p style="margin: 0;font-size: small;"> {{my_order.ref_no}}</p>
+                                                           
+                                                        <div class="text-muted">
+                                                            <h5 class=" mb-1" style="line-height: 1.9;font-size: small;">Vendor Name</h5>
+                                                                        <p>{{my_order.vendor_name}}</p>
+                                                        </div>
+                                                       
+                                                            </div>
+                                                            
+                                                            
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead><!-- end thead -->
+                                            
+                                            <tbody>
+                                                
+                                                {% if my_order.country %}
+                                                <tr>
+                                                    
+                                                    <th>
+                                                        <div class="text-muted">
+                                                            <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;"> Country of Origin</h5>
+                                                            <!-- <p class="mb-1">Bole Sub city, Kebele 02,House No. 393/2</p> -->
+                                                            <p class="mb-1" style="font-size: small;line-height: 1.2;">{{my_order.country}}</p>
+                                                        </div>
+                                                        <div class="text-muted">
+                                                            <h5 class="text-muted text-sm-end font-size-15 mb-1" style="line-height: 0.7;"> Final Destination</h5>
+                                                            <!-- <p class="mb-1">Bole Sub city, Kebele 02,House No. 393/2</p> -->
+                                                            <p class="mb-1" style="font-size: small;line-height: 1.2;">{{my_order.destination}}</p>
+                                                        </div>
+                                                        
+                                                    </th>
+                                                    
+                                                    <th>
+                                                        <div class="text-muted">
+                                                            <h5 class="font-size-15 mb-1" style="line-height: 0.7;">Port of Loading</h5>
+                                                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.loading_port}}</p>
+                                
+                                                        </div>
+                                                        <div class="text-muted">
+                                                            <h5 class="font-size-15 mb-1" style="line-height: 0.7;">Port Of Discharge</h5>
+                                                            <p class="mb-1" style="line-height: 1.2;font-size: small;">{{my_order.discharge_port}}</p>
+                                
+                                                        </div>
+                                
+                                                        
+                                                    </th>
+                                               
+                                
+                                                </tr>
+                                                {% endif %}
+                                                <tr>
+                                                    <p></p>
+                                                </tr>
+                                                <!-- end tr -->
+                                            </tbody><!-- end tbody -->
+                                        </table><!-- end table -->
+                                    </div>
+                        <hr class="my-4">
+    
+                        <!-- end row -->
+                        
+                        <div class="py-2">
+                            <!-- <h5 class="font-size-15">Purchase Order Summary</h5> -->
+    
+                            <div class="table-responsive">
+                                <table class="table align-middle table-nowrap table-centered mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 70px;">No.</th>
+                                            <th>Item</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th class="text-end" style="width: 120px;">Total</th>
+                                        </tr>
+                                    </thead><!-- end thead -->
+                                    <tbody>
+                                        
+                                       <!--  <tr>
+                                            <th scope="row">01</th>
+                                            <td>
+                                                <div>
+                                                    <h5 class="text-truncate font-size-14 mb-1">PLASTIC RAW MATERIAL EVA</h5>
+                                                    <p class="text-muted mb-0"> EVA</p>
+                                                </div>
+                                            </td>
+                                            <td>$ 245.50</td>
+                                            <td>1</td>
+                                            <td class="text-end">$ 245.50</td>
+                                        </tr> -->
+                                        <!-- end tr -->
+                                       
+                                        {% if pr_items %}
+                                        {% for delivery in pr_items %}
+                                        <tr>
+                                            <td style="font-weight: bold;">0{{ forloop.counter }}</td>
+                                            <td>
+                                                <div>
+                                                    <h5 class="text-truncate font-size-14 mb-1">{{delivery.item_name}}</h5>
+                                                    <p class="text-muted mb-0">HS-code:{{delivery.hs_code}}</p>
+                                                </div>
+                                            </td>
+                                            {% if my_order.country %}
+                                            <td> ${{delivery.price}}</td>
+                                            <td>{{delivery.quantity}}</td>
+                                            <td> ${{delivery.total_price}} </td>
+                                            {% else %}
+                                            <td> {{delivery.price}}</td>
+                                            <td>{{delivery.quantity}}</td>
+                                            <td> {{delivery.before_vat}} </td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                        {% endif %}
+
+                                        {% if my_order.freight %}
+                                        <tr>
+                                            <th scope="row" colspan="4" class="border-0 text-end">
+                                                Shipping Charge :</th>
+                                                
+                                            <td class="border-0 text-end" ><p id="shipping_price">${{my_order.freight}}</p></td>
+                                        </tr>
+                                        
+                                        <!-- end tr -->
+                                        <tr>
+                                            <th scope="row" colspan="4" class="text-end">Sub Total</th>
+                                            <td class="text-end" id="total_price">${{my_order.PR_total_price|add:my_order.freight }}</td>
+                                        </tr>
+                                        
+                                        {% else %}
+                                        {% if my_order.PR_before_vat %}
+                                        <tr>
+                                            <th scope="row" colspan="4" class="text-end">Before VAT</th>
+                                            <td class="text-end" id="total_price">{{my_order.PR_before_vat}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" colspan="4" class="text-end">VAT</th>
+                                            <td class="text-end" id="total_price">{{vat}}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <!-- end tr -->
+                                         <tr>
+                                            <th scope="row" colspan="4" class="text-end">Total</th>
+                                            <td class="text-end" id="total_price">{{my_order.PR_total_price}}</td>
+                                        </tr>
+                                        {% endif %}
+                                       <!--  
+                            
+                                        <tr>
+                                            <th scope="row" colspan="4" class="border-0 text-end">Total</th>
+                                            <td class="border-0 text-end"><h4 class="m-0 fw-semibold" id="final_pric"></h4></td>
+                                        </tr> -->
+                                        
+                                        
+                                        </tr>
+                                        <!-- end tr -->
+                                    </tbody><!-- end tbody -->
+                                </table><!-- end table -->
+                            </div><!-- end table responsive -->
+                           
+                        </div>
+                   
+                </div>
+            
+   
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const totalPrice = document.getElementById('total_price')
+    const shippingPriceElement = document.getElementById('shipping_price');
+    const finalPrice = document.getElementById('final_price')
+    
+    var total_price = parseFloat(totalPrice.textContent);
+    var shippingPrice = parseFloat(shippingPriceElement.textContent);
+    console.log(shippingPrice)
+    shippingPrice =shippingPrice.toString()
+    var modifiedValue = shippingPrice.replace('$', '');
+    console.log(modifiedValue)
+    const price = total_price + final_price
+    
+    finalPrice.innerHTML = price
+    
+})
+        
+</script>
+{% endblock %}

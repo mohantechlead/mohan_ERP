@@ -1,0 +1,30 @@
+<!-- templates/admin/custom_report.html -->
+{% extends "grn_base.html" %}
+
+{% block content %}
+<div class="module">
+    <table>
+        <caption>Custom Report</caption>
+        <thead>
+            <tr>
+                <th>Field 1</th>
+                <th>Field 2</th>
+                <!-- Add more table headers as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+                <tr>
+                    <td>{{ item.field1 }}</td>
+                    <td>{{ item.field2 }}</td>
+                    <!-- Add more table cells as needed -->
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

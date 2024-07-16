@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'FGRN',
     'GRN',
     'DN',
+    'rest_framework',
+    # 'django.contrib.humanize',
+    'members',
 ]
 
 MIDDLEWARE = [
@@ -79,10 +82,14 @@ WSGI_APPLICATION = 'mohan_ERP.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'orders',
+       'USER': 'postgres',
+       'PASSWORD': 'mohanPLC',
+       'HOST': '127.0.0.1', 
+        'PORT': '5432',
+   }
 }
 
 
@@ -120,14 +127,25 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+# STATIC_URL = 'static/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static"
+# ]
+
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'tech@mohanplc.com'
+EMAIL_HOST_PASSWORD = 'ieqlewrifhfvhesd'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 

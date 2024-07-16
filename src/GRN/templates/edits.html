@@ -1,0 +1,293 @@
+{% extends "grn_base.html" %}
+
+
+
+{% block content %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+{% if error_message %}
+<div class="alert alert-danger">
+    {{ error_message }}
+</div>
+{% endif %}
+{{ form.non_field_errors }}
+<div class="form-group">
+    {{ form.your_field.label_tag }}
+    {{ form.your_field }}
+    {{ form.your_field.errors }}
+</div>
+<div>
+    {{ form.errors }}
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Create Import PR</h1>
+            <h2 class="text-center">PR Form</h2>
+            <br>
+
+            <form method="post" id="form1" action="{% url 'update_import_pr' %} " novalidate>
+                {% csrf_token %}
+                <div class="form-group col-sm-8">
+                    <label class="control-label col-sm-2" style="margin-top: 20px;">Site Name   <i class="fa fa-edit" aria-hidden="true"></i></label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" name="site_name" value="{{ form.site_name.value }}">
+
+                    </div>
+                </div>
+                <div class="col-sm-6" style="margin-top: 40px;">
+                    <span class="form-group">
+                        <label class="control-label col-sm-5"> Proforma Invoice No  </label>
+                        <div class="col-sm-8">
+
+                            <input type="text" class="form-control" name="PR_no" value="{{ form.PR_no.value }}" disabled>
+                        </div>
+                    </span>
+                    <span class="form-group">
+                        <label class="control-label col-sm-5">
+                            Vendor Company  <i class="fa fa-edit" aria-hidden="true"></i></label>
+                        <div class="col-sm-8" style="margin-top: 10px;">
+                            <input type="text" class="form-control" name="vendor_name" value="{{ form.vendor_name.value }}">
+
+                        </div>
+                    </span>
+
+
+                </div>
+
+                <div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Proforma Invoice Date</label>
+                            <div class="col-sm-8">
+                                <input type="date" name="date" value="{{ form.date.value }}" class="form-control datetimepicker-input"
+                                    data-target="#datepicker1"  />
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-6 " style="margin-bottom: 50px;">
+                            <div class="col-sm-8">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6"></div>
+                    <div class="col-sm-6">
+                        <span class="form-group">
+                            <label class="control-label col-sm-5">Country of Origin  <i class="fa fa-edit" aria-hidden="true"></i></label>
+                            <div class="col-sm-8" style="margin-top: 10px;">
+                                <input type="text" class="form-control" name="country" value="{{ form.country.value }}">
+
+                            </div>
+                        </span>
+                        <span class="form-group">
+                            <label class="control-label col-sm-4">Final Destination    <i class="fa fa-edit" aria-hidden="true"></i></label>
+                            <div class="col-sm-8">
+
+                                <input type="text" class="form-control" name="destination" value="{{ form.destination.value }}"> 
+                            </div>
+                        </span>
+                    </div>
+
+                    <div class="col-sm-5">
+                        <span class="form-group">
+                            <label class="control-label col-sm-5">Port of Loading    <i class="fa fa-edit" aria-hidden="true"></i></label>
+                            <div class="col-sm-8" style="margin-top: 10px;">
+                                <input type="text" class="form-control" name="loading_port" value="{{ form.loading_port.value }}">
+
+                            </div>
+                        </span>
+                        <span class="form-group">
+                            <label class="control-label col-sm-6">Port of Discharge    <i class="fa fa-edit" aria-hidden="true"></i></label>
+                            <div class="col-sm-8">
+
+                                <input type="text" class="form-control" name="discharge_port" value="{{ form.discharge_port.value }}">
+                            </div>
+                        </span>
+                    </div>
+
+                    <!-- <div class="col-sm-6">
+                        <span class="form-group">
+                            <label class="control-label col-sm-4">Freight Price</label>
+                            <div class="col-sm-8" style="margin-top: 10px;">
+                                <input type="text" class="form-control" name="PR_before_vat">
+
+                            </div>
+                        </span>
+                        <span class="form-group">
+                            <label class="control-label col-sm-4">Total FOB Price</label>
+                            <div class="col-sm-8">
+
+                                <input type="text" class="form-control" name="PR_total_price">
+                            </div>
+                        </span>
+                    </div> -->
+
+
+                </div>
+                
+
+                <div class="col-sm-12" style="display: block;">
+
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="">Measurement Type</label>
+                            <div class="radio-group" value="{{ form.measurement.value }}">
+                                <div>
+                                    <input type="radio" name="measurement" value="tons" id="tons">
+                                    <label for="tons">Metric Tons</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="measurement" value="kgs" id="kgs">
+                                    <label for="kgs">KGs</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="measurement" value="meters" id="meters">
+                                    <label for="meters">Meters</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="measurement" value="pieces" id="pieces">
+                                    <label for="pieces">PCs</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="measurement" value="spools" id="spools">
+                                    <label for="spools">Spools</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="measurement" value="sets" id="sets">
+                                    <label for="sets">Sets</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="measurement" value="other" id="other">
+                                    <label for="other">Other</label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="">Payment Terms</label>
+                            <div class="radio-group">
+                                <div>
+                                    <input type="radio" name="payment_type" value="dzs" id="lc-sight">
+                                    <label for="lc-sight">Irrevocable LC at Sight</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="payment_type" value="pairs" id="cash-doc">
+                                    <label for="cash-doc">Cash Against Doc</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="payment_type" value="dzs" id="telegraphic-transfer">
+                                    <label for="telegraphic-transfer">Telegraphic Transfer</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="payment_type" value="pairs" id="confirmed-lc">
+                                    <label for="confirmed-lc">Confirmed LC</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="payment_type" value="pairs" id="deferred-lc">
+                                    <label for="deferred-lc">Deferred LC</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="payment_type" value="dzs" id="franco-valuta">
+                                    <label for="franco-valuta">Franco Valuta</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="">Mode of Transport</label>
+                            <div class="radio-group">
+                                <div>
+                                    <input type="radio" name="transportation" value="dzs" id="lc-sight">
+                                    <label for="lc-sight">Sea</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="transportation" value="pairs" id="cash-doc">
+                                    <label for="cash-doc">Air</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="transportation" value="dzs" id="telegraphic-transfer">
+                                    <label for="telegraphic-transfer">Land</label>
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                   
+                    
+                    
+                </div>
+                <div class="col-sm-12">
+                    
+                    <div class="col-sm-3">
+                        <label for="">Shipment Type</label>
+                        <div class="radio-group" value="{{ form.shipment_type.value }}">
+                            <div>
+                                <input type="radio" name="shipment_type" value="fob" id="fob" {% if form.shipment_type.value == 'fob' %}checked{% endif %}>
+                                <label for="fob">FOB</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="shipment_type" value="cfr" id="cfr" {% if form.shipment_type.value == 'cfr' %}checked{% endif %}>
+                                <label for="cfr">CFR</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="shipment_type" value="fca" id="fca" {% if form.shipment_type.value == 'fca' %}checked{% endif %}>
+                                <label for="fca">FCA</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="shipment_type" value="cif" id="cif" {% if form.shipment_type.value == 'cif' %}checked{% endif %}>
+                                <label for="cif">CIF</label>
+                            </div>
+                            <div>
+                                <input type="radio" name="shipment_type" value="air_freight" id="air_freight" {% if form.shipment_type.value == 'air_freight' %}checked{% endif %}>
+                                <label for="air_freight">Air Freight</label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-7">
+                        <div id="input_cfr" style="display: none" class="col-sm-5">
+                            <label for="fob_label">Freight Price </label>
+                            <input type="text"  class="form-control col-sm-5" name="freight1">
+                        </div>
+                        <div id="input_fca" style="display: none;" class="col-sm-5">
+                            <div>
+                                <label for="fob_label">Freight Price </label>
+                                <input type="text"  class="form-control col-sm-5" name="freight2">
+                            </div>
+                            <div  style=" margin-top: 20px">
+                                <label for="fob_label" style=" margin-top: 20px">Djbouti Costs </label>
+                                <input type="text"  class="form-control col-sm-5" name="djbouti_costs">
+                            </div>
+                        </div>
+                    </div>
+                   
+                </div>
+
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<button id="submits" class="col-sm-3 btn-lg " style="color: #6d7fcc; background-color: white; margin-left: 100px;">
+    Submits
+</button>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"
+    integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"
+    integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/"
+    crossorigin="anonymous"></script>
+
+<script src="../../static/js/grn/edits.js"></script>
+{% endblock %}

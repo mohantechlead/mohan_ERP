@@ -1,5 +1,17 @@
+# from django.contrib import admin
+# from django.urls import path, include
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     path('mr/', include('MR.urls')),
+#     path('fgrn/', include('FGRN.urls')),
+#     path('grn/', include('GRN.urls')),
+#     path('dn/', include('DN.urls')),
+# ]
+
+
 """
-URL configuration for mohan_ERP project.
+URL configuration for mysite project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -19,8 +31,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('mr/', include('MR.urls')),
-    path('fgrn/', include('FGRN.urls')),
-    path('grn/', include('GRN.urls')),
-    path('dn/', include('DN.urls')),
-]
+    path('MR/', include('MR.urls')),
+    path('GRN/', include('GRN.urls')),
+    path('FGRN/', include('FGRN.urls')),
+    path('DN/', include('DN.urls')),
+    path('members/', include('members.urls')),
+    path('members/', include('django.contrib.auth.urls')),
+    ]

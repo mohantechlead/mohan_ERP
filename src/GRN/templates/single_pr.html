@@ -1,0 +1,46 @@
+{% extends 'grn_base.html' %}
+
+{% block content %}
+   <div class="form-group pull-left">
+        <strong><h4>Order Details</h4></strong>
+        <form action="/search_prs/">
+            <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
+              <input type="text" name="serial_no" placeholder="Order No" class="form-control" style=" margin-top: 10px; ">
+              <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search Order</button></div>
+            </div>
+          </form>
+        <br>
+        <br>
+       
+       
+        <table  class="table table-striped table-bordered">
+            <tr>
+                <th>PR Number</th>
+                <th>Date</th>
+                <th>Site Name</th>
+                <th>Before VAT</th>
+                <th>Total Price</th>
+                <th>Vendor Name</th>
+                <th>Requested By</th>
+                <th>Approved By</th>
+                <th>Status</th>
+              </tr>
+              
+              <tr>
+                <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ my_order.PR_no }}</a></td>
+                <td>{{ my_order.date }}</td>
+                <td>{{ my_order.site_name }}</td>
+                <td>{{ my_order.PR_before_vat }}</td>
+                <td>{{ my_order.PR_total_price }}</td>
+                <td>{{ my_order.vendor_name }}</td>
+                <td>{{ my_order.requested_by }}</td>
+                <td>{{ my_order.approved_by }}</td>
+                <td>{{ my_order.status }}</td>
+              </tr>
+           
+
+        </table>
+    </div>
+
+
+{% endblock %}

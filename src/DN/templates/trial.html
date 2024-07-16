@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Display Orders</title>
+</head>
+<body>
+    <h1>Display Orders</h1>
+    <form method="post" action="https://opensource.com/."> 
+        {% csrf_token %} 
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Receipt email address</label>
+            <input type="text" class="form-control" name="email" id="exampleFormControlInput1" placeholder="Receipt email address">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputSubject" class="form-label">Subject</label>
+            <input type="text" class="form-control" name="subject" id="exampleInputSubject">
+          </div>
+          <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">Message</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" name="message" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    <table>
+        <tr>
+            <th>Serial No</th>
+            <th>Date</th>
+            <th>Invoice</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+        </tr>
+        <!-- {% for order in my_orders %}
+        <tr>
+            <td>{{ order.serial_no }}</td>
+            <td>{{ order.date }}</td>
+            <td>{{ order.invoice }}</td>
+            <td>{{ order.desc }}</td>
+            <td>{{ order.price }}</td>
+            <td>{{ order.order_quantity }}</td>
+            <td>{{ order.total_price }}</td>
+            <td>{{ order.customer_name }}</td>
+        </tr>
+        {% endfor %} -->
+    </table>
+</body>
+</html>

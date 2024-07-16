@@ -1,0 +1,147 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+<div class="form-group " style="margin-left: 40px;">
+    <h3 style="text-align: center;">SALES AND DELIVERY AGREEMENT</h3>
+  <p>
+    
+    {% with order_item=my_order %}
+    PARTIES ENTERING THIS AGREEMENT ON THIS {{ order_item.date|date:"j" }} DAY OF THE MONTH OF {{ order_item.date|date:"F" }} IN THE YEAR {{ order_item.date|date:"Y" }} OF THE GREGORIAN CALENDAR:
+  {% endwith %} <br>
+
+This ‘Sales and Delivery Agreement’ is entered between Mohan PLC, Sub-city Akaki Kality, Woreda 02, House no. New, Tel: +251-11-6620329, Tin. No. 0002848951  that shall be referred to as ‘Seller’ <br>
+</p>
+<p style="text-align: center;">AND</p>
+<p>
+New Brilliant Manufacturing PLC, ____________________ that shall be referred to as ‘Buyer’. <br>
+
+And whereas the Buyer is willing to purchase the following items (Hereinafter referred to as ‘goods’): <br>
+
+</p>
+{% with order_item=my_order %}
+  PARTIES ENTERING THIS AGREEMENT ON THIS {{ order_item.date|date:"j" }} DAY OF THE MONTH OF {{ order_item.date|date:"F" }} IN THE YEAR {{ order_item.date|date:"Y" }} OF THE GREGORIAN CALENDAR:
+{% endwith %}
+<table class="table table-bordered">
+    <tr>
+    <th>Description of Goods</th>
+    <th>UOM</th>
+    <th>Quantity</th>
+    <th>Unit price before VAT</th>
+    <th>Value Before VAT</th>
+    <th>Value including VAT</th>
+    <th>Invoice number</th>
+    <th>EVA Compound </th>
+    <th>KG.</th>
+    </tr>
+    <tr>
+        <td>{{ my_order.description }}</td>
+        <td>{{ my_order.measurement }}</td>
+        <td>{{ my_order.order_quantity }}</td>
+        <td>{{ my_order.price }}</td>
+        <td>{{ my_order.before_vat }}</td>
+        <td>{{ my_order.total_price }}</td>
+        <td>{{ my_order.invoice }}</td>
+        <!-- <td class="order-link" data-order-id="{{ order.serial_no }}">{{ my_order.serial_no }}</td>
+        <td>{{ my_order.date }}</td>
+        -->
+    </tr>
+</table>
+
+
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-1</h4>
+<h4 style="text-decoration: underline; text-align: center;">PURPOSE OF THE AGREEMENT</h4>
+<p>
+The purpose and supply of the Agreement is to sell and buy goods in accordance with the terms and conditions of this Agreement.
+</p>
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-2</h4>
+    <h4 style="text-decoration: underline; text-align: center;">TERMS AND CONDITIONS</h4>
+<p>The Seller has agreed to supply goods mentioned in this contract
+The Buyer has agreed to purchase and accept goods mentioned in this contract.
+</p>
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-3</h4>
+<h4 style="text-decoration: underline; text-align: center;">OBLIGATIONS AND RIGHTS OF THE SELLER</h4>
+<p>
+The Seller has to deliver the goods, as described in this contract.
+The Seller has to deliver the goods within a period of 90 days from the day that the Seller has received the funds and/or raised the invoice for this sale.
+The Seller has the right to deliver the cargo in partial lots as and when the goods are ready for dispatch.
+The Seller has the rights to subcontract orders given by the Buyer to the Seller, or has the right to subcontract parts of the said product.
+</p>
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-4</h4>
+    <h4 style="text-decoration: underline; text-align: center;">OBLIGATIONS AND RIGHTS OF THE BUYER</h4>
+    <p>
+The Buyer may allow the Seller to use the Seller’s name on documents to facilitate ease of logistics.
+The Buyer must pay the full value of the goods at a mutually agreed time frame with the Seller.
+The Buyer must deduct 2% of the before VAT value as withholding tax.
+</p>
+
+
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-5</h4>
+    <h4 style="text-decoration: underline; text-align: center;">COST AND PAYMENT MODE</h4>
+    <p>
+The Buyer shall make the payment as per the agreed sales terms.
+The Seller must raise a cash or a credit VAT invoice in the name of the Buyer.
+The cost of the goods may vary over time, and the price of each transaction shall be mutually agreed at the time of raising the invoice and/or effecting the payment.
+</p>
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-6</h4>
+<h4 style="text-decoration: underline; text-align: center;">STEPS TO FOLLOW </h4>
+<p>
+The Buyer must deduct 2% of withholding tax and pay the value of the goods as per the relevant laws, proclamations and directives of the Federal Democratic Republic of Ethiopia (FDRE), and we will not be responsible for withholding tax if the withholding tax receipts is not provided to us by the end of the month of which the invoice is raised. If the buyer is exempted from withholding tax, then they must provide the necessary documents evidencing that to us.
+The Buyer agrees that the entire consignment may not be delivered at once, and may be broken down into many partial deliveries over 90 days.
+The Seller must attach a ‘Delivery Note’ (DN) that shows the quantity delivered against the said invoice with the transport vehicle each time a partial delivery is made.
+</p>
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-7</h4>
+<h4 style="text-decoration: underline; text-align: center;">CONFIDENTIALITY</h4>
+<p>
+Details of this agreement must be confidential between both parties. This includes, the price, chemical specifications, and other information that may impact a competitive advantage to either parties. Confidentiality of any information that the Buyer or the Seller learns of each other during this transaction must also be respected.
+</p>
+
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-8</h4>
+<h4 style="text-decoration: underline;  text-align: center;">GOVERNING LAW </h4>
+<p>
+This Agreement shall be governed by and shall be construed in accordance with the laws of the Federal Democratic Republic of Ethiopia (FDRE). Non-contractual obligations (if any) arising out of or in connection with this Agreement (including its formation) shall also be governed by the laws of Ethiopia.
+</p>
+
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-9</h4>
+<h4 style="text-decoration: underline; text-align: center;">FORCE MAJEURE</h4>
+
+<p>
+The Seller may be unable to supply goods to the Buyer in a case of force majeures. Force majeure’s could include matters like electricity cuts from the grid, natural disasters, machine breakdowns, strikes, domestic or international issues, and any unforeseen event or incident that hampers the Seller to be unable to supply goods as per the agreement. 
+There shall be no penalty, compensation, or monetary consequences that the Seller bears in case of a force majeure.
+</p>
+<h4 style="text-decoration: underline; text-align: center;">ARTICLE-10</h4>
+<h4 style="text-decoration: underline; text-align: center;">ENTIRE AGREEMENT</h4>
+<p>
+This Agreement and its Annexes set forth the entire agreement between the parties with regard to the subject matter hereof. All prior agreements, representations and warranties, express or implied, oral or written, with respect to the subject matter hereof, are hereby superseded by the Agreement.  
+</p>
+<p>
+<strong>IN WITNESS WHERE OF</strong>, all Parties hereto have set and subscribed their respective hands on the date stated in the first paragraph of this agreement.
+<br>
+  <div style="justify-content: space-evenly; display: flex;">
+       <h4 style="text-decoration: underline;"> Seller</h4> 
+       <h4 style="text-decoration: underline;margin-left: 132px;">Buyer</h4>
+    </div>
+    <br>
+    <div style="justify-content: space-evenly; display: flex;">
+        <p style="text-decoration: underline;"> Seller</p> 
+        <p style="text-decoration: underline;margin-left: 132px;">Buyer</p>
+     </div>
+______________________________                                       ____________________________
+            (Authorized Personnel)                                                    (Authorized Personnel)
+<br>
+WITNESSES   <br>
+                        NAME                  SIGNATURE                                                    
+
+________________________________             ________________________________   
+
+________________________________             ________________________________
+
+________________________________             ________________________________   
+
+  </p>
+
+</div>
+
+<script>
+ 
+</script>
+{% endblock %}

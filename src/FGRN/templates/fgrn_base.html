@@ -1,120 +1,121 @@
+<!-- base.html -->
+
 {% load static %}
+
+
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="{% static 'css/mohan.css' %}" />
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.8/dist/cdn.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <title></title>
-  </head>
-
-  <body class="bg-light-white">
-    <nav class="bg-delft-blue"  x-data="{navbarOpen:false}">
-      <div
-        class="container px-4 flex flex-wrap py-2 mx-auto">
-      <ul>
-        <li x-data="{maindropdownOpen:false}">
-            <button> 
-                <a
-                  class="inline-flex p-2 text-xl font-bold uppercase tracking-wider text-white" 
-                  @click="maindropdownOpen = !maindropdownOpen" @click.away = "maindropdownOpen = false"
-                  >FGRN</a
-                >
-            </button>
-                <div class="lg:absolute bg-white rounded-md p-2" :class="{'hidden':!maindropdownOpen, 'flex flex-col':maindropdownOpen}">
-                        <ul class="space-y-2">
-                            <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                                <a href="{% url 'mr_base' %}">MR</a>
-                            </li> 
-                            <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                                <a href="#">GRN</a>
-                            </li> 
-                            <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                                <a href="#">DN</a>
-                            </li> 
-                        </ul>
-                    </div>
-        </li>
-      </ul>
-        
+<html>
    
-        <button
-          class="inline-flex items-center justify-center border h-10 w-10 text-white rounded-md outline-none focus:outline-none lg:hidden ml-auto"
-          @click="navbarOpen = !navbarOpen"  
-        >
-          <i class="fa fa-bars"></i>
-        </button>
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+tdXAdVB65f/9U6HcWfIw0WyjsQ8lThhRRNenPVE5DzjG8P" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-        <div
-          class="w-full lg:inline-flex lg:w-auto mt-2 lg:mt-0 ml-auto"
-          :class="{'hidden':!navbarOpen, 'flex':navbarOpen}"
-        >
-          <ul class="w-full lg:w-auto flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-2">
-            <!-- <li>
-              <a
-                href="#"
-                class="flex px-4 py-2 rounder-md font-medium text-white hover:bg-light-white"
-                >Dashboard</a
-              >
-            </li>
-            <li>
-              <a
-                href="#"
-                class="flex px-4 py-2 rounder-md font-medium text-white hover:bg-light-white"
-                >Projects</a
-              >
-            </li> -->
+    <style>
+        .hidden {
+            display:none
+        }
+        p{
+            margin-bottom: 10px;
+            display:-ms-flexbox;display:flex;-ms-flex:0 0 auto;flex:0 0 auto;-ms-flex-flow:row wrap;flex-flow:row wrap;-ms-flex-align:center;align-items:center;
+        }
+       
+        .my_height_class {
+            color: green;
+            height: 30px;
+        }
+        textarea.form-control {
+            height: 35px;
+            }
+        label {
+           color: black;
+        }
+    </style>
+</head>
 
-            <li class="relative" x-data="{dropdownOpen:false}">
-                <button>
-          <a
-                href="#"
-                class="flex outline-none focus:outline-none px-4 py-2 rounder-md font-medium text-white hover:bg-light-white"
-                @click="dropdownOpen = !dropdownOpen" @click.away = "dropdownOpen = false"
-                >MR</a
-              >
-            </button>
-            <div class="lg:absolute bg-white right-0 rounded-md p-2" :class="{'hidden':!dropdownOpen, 'flex flex-col':dropdownOpen}">
-                <ul class="space-y-2">
-                    <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                        <a href="#">Create MR</a>
-                    </li> 
-                    <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                        <a href="#">Display MR</a>
-                    </li>
-                </ul>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar  -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Mohan PLC</h3>
             </div>
-            </li>
-            
-            <li class="relative" x-data="{invdropdownOpen:false}">
-                <button>
-          <a
-                href="#"
-                class="flex outline-none focus:outline-none px-4 py-2 rounder-md font-medium text-white hover:bg-light-white"
-                @click="invdropdownOpen = !invdropdownOpen" @click.away = "invdropdownOpen = false"
-                >Inventory</a
-              >
-            </button>
-            <div class="lg:absolute bg-white right-0 rounded-md p-2" :class="{'hidden':!invdropdownOpen, 'flex flex-col':invdropdownOpen}">
-                <ul class="space-y-2">
-                    <li class="flex p-2 font-medium text-gray-600 rounded-md hover:bg-light-white hover:text-black lg:w-48">
-                        <a href="#">Display Inventory</a>
-                    </li> 
-                </ul>
-            </div>
-            </li>
-          </ul>
+
+            <ul class="list-unstyled components">
+                <br>
+                
+               
+                <li style="font-size:larger; font-weight: 500;">
+                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle">FGRN</a>
+                    <ul class="collapse list-unstyled" id="homeSubmenu">
+                        <li style="font-size: large;">
+                            <a href="{% url 'create_fgrn'%}">Create FGRN</a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'display_fgrn'%}">Display FGRN</a>
+                        </li>
+                     
+                    </ul>
+                </li> 
+                <li style="font-size:larger; font-weight: 500;">
+                    <a href="#goodsSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle">Finished Goods</a>
+                    <ul class="collapse list-unstyled" id="goodsSubmenu">
+                       
+                        <li style="font-size: large;">
+                            <a href="{% url 'display_goods'%}">Finished Goods</a>
+                        </li>
+                     
+                    </ul>
+                </li> 
+            </ul>
+
+        </nav>
+
+        <!-- Page Content  -->
+        <div id="content">
+
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid d-flex" style="font-size:larger; font-weight: 500;color: grey;word-spacing: 13px;">
+                    <button type="button" id="sidebarCollapse" class="btn toggle">
+                        <i class="fa fa-bars"></i>
+                        <span style="color: white;"></span>
+                    </button>
+                    <a style=" font-size:30px; font-weight: 600; color: #2470dc;" href="{% url 'create_fgrn'%}">FGRN      |</a>
+                    <a href="{% url 'create_grn'%}">GRN     |</a>
+                    <a href="{% url 'create_MR'%}">MR     |</a>
+                    <a href="{% url 'input_delivery'%}">DN</a>
+                   
+
+                </div>
+                
+            </nav>
+            {% block content %}
+            {% endblock %}
+
         </div>
-      </div>
-    </nav>
-    <div>
-        
+      
     </div>
-  </body>
+    
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+    
+    $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>   
+</body>
+
 </html>

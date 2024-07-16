@@ -1,0 +1,43 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+   <div class="form-group pull-left">
+        
+       
+        <section class="intro">
+            <div class="gradient-custom h-100">
+              <div class="mask d-flex align-items-center h-100">
+                <div class="container">
+                  <div class="row justify-content-center">
+                    <div class="col-12">
+                      <div id="datatable"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>  
+          
+        <table  class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Total Sales</th>
+              <th>Total Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in json_data.data %}
+            <tr>
+              <td>{{ entry.description }}</td>
+              <td>{{ entry.total_sales }}</td>
+              <td>{{ entry.total_quantity }}</td>
+              
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}

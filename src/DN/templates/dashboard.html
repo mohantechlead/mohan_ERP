@@ -1,0 +1,245 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+
+
+    <div style=" margin: 10px 20%;">
+        <form action="/dashboards/">
+
+            <div class="form-group col-sm-4" style="display: flex; ">
+                <div>
+                    <input type="text" placeholder="No of Customers" name="limit" class="form-control "
+                        style="width: 100%;">
+                </div>
+                <div style="width: 20%;"><button type="submit" class="btn btn-primary">Sort</button></div>
+
+            </div>
+
+       
+        </form>
+        
+        <form action="/dashboards/">
+            <div class="col-sm-8" style="margin-top: 0px;">
+
+                <input type="radio" name="chart_type" value="pie"> Pie
+                <input type="radio" name="chart_type" value="bar"> Bar
+                <button type="submit" class="btn btn-primary">chart</button>
+            </div>
+        </form>
+    </div>
+    <div style=" margin: 100px 30px; height: 500px; width: 2000px">
+        <canvas id="myChart" width="2000" height="500"></canvas>
+    </div>
+
+    <div style=" margin: 10px 20%;">
+        <form action="/dashboards/">
+
+            <div class="form-group col-sm-4" style="display: flex; ">
+                <div>
+                    <input type="text" placeholder="No of Items" name="items" class="form-control "
+                        style="width: 100%;">
+                </div>
+                <div style="width: 20%;"><button type="submit" class="btn btn-primary">Sort</button></div>
+
+            </div>
+
+        </form>
+
+    </div>
+    
+    <div style=" margin: 0 auto; height: 500px; width:2000px">
+        <canvas id="itemChart" height="500"></canvas>
+    </div>
+    <div>
+        <div class="col-md-6">
+            <form method="get">
+                <label for="start_date">Start Date:</label>
+                <input type="date" name="start_date" id="start_date">
+                <label for="end_date">End Date:</label>
+                <input type="date" name="end_date" id="end_date">
+                <button type="submit" class="btn btn-primary" value="Filter">Filter</button>
+            </form>
+
+        </div>
+        <div style="margin: 100px 30px; height: 300px; ">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    {{ json_data|json_script:"hello-data" }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script>
+        // Function to fetch customer sales data from your Django view
+        var json_data = JSON.parse(document.getElementById('hello-data').textContent);
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+        var backgroundColors = json_data.labels.map(() => getRandomColor());
+        const barColors = ['rgba(0, 0, 255, 0.2)','rgba(255, 105, 180, 0.2)','rgba(0, 128, 0, 0.2)','rgba(255, 140, 0, 0.2)','rgba(128, 0, 128, 0.2)','rgba(255, 215, 0, 0.2)','rgba(255, 0, 0, 0.2)','rgba(169, 169, 169, 0.2)','rgba(0, 255, 255, 0.2)','rgba(128, 128, 0, 0.2)','rgba(255, 127, 80, 0.2)','rgba(123, 104, 238, 0.2)','rgba(255, 223, 0, 0.2)','rgba(255, 99, 71, 0.2)','rgba(192, 192, 192, 0.2)'];
+        function initializeChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const chartType = json_data.chart_type;
+            new Chart(ctx, {
+                type: chartType,
+
+                data: {
+                    labels: json_data.labels,
+                    datasets: [{
+                        label:'Customers',
+                        data: json_data.data,
+                        backgroundColor: barColors,
+                        borderColor: barColors,
+                        minBarLength: 2,
+                        barThickness: 22, // Adjust this value to make the bars narrower
+                        borderWidth: 1,
+                        barPercentage: 2,
+                        
+                    }]
+                },
+                options: {
+                    tooltips: {
+                        callbacks: {
+                            
+                            label: function (tooltipItem, data) {
+                            if (chartType === 'bar') {
+                                // Format tooltip for bar chart
+                                return tooltipItem.yLabel.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                            } else if (chartType === 'pie') {
+                                // Customize the tooltip text for pie chart as needed
+                                const label = data.labels[tooltipItem.index] || ''; // Segment label
+                                const value = data.datasets[0].data[tooltipItem.index] || 0; // Segment value
+                                return `${label}: ${value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}`;
+                            } else {
+                                // Handle other chart types if needed
+                                return '';
+                            }
+                        }
+                            
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    title: {
+                        display: true,
+                        text: 'Customer with most prices'
+                    },
+                    scales: {
+                xAxes: [{
+                    max: 1000,
+                    display: chartType === 'bar' // Display x-axis for bar chart only
+                }],
+                yAxes: [{
+                    display: chartType === 'bar', // Display y-axis for bar chart only
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total Sales'
+                    },
+                }],
+            },
+                }
+            });
+        }
+        function itemChart() {
+            const ctx = document.getElementById('itemChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: json_data.item_labels,
+                    datasets: [{
+                        data: json_data.item_data,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        minBarLength: 2,
+                        barThickness: 22,
+                        borderWidth: 1,
+                        barPercentage: 2,
+                    }]
+                },
+                options: {
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                return tooltipItem.yLabel.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    title: {
+                        display: true,
+                        text: 'Most Sold Item'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+
+                        }
+                    }
+                }
+            });
+        }
+        function revenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            const monthLabels = json_data.revenue_labels.map(monthValue => months[monthValue - 1])
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels:
+                        // json_data.revenue_labels,
+                        monthLabels,
+                    datasets: [
+                        {
+                            labels: "Weekly Revenue",
+                            data: json_data.revenue_data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)'
+                        },
+                        //   {
+                        //     labels:"monthly Revenue",
+                        //     data: json_data.monthly_revenue_data,
+                        //     backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        //     borderColor: 'rgba(54, 162, 235, 1)'
+                        //   },
+
+                    ]
+                },
+                options: {
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                return tooltipItem.yLabel.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    title: {
+                        display: true,
+                        text: 'Monthly Revenue'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                        }
+                    }
+                }
+            });
+        }
+        initializeChart();
+
+        revenueChart();
+        itemChart();
+    </script>
+
+{% endblock %}

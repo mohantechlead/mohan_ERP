@@ -1,0 +1,49 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+
+   <div class="form-group pull-left">
+        <strong><h4>GRN Details</h4></strong>
+        <br><br>
+          
+        <br>
+        <section class="intro">
+            <div class="gradient-custom h-100">
+              <div class="mask d-flex align-items-center h-100">
+                <div class="container">
+                  <div class="row justify-content-center">
+                    <div class="col-12">
+                      <div id="datatable"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+       
+        <table  class="table table-striped table-bordered">
+            <tr>
+                <th>GRN Number</th>
+                <th>PR Number</th>
+                <th>GRN Date</th>
+                <th>Recieved From</th>
+                <th>Truck Number</th>
+                <th>Remaining</th>
+            </tr>
+    
+            {% for delivery in deliveries %}
+            <tr>
+                <td>{{ delivery.GRN_no }}</td>
+                <td>{{ delivery.PR_no.PR_no }}</td>
+                <td>{{ delivery.grn_date }}</td>
+                <td>{{ delivery.recieved_from}}</td>
+                <td>{{ delivery.truck_no }}</td>
+                <td>{{ delivery.PR_no.remaining }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
+
+{% endblock %}

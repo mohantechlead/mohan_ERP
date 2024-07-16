@@ -1,0 +1,17 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+    {% for order in orders %}
+    <tr>
+    <td>{{ order.order_number }}</td>
+    {% if order.delivery %}
+        <td>{{ order.delivery.serial_no }}</td>
+        <td>{{ order.delivery.order_date }}</td>
+        <td>{{ order.delivery.customer_name }}</td>
+    {% else %}
+        <td>No delivery associated with this order</td>
+    {% endif %}
+    </tr>
+    {% endfor %}
+{% endblock %}
+
