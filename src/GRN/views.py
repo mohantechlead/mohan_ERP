@@ -159,11 +159,11 @@ def create_grn(request):
         'items':items
     }
     return render(request, 'create_grn.html', context)
+
 def create_grn_items(request):
     
     if request.method == 'POST':
         formset = formset_factory(GRNItemForm, extra=1, min_num=1)
-        
         formset = formset(request.POST or None,prefix="GRN_items")
         print(formset.data,"r")
       
@@ -186,6 +186,9 @@ def create_grn_items(request):
                     print("yessir")
                     
                     item_name = form.cleaned_data['item_name']
+                    item = item.filter(item_name = items).first()
+                    code = item.hs_code
+                    form.instance.hs_code = code
                     quantity = form.cleaned_data['quantity']
                     items = PR_item.objects.get(item_name=item_name,PR_no = pr_no)
                     
@@ -214,8 +217,12 @@ def create_grn_items(request):
                 print("remaining",pr.remaining)
                 pr.save()
                     
+                context = {
+        'formset': formset,
+        'code': code,
+                          }
 
-            return redirect('create_grn_items')
+            return render(request,'create_grn_items.html', context)
     else:
        
         formset = formset_factory(GRNItemForm, extra=1)
@@ -232,8 +239,7 @@ def create_items(request):
         formset = formset_factory(PRItemForm, extra=1, min_num=1)
         
         formset = formset(request.POST or None,prefix="items")
-        #print(formset.data,"r")
-      
+        
         if formset.errors:
             print(formset.errors)   
         
@@ -257,6 +263,11 @@ def create_items(request):
                         form.instance.total_price = form.cleaned_data['before_vat']
                     form.instance.remaining = form.cleaned_data['quantity']
                     form.instance.PR_no = pr
+                    items = form.cleaned_data['item_name']
+                    item = HS_code.objects.all()
+                    item = item.filter(item_name = items).first()
+                    code = item.hs_code
+                    form.instance.hs_code = code
                     before_vat_price += float(form.cleaned_data['before_vat'])
                     final_quantity += form.cleaned_data['quantity']
                     if form.cleaned_data['total_price']:
@@ -265,17 +276,9 @@ def create_items(request):
                     form.save()
                 print(final_price,before_vat_price)
                 
-                #pr.PR_before_vat += before_vat_price
-                #pr.PR_total_price = float(final_price)
                 pr.total_quantity = final_quantity
                 pr.remaining = final_quantity
-                #if pr.excise_tax:
-                    
-                 #   amount = before_vat_price * 0.05
-                  #  pr.excise_tax = ((before_vat_price + amount) + (0.15 * (before_vat_price + amount))) - final_price
-                  #  pr.PR_total_price = ((before_vat_price + amount) + (0.15 * (before_vat_price + amount)))
-                pr.save()
-                #message.success("successful!")
+                pr.save()    
             pr_form = PRForm(prefix="purchases")
             formset = formset_factory(PRItemForm, extra=1)
             formset = formset(prefix="items")
@@ -283,8 +286,9 @@ def create_items(request):
             context = {
                 'pr_form': pr_form,
                 'formset': formset,
-                # 'message':success_message,
+                'code': code,
             }
+
             return render(request, 'create_pr.html', context)
     else:
        

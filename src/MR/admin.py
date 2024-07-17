@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import MR,MR_item, inventory
 
-# Register your models here.
+admin.site.register(MR)
+admin.site.register(MR_item)
+admin.site.register(inventory)

@@ -16,6 +16,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
+from django.contrib import messages
+from .models import *
 # Create your views here.
 @api_view(['GET','POST'])
 def order_list(request):
@@ -47,30 +49,30 @@ def input_delivery(request):
     my_orders = orders.objects.all()
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
-        if form.is_valid():
-            delivery = form
-            serial_no = form.cleaned_data['serial_no']
-            delivery_quantity = form.cleaned_data['delivery_quantity']
-            delivery_number = form.cleaned_data['delivery_number']
-            order = orders.objects.get(serial_no=serial_no.serial_no)
-            order.remaining = order.remaining - delivery_quantity
-            if order.remaining < 0:
-                error_message = 'Over Delivery'
-                subject = 'Over Delivery Notification'
-                message = f'The order with Order ID {serial_no.serial_no} has been over delivered by {order.remaining} on delivery number {delivery_number}.'
-                from_email = 'se.luhana.daniel@gmail.com'
-                #recipient_list = ['luhanad@ymail.com']
-                recipient_list = ['luhanad@ymail.com','harsh@mohanplc.com','mayuraddis@gmail.com','amritakaur2612@gmail.com','rupaladdis@gmail.com']
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-                form.save()
-                order.save()
-                return render(request, 'input_delivery.html', {'form': form, 'error_message': error_message})
-            else:
-                form.save()
-                order.save() 
+        delivery_number = request.POST['delivery_number']
+        if delivery.objects.filter(delivery_number__icontains = delivery_number).exists():
+            messages.error(request, 'Delivery Number already exists')
             return redirect('input_delivery')
-        if form.errors:
-            print(form.errors)
+        else: 
+            if form.is_valid():
+                # delivery = form
+                delivery_number = form.cleaned_data['delivery_number']
+                serial_no = form.cleaned_data['serial_no']
+                delivery_quantity = form.cleaned_data['delivery_quantity']
+                delivery_number = form.cleaned_data['delivery_number']
+                order = orders.objects.get(serial_no=serial_no.serial_no)
+                order.remaining = order.remaining - delivery_quantity
+                if order.remaining < 0:
+                    error_message = 'Over Delivery'
+                    form.save()
+                    order.save()
+                    return render(request, 'input_delivery.html', {'form': form, 'error_message': error_message})
+                else:
+                    form.save()
+                    order.save() 
+                return redirect('input_delivery')
+            if form.errors:
+                print(form.errors)
     else:
         form = DeliveryForm()
     return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders})

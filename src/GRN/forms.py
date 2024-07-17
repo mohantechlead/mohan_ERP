@@ -25,27 +25,19 @@ class PRItemForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={'class': 'total_price form-control', 'readonly': 'readonly'})
     )
-
     before_vat = forms.DecimalField(
         
         required=False,
         widget=forms.TextInput(attrs={'class': 'before_vat form-control', 'readonly': 'readonly'})
     )
-
     quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
     price = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'price form-control'}))
     item_measurement = forms.CharField(widget=forms.TextInput(attrs={'class': 'item_measurement form-control'}), required=False)
-   
-   # PR_no = forms.CharField(
-    #     widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter pr'}),
-    # ) 
-
-    item_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter name'}),
-    )
-    hs_code = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'HS-CODE'}),
-    )
+    item_name = forms.ModelChoiceField(queryset=HS_code.objects.all(),
+                                       empty_label="Item Name",
+                                       widget=forms.Select(attrs={'class': 'item_name form-control'}),
+                                       to_field_name='item_name')
+    hs_code = forms.CharField(label='HS CODE', required=False, widget=forms.TextInput(attrs={'class': 'hs_codes form-control'}))
     
     class Meta:
    
@@ -75,10 +67,11 @@ class GRNForm(forms.ModelForm):
 
 class GRNItemForm(forms.ModelForm):
     quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
-   
-    item_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter name'}),
-    )
+    item_name = forms.ModelChoiceField(queryset=HS_code.objects.all(),
+                                       empty_label="Item Name",
+                                       widget=forms.Select(attrs={'class': 'item_name form-control'}),
+                                       to_field_name='item_name')
+
     class Meta:
         
         model = GRN_item

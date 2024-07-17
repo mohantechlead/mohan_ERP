@@ -4,7 +4,8 @@ from django.db import models
 class FGRN(models.Model):
     FGRN_no = models.TextField(primary_key= True)
     recieved_from = models.TextField(blank=True, null= True)
-    # recieved_by = models.TextField(blank=True, null= True)
+    recieved_by = models.TextField(blank=True, null= True)
+    description = models.TextField(blank=True, null= True)
     date = models.DateField()
 
 class FGRN_item(models.Model):
@@ -20,3 +21,6 @@ class FGRN_item(models.Model):
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)
     quantity = quantity = models.FloatField()
+
+    def __str__(self):
+        return self.item_name

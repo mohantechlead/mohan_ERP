@@ -45,5 +45,14 @@ class GRN_item(models.Model):
     item_name = models.TextField(blank=True, null=True)
     quantity = models.IntegerField()
 
+class HS_code(models.Model):
+    number = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    hs_code = models.TextField(blank=True, null=True)
+    item_name = models.TextField(blank=False, null=False)
+
+    def __str__(self):
+     return self.item_name
+    
+
 
     

@@ -26,12 +26,15 @@ class FGRNForm(forms.ModelForm):
       
     class Meta:
         model = FGRN
-        fields = ['FGRN_no','date','recieved_from','recieved_by']
+        fields = ['FGRN_no','date','recieved_from','recieved_by', 'description']
    
 class FGRNItemForm(forms.ModelForm):
     
-    item_name = forms.CharField(
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name', 'id': 'item_name','id': 'item_name',})
+    # item_name = forms.CharField(
+    #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name', 'id': 'item_name','id': 'item_name',})
+    # )
+    item_name= forms.ModelChoiceField(
+        # queryset=finished_goods.objects.all()
     )
     description = forms.CharField(
         required = False,
@@ -46,6 +49,7 @@ class FGRNItemForm(forms.ModelForm):
     ("Bag", "Bag"), 
     ("Pkg", "Pkg"),
     ("Crt", "Crt"),) 
+    
     unit_type = forms.ChoiceField(
         choices = UNIT_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),
