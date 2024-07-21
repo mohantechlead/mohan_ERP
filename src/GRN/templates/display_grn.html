@@ -37,29 +37,29 @@
   <table class="table table-striped table-bordered">
     <tr>
       <th>GRN Number</th>
-      <th>PR Number</th>
+      {% comment %} <th>PR Number</th> {% endcomment %}
       <th>GRN Date</th>
       <th>Transporter Name</th>
       <th>Plate Number</th>
       <th>Recieved From</th>
-      <th>Remaining</th>
-      <th>Store Name</th>
+      {% comment %} <th>Remaining</th> {% endcomment %}
+      {% comment %} <th>Store Name</th>
       <th>Store Keeper</th>
-    
+     {% endcomment %}
     </tr>
     {% for order in my_order %}
     <tr>
       <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
        --><td><a href="#" class="grn-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</a></td>
-      <td><a href="#" class="order-link" data-order-id="{{ order.PR_no.PR_no }}">{{ order.PR_no.PR_no }}</a></td>
+      {% comment %} <td><a href="#" class="order-link" data-order-id="{{ order.PR_no.PR_no }}">{{ order.PR_no.PR_no }}</a></td> {% endcomment %}
       <td>{{ order.grn_date }}</td>
       <td>{{ order.transporter_name }}</td>
       <td>{{ order.truck_no }}</td>
       <td>{{ order.recieved_from }}</td>
-      <td>{{ order.PR_no.remaining }}</td>
+      {% comment %} <td>{{ order.PR_no.remaining }}</td>
       <td>{{ order.store_name }}</td>
       <td>{{ order.store_keeper }}</td>
-     
+      {% endcomment %}
     </tr>
     {% endfor %}
   </table>

@@ -46,34 +46,7 @@
 
             <ul class="list-unstyled components">
                 <br>
-                
-                <li class="active" style="font-size:larger; font-weight: 500;">
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Home</a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li style="font-size: large;">
-                            <a href="{% url 'custom_report_page' %}">Local Approval</a>
-                        </li>
-                    </ul>
-                    
-                   
-                </li>
-                <li style="font-size:larger; font-weight: 500;">
-                    <a href="#PRSubmenu" data-toggle="collapse" aria-expanded="false"
-                        class="dropdown-toggle">Local PR</a>
-                    <ul class="collapse list-unstyled" id="PRSubmenu">
-                        <li style="font-size: large;">
-                            <a href="{% url 'create_pr' %}">Create PR</a>
-                        </li>
-                        <li style="font-size:larger; font-weight: 500;">
-                            <a href="{% url 'display_pr' %}">Display PR</a>
-                        </li>
-                     
-                    </ul>
-                </li> 
-                
-                <li style="font-size:larger; font-weight: 500;">
-                    <a href="{% url 'display_search_items' %}">Display Items</a>
-                </li>
+            
               
                 <li style="font-size:larger; font-weight: 500;">
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false"
@@ -87,6 +60,10 @@
                         </li>
                      
                     </ul>
+                </li>
+
+                <li style="font-size:larger; font-weight: 500;">
+                    <a href="{% url 'display_search_items' %}">Display Items</a>
                 </li>
                 
                 

@@ -21,19 +21,19 @@ def grn_number(request):
         formset = formset(prefix="GRN_items")
         number = request.GET['grn_number']
         names = purchase_orders.objects.all()
-        try:
-            order = purchase_orders.objects.get(PR_no=number)
-            pr_items = PR_item.objects.all()
-            pr_items = pr_items.filter(PR_no=number)
-            print(pr_items)
-        except purchase_orders.DoesNotExist:
-            # If it's not found in purchase_orders, try searching in import_PR
+        # try:
+        #     order = purchase_orders.objects.get(PR_no=number)
+        #     pr_items = PR_item.objects.all()
+        #     pr_items = pr_items.filter(PR_no=number)
+        #     print(pr_items)
+        # except purchase_orders.DoesNotExist:
+        #     # If it's not found in purchase_orders, try searching in import_PR
            
-            order = None 
-        print(pr_items,"ittt")
+        #     order = None 
+        # print(pr_items,"ittt")
         context = {
-            'order': order,
-            'pr_items':pr_items,
+            # 'order': order,
+            # 'pr_items':pr_items,
             'grn_form': grn_form,
             'formset': formset,
             'names':names
@@ -85,38 +85,6 @@ def create_trial_grn(request):
     }
     return render(request, 'trial_submit_grn.html', context)
 
-def create_pr(request):
-    orders = purchase_orders.objects.all()
-    if request.method == 'POST':
-        pr_form = PRForm(request.POST )
-        excise = request.POST.get('excise_tax')
-        print(pr_form.data,"y")
-        if pr_form.errors:
-            print(pr_form.errors)  
-        print(request.POST) 
-        if pr_form.is_valid():
-            instance = pr_form.save(commit=False)
-            instance.status = "Pending"
-            #instance.PR_before_vat = 0.00
-            #instance.PR_total_price = 0.00
-            instance.excise_tax = excise
-
-            instance.save()
-            
-            
-    
-    pr_form = PRForm(prefix="purchases")
-    formset = formset_factory(PRItemForm, extra=1)
-    formset = formset(prefix="items")
-
-    context = {
-        'pr_form': pr_form,
-        'formset': formset,
-        'the_orders': orders,
-    }
-    return render(request, 'create_pr.html', context)
-
-
 
 def create_grn(request):
     
@@ -130,24 +98,14 @@ def create_grn(request):
        
         if grn_form.is_valid():
             print("yes 1")
-            pr_no = grn_form.cleaned_data['PR_no']
+            # pr_no = grn_form.cleaned_data['PR_no']
+            grn = grn_form.save()
+
            
-            if pr_no != None:
-                print(pr_no,"no")
-                pr = pr_no
-                print(pr,"pr")
-                
-                if pr.status == "Approved" or pr.status == "approved":
-                    grn = grn_form.save()
-                    print("yes")
-                else:
-                    error_message =  "PR is not Approved."
-                    print("not")
-                    return render(request, 'create_grn.html', {'error_message': error_message})
-            else:
-                print("?")
-                grn = grn_form.save()
-            return render(request, 'create_grn.html')
+        else:
+            print("?")
+            grn = grn_form.save()
+        return render(request, 'create_grn.html')
     
     grn_form = GRNForm(prefix="purchases")
     formset = formset_factory(GRNItemForm, extra=1)
@@ -167,8 +125,7 @@ def create_grn_items(request):
         formset = formset(request.POST or None,prefix="GRN_items")
         print(formset.data,"r")
       
-        if formset.errors:
-            print(formset.errors)   
+         
         
         # Check if 'PR_no' field is empty in each form within the formset
         non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
@@ -176,26 +133,26 @@ def create_grn_items(request):
         print(non_empty_forms,"forms")
         if non_empty_forms:
             if formset.is_valid():
-                pr_no = request.POST.get('PR_no')
-                pr = purchase_orders.objects.get(PR_no = pr_no)
+                # pr_no = request.POST.get('PR_no')
+                # pr = purchase_orders.objects.get(PR_no = pr_no)
                 grn_no = request.POST.get('GRN_no')
                 grn = GRN.objects.get(GRN_no = grn_no)
                 for form in non_empty_forms:
-                    form.instance.PR_no = pr
+                    # form.instance.PR_no = pr
                     form.instance.GRN_no = grn
                     print("yessir")
                     
                     item_name = form.cleaned_data['item_name']
-                    item = item.filter(item_name = items).first()
-                    code = item.hs_code
-                    form.instance.hs_code = code
+                    # item = item.filter(item_name = items).first()
+                    # code = item.hs_code
+                    # form.instance.hs_code = code
                     quantity = form.cleaned_data['quantity']
-                    items = PR_item.objects.get(item_name=item_name,PR_no = pr_no)
+                    # items = PR_item.objects.get(item_name=item_name)
                     
-                    print(items,"r")
-                    items.remaining = items.remaining - quantity
+                    # print(items,"r")
+                    # items.remaining = items.remaining - quantity
 
-                    items.save()
+                    # items.save()
 
                     try:
                         inventory_item = inventory.objects.get(item_name = item_name)
@@ -207,19 +164,13 @@ def create_grn_items(request):
                         inventory_item.save()
 
                     form.save()
-                items_total = PR_item.objects.filter(PR_no = pr_no)
-                total_quantity = items_total.aggregate(Sum('remaining'))['remaining__sum']
-                print(total_quantity)
-                # If there are no items with pr_no=1, total_quantity will be None, so you may want to set it to 0.
-                if total_quantity is None:
-                    total_quantity = 0
-                pr.remaining = total_quantity
-                print("remaining",pr.remaining)
-                pr.save()
+                               
+                    if formset.errors:
+                        print(formset.errors)  
                     
                 context = {
         'formset': formset,
-        'code': code,
+        # 'code': code,
                           }
 
             return render(request,'create_grn_items.html', context)
@@ -233,105 +184,97 @@ def create_grn_items(request):
     }
     return render(request, 'create_grn_items.html', context)
 
-def create_items(request):
+# def create_items(request):
     
-    if request.method == 'POST':
-        formset = formset_factory(PRItemForm, extra=1, min_num=1)
+#     if request.method == 'POST':
+#         formset = formset_factory(PRItemForm, extra=1, min_num=1)
         
-        formset = formset(request.POST or None,prefix="items")
+#         formset = formset(request.POST or None,prefix="items")
         
-        if formset.errors:
-            print(formset.errors)   
+#         if formset.errors:
+#             print(formset.errors)   
         
-        # Check if 'PR_no' field is empty in each form within the formset
-        for form in formset:
-            print(form,"form")
-        non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
-        vat_is_checked = request.POST.get('vat_is_checked')
+#         # Check if 'PR_no' field is empty in each form within the formset
+#         for form in formset:
+#             print(form,"form")
+#         non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
+#         vat_is_checked = request.POST.get('vat_is_checked')
         
-        if non_empty_forms:
-            if formset.is_valid():
-                before_vat_price = 0.00
-                final_price = 0.00
-                final_quantity = 0
-                pr_no = request.POST.get('PR_no')
-                print(pr_no)
-                pr = purchase_orders.objects.get(PR_no = pr_no)
-                for form in non_empty_forms:
-                    if vat_is_checked:
-                        print("yessay")
-                        form.instance.total_price = form.cleaned_data['before_vat']
-                    form.instance.remaining = form.cleaned_data['quantity']
-                    form.instance.PR_no = pr
-                    items = form.cleaned_data['item_name']
-                    item = HS_code.objects.all()
-                    item = item.filter(item_name = items).first()
-                    code = item.hs_code
-                    form.instance.hs_code = code
-                    before_vat_price += float(form.cleaned_data['before_vat'])
-                    final_quantity += form.cleaned_data['quantity']
-                    if form.cleaned_data['total_price']:
-                        final_price += float(form.cleaned_data['total_price'])
+#         if non_empty_forms:
+#             if formset.is_valid():
+#                 before_vat_price = 0.00
+#                 final_price = 0.00
+#                 final_quantity = 0
+#                 pr_no = request.POST.get('PR_no')
+#                 print(pr_no)
+#                 pr = purchase_orders.objects.get(PR_no = pr_no)
+#                 for form in non_empty_forms:
+#                     if vat_is_checked:
+#                         print("yessay")
+#                         form.instance.total_price = form.cleaned_data['before_vat']
+#                     form.instance.remaining = form.cleaned_data['quantity']
+#                     form.instance.PR_no = pr
+#                     items = form.cleaned_data['item_name']
+#                     item = HS_code.objects.all()
+#                     item = item.filter(item_name = items).first()
+#                     code = item.hs_code
+#                     form.instance.hs_code = code
+#                     before_vat_price += float(form.cleaned_data['before_vat'])
+#                     final_quantity += form.cleaned_data['quantity']
+#                     if form.cleaned_data['total_price']:
+#                         final_price += float(form.cleaned_data['total_price'])
                     
-                    form.save()
-                print(final_price,before_vat_price)
+#                     form.save()
+#                 print(final_price,before_vat_price)
                 
-                pr.total_quantity = final_quantity
-                pr.remaining = final_quantity
-                pr.save()    
-            pr_form = PRForm(prefix="purchases")
-            formset = formset_factory(PRItemForm, extra=1)
-            formset = formset(prefix="items")
+#                 pr.total_quantity = final_quantity
+#                 pr.remaining = final_quantity
+#                 pr.save()    
+#             pr_form = PRForm(prefix="purchases")
+#             formset = formset_factory(PRItemForm, extra=1)
+#             formset = formset(prefix="items")
 
-            context = {
-                'pr_form': pr_form,
-                'formset': formset,
-                'code': code,
-            }
+#             context = {
+#                 'pr_form': pr_form,
+#                 'formset': formset,
+#                 'code': code,
+#             }
 
-            return render(request, 'create_pr.html', context)
-    else:
+#             return render(request, 'create_pr.html', context)
+#     else:
        
-        formset = formset_factory(PRItemForm, extra=1)
-        formset = formset(prefix="items")
+#         formset = formset_factory(PRItemForm, extra=1)
+#         formset = formset(prefix="items")
 
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'create_items.html', context)
+#     context = {
+#         'formset': formset,
+#     }
+#     return render(request, 'create_items.html', context)
 
-def display_items(request,pr_no):
-    if request.method == 'GET':
-        pr_no = pr_no
-        my_order = get_object_or_404(purchase_orders, PR_no=pr_no)
-        items = PR_item.objects.all()
-        items = items.filter(PR_no=pr_no)
-        if items.exists():
-            context = {
-                        'items': items,
-                        'my_order': my_order,
-                    }
-            return render(request, 'my_items.html', context)
+# def display_items(request,pr_no):
+#     if request.method == 'GET':
+#         pr_no = pr_no
+#         my_order = get_object_or_404(purchase_orders, PR_no=pr_no)
+#         items = PR_item.objects.all()
+#         items = items.filter(PR_no=pr_no)
+#         if items.exists():
+#             context = {
+#                         'items': items,
+#                         'my_order': my_order,
+#                     }
+#             return render(request, 'my_items.html', context)
             
-        else:
-            print("none")
-            return render(request, 'single_delivery.html', context)
+#         else:
+#             print("none")
+#             return render(request, 'single_delivery.html', context)
 
-    else:
-        context = {
-                        'deliveries': deliveries,
-                    }
-        return render(request, 'single_delivery.html', context)
+#     else:
+#         context = {
+#                         'deliveries': deliveries,
+#                     }
+#         return render(request, 'single_delivery.html', context)
 
-def display_pr(request):
-    if request.method == 'GET':
-        orders = purchase_orders.objects.all()
-        orders = orders.order_by('PR_no')
-        context = {
-                    'my_order': orders
-                }
-          
-        return render(request, 'display_pr.html', context)
+
 
 def display_search_items(request):
     if request.method == 'GET':
@@ -357,8 +300,8 @@ def display_grns(request):
     if request.method == 'GET':
         grn_no = request.GET['GRN_no']
         orders = GRN.objects.get(GRN_no=grn_no)
-        pr_no = orders.PR_no.PR_no
-        pr_items = PR_item.objects.all()
+        # pr_no = orders.PR_no.PR_no
+        # pr_items = PR_item.objects.all()
         grn_items = GRN_item.objects.all()
         grn_items = grn_items.filter(GRN_no=grn_no)
         if grn_items.exists():
@@ -398,6 +341,32 @@ def search_prs(request,pr_no):
                         'my_order': my_order,
                     }
         return render(request, 'display_pr.html')
+    
+# def search_grn(request,grn_no):
+    
+#     if request.method == 'GET':
+#         grn_no = grn_no
+#         my_order = get_object_or_404(GRN, grn=grn_no)
+        
+   
+#         # If the order exists,
+#         if my_order:
+#             print(my_order)
+#             print('yes')
+#             context = {
+#                         'my_order': my_order,
+#                     }
+#             return render(request, 'single_pr.html', context)
+
+#         else:
+#             print("none")
+#             return render(request, 'single_pr.html', context)
+
+#     else:
+#         context = {
+#                         'my_order': my_order,
+#                     }
+#         return render(request, 'display_pr.html')
 
 def search_customer(request):
     if request.method == 'GET':
@@ -506,57 +475,6 @@ def print_pr(request):
                     }
     return render(request, 'print_pr.html', context)
 
-@login_required 
-@user_passes_test(is_admin)
-def custom_report_page(request):
-    # Your custom logic here (e.g., fetching data)
-    if not is_admin(request.user):
-        # User is not authenticated to access this view
-        messages.error(request, "You are not authorized to access this page.")
-        print("wrong")
-        return redirect('login')
-
-    pending_orders = purchase_orders.objects.filter(status='Pending')
-    # Handle form submission
-    
-    if request.method == 'POST':
-        form = approvalForm(request.POST)
-        print(form.data)
-        if form.is_valid():
-            print(form.cleaned_data['approval'])
-            action = form.cleaned_data['action']
-            approval_name = form.cleaned_data['approval']
-            
-            if action == 'approve':
-                for pr_no in form.cleaned_data['selected_orders']:
-                    print(pr_no.PR_no)
-                    purchase_order = purchase_orders.objects.get(PR_no=pr_no.PR_no)
-                    purchase_order.status = 'approved'
-                    purchase_order.approved_by = approval_name
-                    # if approval_name == "":
-                    #     print(approval_name,"nottt")
-                    #     messages.error(request, "Please enter Authorizer's name")
-                    #     print("wrong")
-                    #     return redirect('custom_report_page')
-                    purchase_order.save()
-            elif action == 'reject':
-                for pr_no in form.cleaned_data['selected_orders']:
-                    purchase_order = purchase_orders.objects.get(PR_no=pr_no.PR_no)
-                    purchase_order.status = 'rejected'
-                    purchase_order.approved_by = approval_name
-                    purchase_order.save()
-            return redirect('custom_report_page')
-
-    else:
-        form = approvalForm()
-
-    context = {
-        'pending_orders': pending_orders,
-        'form': form,
-    }
-
-   
-    return render(request, 'admin/custom_report_page.html', context)
 
 def search_grns(request):
     if request.method == 'GET':
