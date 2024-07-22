@@ -3,6 +3,8 @@ Django==5.0
 django-rest-framework==0.1.0
 djangorestframework==3.15.2
 docopt==0.6.2
+gunicorn==22.0.0
 num2words==0.5.13
+packaging==24.1
 psycopg2==2.9.9
 sqlparse==0.5.1
