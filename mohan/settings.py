@@ -83,15 +83,19 @@ WSGI_APPLICATION = 'mohan.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'orders',
+#        'USER': 'postgres',
+#        'PASSWORD': 'mohanPLC',
+#        'HOST': '127.0.0.1', 
+#         'PORT': '5432',
+#    }
+# }
+
 DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'orders',
-       'USER': 'postgres',
-       'PASSWORD': 'mohanPLC',
-       'HOST': '127.0.0.1', 
-        'PORT': '5432',
-   }
+    'default': dj_database_url.config()
 }
 
 
