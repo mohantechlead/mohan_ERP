@@ -114,7 +114,7 @@ def display_FGRN(request):
         'mr_list': mr_list
     }
 
-    return render(request,'display_FGRN.html', context)
+    return render(request,'display_fgrn.html', context)
 
 
 def display_goods(request):
