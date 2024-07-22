@@ -125,8 +125,8 @@ def create_grn_items(request):
         formset = formset(request.POST or None,prefix="GRN_items")
         print(formset.data,"r")
       
-         
-        
+        if formset.errors:
+                        print(formset.errors) 
         # Check if 'PR_no' field is empty in each form within the formset
         non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
 
@@ -154,19 +154,20 @@ def create_grn_items(request):
 
                     # items.save()
 
-                    try:
-                        inventory_item = inventory.objects.get(item_name = item_name)
-                        inventory_item.quantity += quantity
-                        inventory_item.save()
-                    except inventory.DoesNotExist:
-                        print(item_name, quantity, "yes")
-                        inventory_item = inventory(item_name = item_name, quantity = quantity)
-                        inventory_item.save()
+                    # try:
+                    #     inventory_item = inventory.objects.get(item_name = item_name)
+                    #     inventory_item.quantity += quantity
+                    #     inventory_item.save()
+                    # except inventory.DoesNotExist:
+                    #     print(item_name, quantity, "yes")
+                    #     inventory_item = inventory(item_name = item_name, quantity = quantity)
+                    #     inventory_item.save()
 
                     form.save()
+                    
+                grn.save()
                                
-                    if formset.errors:
-                        print(formset.errors)  
+                    
                     
                 context = {
         'formset': formset,
@@ -184,10 +185,10 @@ def create_grn_items(request):
     }
     return render(request, 'create_grn_items.html', context)
 
-# def create_items(request):
+# def create_grn_items(request):
     
 #     if request.method == 'POST':
-#         formset = formset_factory(PRItemForm, extra=1, min_num=1)
+#         formset = formset_factory(GRNItemForm, extra=1, min_num=1)
         
 #         formset = formset(request.POST or None,prefix="items")
         
@@ -198,81 +199,78 @@ def create_grn_items(request):
 #         for form in formset:
 #             print(form,"form")
 #         non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
-#         vat_is_checked = request.POST.get('vat_is_checked')
+#         # vat_is_checked = request.POST.get('vat_is_checked')
         
 #         if non_empty_forms:
 #             if formset.is_valid():
-#                 before_vat_price = 0.00
-#                 final_price = 0.00
-#                 final_quantity = 0
-#                 pr_no = request.POST.get('PR_no')
-#                 print(pr_no)
-#                 pr = purchase_orders.objects.get(PR_no = pr_no)
+#                 grn_no = request.POST.get('GRN)no')
+#                 print(grn_no)
+#                 grn = GRN.objects.get(GRN_no = grn_no)
 #                 for form in non_empty_forms:
-#                     if vat_is_checked:
-#                         print("yessay")
-#                         form.instance.total_price = form.cleaned_data['before_vat']
-#                     form.instance.remaining = form.cleaned_data['quantity']
-#                     form.instance.PR_no = pr
+#                     # if vat_is_checked:
+#                     #     print("yessay")
+#                     #     form.instance.total_price = form.cleaned_data['before_vat']
+#                     form.instance.quantity = form.cleaned_data['quantity']
+#                     form.instance.GRN_no = grn
 #                     items = form.cleaned_data['item_name']
 #                     item = HS_code.objects.all()
 #                     item = item.filter(item_name = items).first()
 #                     code = item.hs_code
 #                     form.instance.hs_code = code
-#                     before_vat_price += float(form.cleaned_data['before_vat'])
-#                     final_quantity += form.cleaned_data['quantity']
-#                     if form.cleaned_data['total_price']:
-#                         final_price += float(form.cleaned_data['total_price'])
+#                     # before_vat_price += float(form.cleaned_data['before_vat'])
+#                     # final_quantity += form.cleaned_data['quantity']
+#                     # if form.cleaned_data['total_price']:
+#                     #     final_price += float(form.cleaned_data['total_price'])
                     
 #                     form.save()
-#                 print(final_price,before_vat_price)
+#                 # print(final_price,before_vat_price)
                 
-#                 pr.total_quantity = final_quantity
-#                 pr.remaining = final_quantity
-#                 pr.save()    
-#             pr_form = PRForm(prefix="purchases")
+#                 # pr.total_quantity = final_quantity
+#                 # pr.remaining = final_quantity
+#                 grn.save()    
+#             grn_form = GRNForm(prefix="purchases")
 #             formset = formset_factory(PRItemForm, extra=1)
 #             formset = formset(prefix="items")
 
 #             context = {
-#                 'pr_form': pr_form,
+#                 'grn_form': grn_form,
 #                 'formset': formset,
 #                 'code': code,
 #             }
 
-#             return render(request, 'create_pr.html', context)
+#             return render(request, 'create_grn.html', context)
 #     else:
        
-#         formset = formset_factory(PRItemForm, extra=1)
+#         formset = formset_factory(GRNItemForm, extra=1)
 #         formset = formset(prefix="items")
 
 #     context = {
 #         'formset': formset,
 #     }
-#     return render(request, 'create_items.html', context)
+#     return render(request, 'create_grn_items.html', context)
 
-# def display_items(request,pr_no):
-#     if request.method == 'GET':
-#         pr_no = pr_no
-#         my_order = get_object_or_404(purchase_orders, PR_no=pr_no)
-#         items = PR_item.objects.all()
-#         items = items.filter(PR_no=pr_no)
-#         if items.exists():
-#             context = {
-#                         'items': items,
-#                         'my_order': my_order,
-#                     }
-#             return render(request, 'my_items.html', context)
+def display_items(request,pr_no):
+    if request.method == 'GET':
+        pr_no = pr_no
+        my_order = get_object_or_404(purchase_orders, PR_no=pr_no)
+        items = PR_item.objects.all()
+        items = items.filter(PR_no=pr_no)
+        if items.exists():
+            context = {
+                        'items': items,
+                        'my_order': my_order,
+                    }
+            return render(request, 'my_items.html', context)
             
-#         else:
-#             print("none")
-#             return render(request, 'single_delivery.html', context)
+        else:
+            print("none")
+            return render(request, 'single_delivery.html', context)
 
-#     else:
-#         context = {
-#                         'deliveries': deliveries,
-#                     }
-#         return render(request, 'single_delivery.html', context)
+    else:
+        context = {
+                        'deliveries': deliveries,
+                    }
+        return render(request, 'single_delivery.html', context)
 
 
 

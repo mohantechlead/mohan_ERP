@@ -63,7 +63,7 @@ class PRItemForm(forms.ModelForm):
 class GRNForm(forms.ModelForm):
     class Meta:
         model = GRN
-        fields = ['PR_no','GRN_no','grn_date','recieved_from','store_name','store_keeper','status','transporter_name','truck_no']
+        fields = ['GRN_no','grn_date','recieved_from','store_name','store_keeper','status','transporter_name','truck_no']
 
 class GRNItemForm(forms.ModelForm):
     quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))

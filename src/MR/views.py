@@ -33,7 +33,7 @@ def create_MR(request):
     formset = formset_factory(MRItemForm, extra= 1)
     formset = formset(prefix="items")
     print(formset)
-    return render(request,'create_MR.html',{'form': form, 'formset': formset})
+    return render(request,'create_mr.html',{'form': form, 'formset': formset})
 
 def create_MR_items(request):
     if request.method == 'POST':

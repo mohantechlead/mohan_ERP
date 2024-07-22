@@ -34,7 +34,8 @@ class FGRNItemForm(forms.ModelForm):
     #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name', 'id': 'item_name','id': 'item_name',})
     # )
     item_name= forms.ModelChoiceField(
-        queryset=finished_goods.objects.all()
+        queryset=finished_goods.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
     )
     description = forms.CharField(
         required = False,

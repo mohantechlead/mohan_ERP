@@ -36,7 +36,7 @@ def create_fgrn(request):
     formset = formset_factory(FGRNItemForm, extra= 1)
     formset = formset(prefix="items")
     print(formset)
-    return render(request,'create_FGRN.html',{'form': form, 'formset': formset})
+    return render(request,'create_fgrn.html',{'form': form, 'formset': formset})
 
 def create_fgrn_items(request):
     if request.method == 'POST':
