@@ -1,5 +1,5 @@
 """
-WSGI config for mohan_ERP project.
+WSGI config for mohan project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mohan_ERP.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mohan.settings')
 
 application = get_wsgi_application()

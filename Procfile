@@ -1,1 +1,1 @@
-web: gunicorn mohan_ERP.wsgi:application --log-file -
+web: gunicorn mohan.wsgi:application --log-file -
