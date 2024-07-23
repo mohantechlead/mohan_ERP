@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     submitButton.addEventListener('click', function(event){
         event.preventDefault();
-        validateInputs();
+        // validateInputs();
         
         const formData1 = new FormData(form1);
         const formData2 = new FormData(form2);
@@ -98,9 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.reload();
         }
         })
-        .catch(error => {
-        console.error('Error:', error);
-                    });
+      
             });
             // });
         

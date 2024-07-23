@@ -23,6 +23,24 @@ class FGRNForm(forms.ModelForm):
     recieved_by = forms.ChoiceField(
         choices = STORE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),)
+    
+    Description_CHOICES =( 
+        ("", ""),
+    ("Filler Compound", "Filler Compound"), 
+    ("Master batch", "Master batch"),
+    ("Rubb Outer Comp", "Rubb Outer Comp"),
+    ("Rubber Sole Com", "Rubber Sole Com"),
+    ("Rub Comp ", "Rub Comp"),
+    ("Endure 6032 ", "Endure 6032"),
+    ("Eva Compound", "Eva Compound"),
+    ("Eva Sheet 101", "Eva Sheet 101"),
+    ("B Grade Filler", "B Grade Filler"),
+    ("PVC Compound", "PVC Compound")) 
+    
+
+    description = forms.ChoiceField(
+        choices = Description_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),)
       
     class Meta:
         model = FGRN

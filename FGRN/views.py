@@ -36,7 +36,13 @@ def create_fgrn(request):
     formset = formset_factory(FGRNItemForm, extra= 1)
     formset = formset(prefix="items")
     print(formset)
-    return render(request,'create_fgrn.html',{'form': form, 'formset': formset})
+    items = items_list.objects.all()
+    context = {
+            'my_item':items,
+            'form': form, 
+            'formset': formset
+    }
+    return render(request,'create_fgrn.html',context)
 
 def create_fgrn_items(request):
     if request.method == 'POST':
@@ -60,7 +66,7 @@ def create_fgrn_items(request):
                     try:
                         finished_item = finished_goods.objects.get(item_name = item_name)
                         finished_item.quantity += quantity
-                        finished_item_item.save()
+                        finished_item.save()
                     except finished_goods.DoesNotExist:
                         print(item_name, quantity, "yes")
                         finished_item = finished_goods(item_name = item_name, quantity = quantity)
