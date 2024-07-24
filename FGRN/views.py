@@ -35,7 +35,7 @@ def create_fgrn(request):
     form = FGRNForm()
     formset = formset_factory(FGRNItemForm, extra= 1)
     formset = formset(prefix="items")
-    print(formset)
+    # print(formset)
     items = items_list.objects.all()
     context = {
             'my_item':items,
