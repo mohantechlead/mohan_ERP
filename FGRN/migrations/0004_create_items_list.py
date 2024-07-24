@@ -9,10 +9,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='finished_goods',
+             name='items_list',
             fields=[
-                ('item_name', models.TextField(primary_key=True, serialize=False)),
-                ('quantity', models.FloatField()),
+                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('item_name', models.TextField()),
             ],
         ),
     ]
