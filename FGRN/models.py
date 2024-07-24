@@ -18,6 +18,7 @@ class FGRN_item(models.Model):
     description = models.TextField(blank=True, null= True)
     measurement_unit = models.TextField(blank=True, null= True)
     no_of_bags = models.FloatField(blank=True, null=True)
+    per_unit_kg = models.FloatField(blank=True, null=True)
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)

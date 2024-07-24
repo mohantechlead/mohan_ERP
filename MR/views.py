@@ -135,3 +135,31 @@ def display_inventory(request):
     }
 
     return render(request,'display_inventory.html',context)
+
+def display_single_mr(request):
+    if request.method == 'GET':
+        mr_no = request.GET['MR_no']
+        
+        try:
+            mr = MR.objects.get(MR_no=mr_no)
+            mr_items = MR_item.objects.all()
+            mr_items = mr_items.filter(MR_no=mr_no)
+            print(mr_items)
+
+            if mr_items.exists():
+                print(mr_items,"yes")
+                context = {
+                            'mr_item': mr_items,
+                            'my_mr': mr,
+                        }
+                return render(request, 'display_single_mr.html', context)
+        
+        except MR.DoesNotExist:
+                mr = None 
+       
+        print("no")
+        
+        context = {
+                        'my_mr': mr,
+                    }
+    return render(request, 'display_single_mr.html')
