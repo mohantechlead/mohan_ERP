@@ -7,6 +7,7 @@ class FGRN(models.Model):
     recieved_by = models.TextField(blank=True, null= True)
     description = models.TextField(blank=True, null= True)
     date = models.DateField()
+    total_quantity = models.FloatField(blank=True, null=True)
 
 class FGRN_item(models.Model):
     FGRN_no = models.ForeignKey('FGRN', on_delete=models.CASCADE,db_column = 'FGRN_no')
