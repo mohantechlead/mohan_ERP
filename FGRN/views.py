@@ -58,20 +58,26 @@ def create_fgrn_items(request):
         if non_empty_forms:
             if formset.is_valid():
                 FGRN_instance = FGRN.objects.get(FGRN_no = pr_no)
-                
+                final_quantity = 0.0
                 for form in non_empty_forms:
                     form.instance.FGRN_no = FGRN_instance
-                    item_name = form.cleaned_data['item_name']
-                    quantity = form.cleaned_data['quantity']
-                    try:
-                        finished_item = finished_goods.objects.get(item_name = item_name)
-                        finished_item.quantity += quantity
-                        finished_item.save()
-                    except finished_goods.DoesNotExist:
-                        print(item_name, quantity, "yes")
-                        finished_item = finished_goods(item_name = item_name, quantity = quantity)
-                        finished_item.save()
+                    description = FGRN_instance.description
+                    # total_quantity = form.cleaned_data['total_quantity']
+                    
+                    final_quantity += form.cleaned_data['quantity']
                     form.save()
+                                    
+                    FGRN_instance.total_quantity = final_quantity
+                    FGRN_instance.save()
+                    
+                try:
+                    finished_item = finished_goods.objects.get(item_name = description)
+                    finished_item.quantity += final_quantity
+                    finished_item.save()
+                except finished_goods.DoesNotExist:
+                    print(description, final_quantity, "yes")
+                    finished_item = finished_goods(item_name = description, quantity = final_quantity)
+                    finished_item.save()
             else:
                 print(formset.data,"nval")
                 errors = dict(formset.errors.items())
@@ -86,7 +92,7 @@ def create_fgrn_items(request):
                 'formset': formset,
                 # 'message':success_message,
             }
-            return render(request, 'create_FGRN.html', context)
+            return render(request, 'create_fgrn.html', context)
     else:
        
         formset = formset_factory(FGRNItemForm, extra=1)
@@ -95,7 +101,7 @@ def create_fgrn_items(request):
     context = {
         'formset': formset,
     }
-    return render(request, 'create_FGRN.html', context)
+    return render(request, 'create_fgrn.html', context)
 
 def display_FGRN(request):
     mr_list = FGRN.objects.all()

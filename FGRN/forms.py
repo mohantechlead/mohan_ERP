@@ -24,23 +24,24 @@ class FGRNForm(forms.ModelForm):
         choices = STORE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),)
     
-    Description_CHOICES =( 
-        ("", ""),
-    ("Filler Compound", "Filler Compound"), 
-    ("Master batch", "Master batch"),
-    ("Rubb Outer Comp", "Rubb Outer Comp"),
-    ("Rubber Sole Com", "Rubber Sole Com"),
-    ("Rub Comp ", "Rub Comp"),
-    ("Endure 6032 ", "Endure 6032"),
-    ("Eva Compound", "Eva Compound"),
-    ("Eva Sheet 101", "Eva Sheet 101"),
-    ("B Grade Filler", "B Grade Filler"),
-    ("PVC Compound", "PVC Compound")) 
+    # Description_CHOICES =( 
+    #     ("", ""),
+    # ("", "Filler Compound"), 
+    # ("", "Master batch"),
+    # ("R", "Rubb Outer Comp"),
+    # ("", "Rubber Sole Com"),
+    # ("Rub Comp ", "Rub Comp"),
+    # ("Endure 6032 ", "Endure 6032"),
+    # ("Eva Compound", "Eva Compound"),
+    # ("Eva Sheet 101", "Eva Sheet 101"),
+    # ("B Grade Filler", "B Grade Filler"),
+    # ("PVC Compound", "PVC Compound")) 
     
 
-    description = forms.ChoiceField(
-        choices = Description_CHOICES,
+    description = forms.ModelChoiceField(
+        queryset=finished_goods.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),)
+    
       
     class Meta:
         model = FGRN
@@ -52,7 +53,7 @@ class FGRNItemForm(forms.ModelForm):
     #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name', 'id': 'item_name','id': 'item_name',})
     # )
     item_name= forms.ModelChoiceField(
-        queryset=finished_goods.objects.all(),
+        queryset=items_list.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
     description = forms.CharField(

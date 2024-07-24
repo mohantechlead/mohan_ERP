@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       
         const formsets = $('.item-list');
         const priceFields = $('#total_price');
-        const quantityFields = $('#quantity');
+        const quantityFields = $('#total_quantity');
         
          $('.item-list').each(function() {
             const total_quantity_fields = $(this).find('#quantity');
@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });            
           console.log(total)
 
-          priceFields.val(total.toFixed(2))
-          priceFields.text('Total Price: ' + total.toFixed(2))
+          quantityFields.val(total.toFixed(2))
+          quantityFields.text(total.toFixed(2))
         });
     }
      
