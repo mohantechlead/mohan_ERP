@@ -128,6 +128,34 @@ def display_FGRN(request):
 
     return render(request,'display_fgrn.html', context)
 
+def display_single_fgrn(request):
+    if request.method == 'GET':
+        fgrn_no = request.GET['FGRN_no']
+        
+        try:
+            fgrns = FGRN.objects.get(FGRN_no=fgrn_no)
+            fgrn_items = FGRN_item.objects.all()
+            fgrn_items = fgrn_items.filter(FGRN_no=fgrn_no)
+            print(fgrn_items)
+
+            if fgrn_items.exists():
+                print(fgrn_items,"yes")
+                context = {
+                            'fgrn_item': fgrn_items,
+                            'my_fgrn': fgrns,
+                        }
+                return render(request, 'display_single_fgrn.html', context)
+        
+        except FGRN.DoesNotExist:
+                fgrns = None 
+       
+        print("no")
+        
+        context = {
+                        'my_fgrn': fgrns,
+                    }
+    return render(request, 'display_single_fgrn.html')
+
 
 def display_goods(request):
     goods = finished_goods.objects.all()

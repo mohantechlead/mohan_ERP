@@ -5,18 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
         link.addEventListener('click', function (event) {
             event.preventDefault();
             console.log("p2")
-            const orderID = this.getAttribute('data-order-id');
-            window.location.href = `/cosmic/display_single_order?order_no=${orderID}`;
-        });
-    });
-    const orderLinks2 = document.querySelectorAll('.order-link2');
-    console.log("p1")
-    orderLinks2.forEach(function (link) {
-        link.addEventListener('click', function (event) {
-            event.preventDefault();
-            console.log("p2")
-            const orderID = this.getAttribute('data-order-id');
-            window.location.href = `/GRN/display_single_order?PR_no=${orderID}`;
+            const MRID = this.getAttribute('data-order-id');
+            window.location.href = `/MR/display_single_mr?MR_no=${MRID}`;
         });
     });
 });
