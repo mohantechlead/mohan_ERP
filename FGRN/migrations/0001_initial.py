@@ -29,13 +29,13 @@ class Migration(migrations.Migration):
                 ('quantity', models.FloatField()),
             ],
         ),
-        migrations.CreateModel(
-            name='items_list',
-            fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('item_name', models.TextField()),
-            ],
-        ),
+        # migrations.CreateModel(
+        #     name='items_list',
+        #     fields=[
+        #         ('id', models.AutoField(primary_key=True, serialize=False)),
+        #         ('item_name', models.TextField()),
+        #     ],
+        # ),
         migrations.CreateModel(
             name='FGRN_item',
             fields=[
