@@ -12,41 +12,41 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='FGRN',
+            fields=[
+                ('FGRN_no', models.TextField(primary_key=True, serialize=False)),
+                ('recieved_from', models.TextField(blank=True, null=True)),
+                ('recieved_by', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True, null=True)),
+                ('date', models.DateField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='finished_goods',
+            fields=[
+                ('item_name', models.TextField(primary_key=True, serialize=False)),
+                ('quantity', models.FloatField()),
+            ],
+        ),
         # migrations.CreateModel(
-        #     name='FGRN',
+        #     name='items_list',
         #     fields=[
-        #         ('FGRN_no', models.TextField(primary_key=True, serialize=False)),
-        #         ('recieved_from', models.TextField(blank=True, null=True)),
-        #         ('recieved_by', models.TextField(blank=True, null=True)),
-        #         ('description', models.TextField(blank=True, null=True)),
-        #         ('date', models.DateField()),
+        #         ('id', models.AutoField(primary_key=True, serialize=False)),
+        #         ('item_name', models.TextField()),
         #     ],
         # ),
-        # migrations.CreateModel(
-        #     name='finished_goods',
-        #     fields=[
-        #         ('item_name', models.TextField(primary_key=True, serialize=False)),
-        #         ('quantity', models.FloatField()),
-        #     ],
-        # ),
-        # # migrations.CreateModel(
-        # #     name='items_list',
-        # #     fields=[
-        # #         ('id', models.AutoField(primary_key=True, serialize=False)),
-        # #         ('item_name', models.TextField()),
-        # #     ],
-        # # ),
-        # migrations.CreateModel(
-        #     name='FGRN_item',
-        #     fields=[
-        #         ('item_id', models.AutoField(primary_key=True, serialize=False)),
-        #         ('item_name', models.TextField(blank=True, null=True)),
-        #         ('quantity', models.FloatField()),
-        #         ('remarks', models.TextField(blank=True, null=True)),
-        #         ('description', models.TextField(blank=True, null=True)),
-        #         ('measurement_unit', models.TextField(blank=True, null=True)),
-        #         ('no_of_bags', models.FloatField(blank=True, null=True)),
-        #         ('FGRN_no', models.ForeignKey(db_column='FGRN_no', on_delete=django.db.models.deletion.CASCADE, to='FGRN.fgrn')),
-        #     ],
-        # ),
+        migrations.CreateModel(
+            name='FGRN_item',
+            fields=[
+                ('item_id', models.AutoField(primary_key=True, serialize=False)),
+                ('item_name', models.TextField(blank=True, null=True)),
+                ('quantity', models.FloatField()),
+                ('remarks', models.TextField(blank=True, null=True)),
+                ('description', models.TextField(blank=True, null=True)),
+                ('measurement_unit', models.TextField(blank=True, null=True)),
+                ('no_of_bags', models.FloatField(blank=True, null=True)),
+                ('FGRN_no', models.ForeignKey(db_column='FGRN_no', on_delete=django.db.models.deletion.CASCADE, to='FGRN.fgrn')),
+            ],
+        ),
     ]
