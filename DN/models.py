@@ -24,6 +24,7 @@ class trial_delivery(models.Model):
 class delivery(models.Model):
     delivery_number = models.IntegerField(primary_key=True)
     serial_no = models.ForeignKey('Orders', models.DO_NOTHING, db_column='serial_no')
+    # description = models.TextField('Orders', models.DO_NOTHING, db_column='description')
     delivery_date = models.DateField(blank=True)
     delivery_quantity = models.IntegerField(blank=True)
     truck_number = models.TextField(blank=True, null=True)  # This field type is a guess.
