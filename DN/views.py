@@ -48,6 +48,7 @@ def delivery_list(request):
 
 def input_delivery(request):
     my_orders = orders.objects.all()
+    
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
         delivery_number = request.POST['delivery_number']
@@ -56,13 +57,15 @@ def input_delivery(request):
             return redirect('input_delivery')
         else: 
             if form.is_valid():
-                # delivery = form
                 delivery_number = form.cleaned_data['delivery_number']
                 serial_no = form.cleaned_data['serial_no']
                 delivery_quantity = form.cleaned_data['delivery_quantity']
                 delivery_number = form.cleaned_data['delivery_number']
-                order = orders.objects.get(serial_no=serial_no.serial_no)
-                order.remaining = order.remaining - delivery_quantity
+                order = orders.objects.get(serial_no = serial_no.serial_no)
+                my_goods = finished_goods.objects.get(item_name = order.description)
+                my_goods.quantity = my_goods.quantity - delivery_quantity  
+                my_goods.save()            
+                                
                 if order.remaining < 0:
                     error_message = 'Over Delivery'
                     form.save()
@@ -72,6 +75,7 @@ def input_delivery(request):
                     form.save()
                     order.save() 
                 return redirect('input_delivery')
+            
             if form.errors:
                 print(form.errors)
     else:
