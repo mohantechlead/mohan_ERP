@@ -18,6 +18,7 @@ from rest_framework import status
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import *
+from FGRN.models import finished_goods
 # Create your views here.
 @api_view(['GET','POST'])
 def order_list(request):
@@ -99,6 +100,7 @@ def input_orders(request):
     print(orders.objects.all()[1:10])
     my_orders = orders.objects.all()
     the_orders = orders.objects.all()
+    my_goods = finished_goods.objects.all()
     if request.method == 'POST':
         form = OrderForm(request.POST)
        
@@ -122,7 +124,8 @@ def input_orders(request):
     else:
         
         form = OrderForm()
-    return render(request, 'input_orders.html', {'form': form ,'orders':my_orders,'the_orders':the_orders})
+    return render(request, 'input_orders.html', {'form': form ,'orders':my_orders,'the_orders':the_orders, 
+                                                 'my_goods': my_goods})
 
 def display_orders(request):
     my_orders = orders.objects.all()

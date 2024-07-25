@@ -1,8 +1,12 @@
 from django import forms
 from .models import delivery,orders
+from FGRN.models import finished_goods
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+    description = forms.ModelChoiceField(
+        queryset=finished_goods.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),)
 
 class DeliveryForm(forms.ModelForm):
     delivery_number = forms.IntegerField(required=True)

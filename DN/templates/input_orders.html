@@ -67,12 +67,13 @@
   <div class="form-group">
     <label class="control-label col-sm-2">Item Type</label>
     <div class="col-sm-10">
-      <input type="textarea" list="the_orders" class="form-control" rows="3"  name="description" >
-      <datalist id="the_orders">
-        {% for order in the_orders %}
-        <option value="{{order.description}}"></option>
+      <input type="textarea" list="my_goods" class="form-control" rows="3"  name="description" >
+      <datalist id="my_goods">
+        {% for good in my_goods %}
+        <option value="{{good.item_name}}"></option>
         {% endfor %}
       </datalist>
+      <!-- {{form.description}} -->
     </div>
   </div>
   <div class="col-sm-8" style="margin-top: 10px;">
