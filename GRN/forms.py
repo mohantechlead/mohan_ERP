@@ -1,6 +1,7 @@
 from django import forms
 #from .models import GRN, GRNItem
 from .models import *
+from MR.models import *
 
 class PRForm(forms.ModelForm):
     PR_total_price = forms.DecimalField(
@@ -67,10 +68,14 @@ class GRNForm(forms.ModelForm):
 
 class GRNItemForm(forms.ModelForm):
     quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
-    item_name = forms.ModelChoiceField(queryset=HS_code.objects.all(),
-                                       empty_label="Item Name",
-                                       widget=forms.Select(attrs={'class': 'item_name form-control'}),
-                                       to_field_name='item_name')
+    # item_name = forms.ModelChoiceField(queryset=HS_code.objects.all(),
+    #                                    empty_label="Item Name",
+    #                                    widget=forms.Select(attrs={'class': 'item_name form-control'}),
+    #                                    to_field_name='item_name')
+    item_name= forms.ModelChoiceField(
+        queryset=inventory.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
 
     class Meta:
         
