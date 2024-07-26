@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     submitButton.addEventListener('click', function (event) {
         event.preventDefault(); // Prevent the default form submission
 
-        validateInputs();
+        // validateInputs();
        
         // Serialize form data
         const formData1 = new FormData(form1);
@@ -76,9 +76,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.location.reload();
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            // .catch(error => {
+            //     console.error('Error:', error);
+            // });
     });
 
     

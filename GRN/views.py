@@ -154,14 +154,14 @@ def create_grn_items(request):
 
                     # items.save()
 
-                    # try:
-                    #     inventory_item = inventory.objects.get(item_name = item_name)
-                    #     inventory_item.quantity += quantity
-                    #     inventory_item.save()
-                    # except inventory.DoesNotExist:
-                    #     print(item_name, quantity, "yes")
-                    #     inventory_item = inventory(item_name = item_name, quantity = quantity)
-                    #     inventory_item.save()
+                    try:
+                        inventory_item = inventory.objects.get(item_name = item_name)
+                        inventory_item.quantity += quantity
+                        inventory_item.save()
+                    except inventory.DoesNotExist:
+                        print(item_name, quantity, "yes")
+                        inventory_item = inventory(item_name = item_name, quantity = quantity)
+                        inventory_item.save()
 
                     form.save()
                     
