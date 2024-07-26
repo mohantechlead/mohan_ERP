@@ -17,5 +17,7 @@ class MR_item(models.Model):
 class inventory(models.Model):
     item_name = models.TextField(blank=True)
     quantity = models.FloatField(blank=True)
+    no_of_unit = models.FloatField(blank=True, null=True)
+    unit_measurment = models.TextField(blank=True, null=True)
     inventory_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
