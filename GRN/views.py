@@ -147,6 +147,7 @@ def create_grn_items(request):
                     # code = item.hs_code
                     # form.instance.hs_code = code
                     quantity = form.cleaned_data['quantity']
+                    no_of_unit = form.cleaned_data['no_of_unit']
                     # items = PR_item.objects.get(item_name=item_name)
                     
                     # print(items,"r")
@@ -157,6 +158,7 @@ def create_grn_items(request):
                     try:
                         inventory_item = inventory.objects.get(item_name = item_name)
                         inventory_item.quantity += quantity
+                        inventory_item.no_of_unit += no_of_unit
                         inventory_item.save()
                     except inventory.DoesNotExist:
                         print(item_name, quantity, "yes")

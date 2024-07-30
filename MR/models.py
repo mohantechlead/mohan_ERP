@@ -23,7 +23,7 @@ class inventory(models.Model):
     item_name = models.TextField(blank=True)
     no_of_unit = models.FloatField(blank=True, null=True)
     unit_type = models.TextField(blank=True, null=True)
-    unit_measurment = models.TextField(blank=True, null=True)
+    measurement_type = models.TextField(blank=True, null=True)
     quantity = models.FloatField(blank=True)
     inventory_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 

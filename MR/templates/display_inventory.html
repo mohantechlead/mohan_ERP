@@ -28,11 +28,17 @@
                     <tr>
                       <th>Item Name </th>
                       <th>Quantity</th>
+                      <th>Measurement Type</th>
+                      <th>No of Unit</th>
+                      <th>Unit Type</th>
                     </tr>
                     {% for item in items %}
                     <tr>
-                     <td>{{ item.item_name }}</td>
+                    <td>{{ item.item_name }}</td>
                     <td>{{ item.quantity }}</td>
+                    <td>{{ item.measurement_type }}</td>
+                    <td>{{ item.no_of_unit }}</td>
+                    <td>{{ item.unit_type }}</td>
                     </tr>
                     {% endfor %}
                     

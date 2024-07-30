@@ -56,9 +56,13 @@ class InventoryItemForm(forms.ModelForm):
     item_name = forms.CharField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name'})
     )
-    quantity = forms.IntegerField(
+    quantity = forms.FloatField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'quantity'})
     )
+    no_of_unit = forms.FloatField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'quantity'})
+    )
+
     class Meta:
    
         model = inventory
