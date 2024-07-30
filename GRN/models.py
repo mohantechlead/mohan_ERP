@@ -44,6 +44,12 @@ class GRN_item(models.Model):
     grn_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     item_name = models.TextField(blank=True, null=True)
     quantity = models.IntegerField()
+    measurement_type = models.TextField(blank=True, null=True)
+    remarks = models.TextField(blank=True, null= True)
+    description = models.TextField(blank=True, null= True)
+    measurement_unit = models.TextField(blank=True, null= True)
+    no_of_bags = models.FloatField(blank=True, null=True)
+    per_unit_kg = models.FloatField(blank=True, null=True)
 
 class HS_code(models.Model):
     number = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
