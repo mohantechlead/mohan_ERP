@@ -19,7 +19,7 @@ class MRItemForm(forms.ModelForm):
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
     )
-    no_of_unit = forms.CharField(
+    no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
     )
@@ -53,18 +53,8 @@ class MRItemForm(forms.ModelForm):
    
 class InventoryItemForm(forms.ModelForm):
     
-    item_name = forms.CharField(
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name'})
-    )
-    quantity = forms.FloatField(
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'quantity'})
-    )
-    no_of_unit = forms.FloatField(
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'quantity'})
-    )
-
     class Meta:
    
         model = inventory
-        fields = ['item_name','quantity']
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
    

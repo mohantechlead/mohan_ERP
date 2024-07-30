@@ -60,7 +60,7 @@ class FGRNItemForm(forms.ModelForm):
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
     )
-    no_of_unit = forms.CharField(
+    no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
     )
