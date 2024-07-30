@@ -20,7 +20,7 @@
         <div class="col-md-12">
 <div>
     <span class="col-md-3" ></span>
-<h1>Create GRN</h1>
+<h1>Create Import GRN</h1>
 </div>
 
 
@@ -42,15 +42,6 @@
                 <input type="text" class="form-control" name="GRN_no">
             </div>
         </span>
-        <div class="form-group">
-            <label class="control-label col-sm-4">PR no</label>
-            <div class="col-sm-8" style="margin-top: 10px;">
-                <input type="text" class="form-control" name="PR_no">
-
-            </div>
-        </div>
-
-
     </div>
 
 <div>
@@ -102,17 +93,11 @@
         </div>
     </div>
     
-</div>
-<span class="col-sm-4"></span>
-      <div style="justify-content: center;">
-        <button type="submit"  class="col-sm-2 btn-lg " style="color: #6d7fcc; background-color: white;">
-          
-          Submit
-      </button>
-       </div>
+</div>      
 </form>
 </div></div></div>
-<div class="container">
+
+<div class="container mt-2">
     <div class="row">
         <div class="col-md-12">
             {% if pr_form.errors %}
@@ -151,6 +136,7 @@
             
             </form>
         </div></div></div>
+
 
         <button id="submits" class="col-sm-3 btn-lg " style="color: #6d7fcc; background-color: white; margin-left: 100px;">
             Submits

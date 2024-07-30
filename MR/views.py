@@ -58,8 +58,8 @@ def create_MR_items(request):
                     # measurement_type = form.cleaned_data['measurement_type']
                     try:
                         inventory_item = inventory.objects.get(item_name = item_name)
-                        inventory_item.quantity += quantity
-                        inventory_item.no_of_unit += no_of_unit
+                        inventory_item.quantity -= quantity
+                        inventory_item.no_of_unit -= no_of_unit
                         # inventory_item.measurement_type = measurement_type
                         inventory_item.save()
                     except inventory.DoesNotExist:

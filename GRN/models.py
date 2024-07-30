@@ -51,6 +51,36 @@ class GRN_item(models.Model):
     no_of_bags = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
 
+class import_GRN(models.Model):
+    GRN_no = models.TextField(primary_key=True)
+    grn_date = models.DateField(blank=True, null=True)
+    recieved_from = models.TextField(blank=True, null=True)
+    transporter_name = models.TextField(blank=True, null=True)
+    truck_no = models.TextField(blank=True, null=True)
+    store_name =  models.TextField(blank=True, null=True) # This field type is a guess.
+    store_keeper = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'import_GRN'
+
+class import_GRN_item(models.Model):
+    GRN_no = models.ForeignKey('import_GRN', on_delete=models.CASCADE, db_column='GRN_no')
+    grn_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    item_name = models.TextField(blank=True, null=True)
+    quantity = models.FloatField()
+    measurement_type = models.TextField(blank=True, null=True)
+    remarks = models.TextField(blank=True, null= True)
+    description = models.TextField(blank=True, null= True)
+    measurement_unit = models.TextField(blank=True, null= True)
+    no_of_bags = models.FloatField(blank=True, null=True)
+    per_unit_kg = models.FloatField(blank=True, null=True)
+    
+    
+    class Meta:
+        managed = False
+        db_table = 'import_GRN_item'
+
 class HS_code(models.Model):
     number = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     hs_code = models.TextField(blank=True, null=True)
