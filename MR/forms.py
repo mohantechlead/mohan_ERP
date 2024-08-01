@@ -15,10 +15,10 @@ class MRItemForm(forms.ModelForm):
         queryset=inventory.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
-    description = forms.CharField(
-        required = False,
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
-    )
+    # description = forms.CharField(
+    #     required = False,
+    #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
+    # )
     no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
@@ -40,8 +40,17 @@ class MRItemForm(forms.ModelForm):
     quantity = forms.IntegerField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Quantity',  'id':'quantity'})
     )
-    measurement_unit = forms.CharField(
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add measurement units'})
+    # measurement_unit = forms.CharField(
+    #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add measurement units'})
+    # )
+    measurement_choice =( 
+        ("", ""),
+    ("kgs", "kgs")) 
+    
+    measurement_unit = forms.ChoiceField(
+        choices = measurement_choice,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        
     )
     remarks = forms.CharField(
         required = False,

@@ -61,23 +61,22 @@ def create_fgrn_items(request):
                 final_quantity = 0.0
                 for form in non_empty_forms:
                     form.instance.FGRN_no = FGRN_instance
-                    description = FGRN_instance.description
-                    # total_quantity = form.cleaned_data['total_quantity']
-                    
-                    final_quantity += form.cleaned_data['quantity']
+                    # description = FGRN_instance.description
+                    quantity = form.cleaned_data['quantity']
+                    no_of_unit = form.cleaned_data['no_of_unit']
+                    description = form.cleaned_data['description']
+
+
+                    finished_item = finished_goods.objects.get(item_name = description)
+                    finished_item.quantity += quantity
+                    finished_item.no_of_unit += no_of_unit
+                    finished_item.save()
                     form.save()
                                     
                     FGRN_instance.total_quantity = final_quantity
                     FGRN_instance.save()
                     
-                try:
-                    finished_item = finished_goods.objects.get(item_name = description)
-                    finished_item.quantity += final_quantity
-                    finished_item.save()
-                except finished_goods.DoesNotExist:
-                    print(description, final_quantity, "yes")
-                    finished_item = finished_goods(item_name = description, quantity = final_quantity)
-                    finished_item.save()
+                    
             else:
                 print(formset.data,"nval")
                 errors = dict(formset.errors.items())
