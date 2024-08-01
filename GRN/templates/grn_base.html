@@ -50,10 +50,13 @@
               
                 <li style="font-size:larger; font-weight: 500;">
                     <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false"
-                        class="dropdown-toggle"> Local GRN </a>
+                        class="dropdown-toggle"> GRN </a>
                     <ul class="collapse list-unstyled" id="pageSubmenu">
                         <li style="font-size: large;">
-                            <a href="{% url 'create_grn' %}">Create GRN</a>
+                            <a href="{% url 'create_grn' %}">Create Local GRN</a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'create_import_grn' %}">Create Import GRN</a>
                         </li>
                         <li style="font-size:larger; font-weight: 500;">
                             <a href="{% url 'display_grn' %}">Display GRN</a>
@@ -61,6 +64,8 @@
                      
                     </ul>
                 </li>
+
+                
 
                 <li style="font-size:larger; font-weight: 500;">
                     <a href="{% url 'display_search_items' %}">Display Items</a>
@@ -80,9 +85,9 @@
                         <i class="fa fa-bars"></i>
                         <span style="color: white;"></span>
                     </button>
-                    <a href="{% url 'create_fgrn'%}">FGRN      |</a>
                     <a style=" font-size:30px; font-weight: 600; color: #2470dc;" href="{% url 'create_grn'%}">GRN     |</a>
                     <a href="{% url 'create_MR'%}">MR     |</a>
+                    <a href="{% url 'create_fgrn'%}">FGRN      |</a>
                     <a href="{% url 'input_delivery'%}">DN</a>
                     
 

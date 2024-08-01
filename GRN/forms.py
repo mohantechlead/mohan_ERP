@@ -66,21 +66,54 @@ class GRNForm(forms.ModelForm):
         model = GRN
         fields = ['GRN_no','grn_date','recieved_from','store_name','store_keeper','status','transporter_name','truck_no']
 
-class GRNItemForm(forms.ModelForm):
-    # quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
-    # # item_name = forms.ModelChoiceField(queryset=HS_code.objects.all(),
-    # #                                    empty_label="Item Name",
-    # #                                    widget=forms.Select(attrs={'class': 'item_name form-control'}),
-    # #                                    to_field_name='item_name')
-    # item_name= forms.ModelChoiceField(
-    #     queryset=inventory.objects.all(),
-    #     widget=forms.Select(attrs={'class': 'form-control'}),
-    # )
+class ImportGRNForm(forms.ModelForm):
+    class Meta:
+        model = import_GRN
+        fields = ['GRN_no','grn_date','recieved_from','store_name','store_keeper','transporter_name','truck_no']
 
-    # class Meta:
+class ImportGRNItemForm(forms.ModelForm):
+    item_name= forms.ModelChoiceField(
+        queryset=inventory.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+    description = forms.CharField(
+        required = False,
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
+    )
+    no_of_unit = forms.FloatField(
+        required = False,
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
+    )
+    UNIT_CHOICES =( 
+        ("", ""),
+    ("Bag", "Bag"), 
+    ("Pkg", "Pkg"),
+    ("Crt", "Crt"),) 
+    
+    unit_type = forms.ChoiceField(
+        choices = UNIT_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
         
-    #     model = GRN_item
-    #     fields = ['item_name','quantity']
+    )
+    per_unit_kg = forms.FloatField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add value of KG per Unit', 'id': 'per_unit_kg'})
+    )
+    quantity = forms.IntegerField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Quantity',  'id':'quantity'})
+    )
+    measurement_unit = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add measurement units'})
+    )
+    remarks = forms.CharField(
+        required = False,
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Remark'})
+    )
+    class Meta:
+        model = MR_item
+        fields = ['item_name','no_of_unit','unit_type','per_unit_kg','quantity','measurement_unit','remarks']
+
+
+class GRNItemForm(forms.ModelForm):
     item_name= forms.ModelChoiceField(
         queryset=inventory.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),

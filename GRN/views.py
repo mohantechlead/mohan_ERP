@@ -133,28 +133,16 @@ def create_grn_items(request):
         print(non_empty_forms,"forms")
         if non_empty_forms:
             if formset.is_valid():
-                # pr_no = request.POST.get('PR_no')
-                # pr = purchase_orders.objects.get(PR_no = pr_no)
                 grn_no = request.POST.get('GRN_no')
                 grn = GRN.objects.get(GRN_no = grn_no)
                 for form in non_empty_forms:
                     # form.instance.PR_no = pr
                     form.instance.GRN_no = grn
                     print("yessir")
-                    
-                    item_name = form.cleaned_data['item_name']
-                    # item = item.filter(item_name = items).first()
-                    # code = item.hs_code
-                    # form.instance.hs_code = code
+                    item_name = form.cleaned_data['item_name'] 
                     quantity = form.cleaned_data['quantity']
                     no_of_unit = form.cleaned_data['no_of_unit']
-                    # items = PR_item.objects.get(item_name=item_name)
-                    
-                    # print(items,"r")
-                    # items.remaining = items.remaining - quantity
-
-                    # items.save()
-
+                   
                     try:
                         inventory_item = inventory.objects.get(item_name = item_name)
                         inventory_item.quantity += quantity
@@ -499,3 +487,75 @@ def search_grns(request):
                         'deliveries': deliveries,
                     }
         return render(request, 'single_delivery.html', context)
+    
+def create_import_grn(request):
+    
+    if request.method == 'POST':
+        grn_form = ImportGRNForm(request.POST )
+       
+        if grn_form.errors:
+            print(grn_form.errors)  
+
+        print(request.POST)
+       
+        if grn_form.is_valid():
+            grn = grn_form.save()
+                        
+            return render(request, 'create_import_grn.html')
+    
+    grn_form = ImportGRNForm(prefix="purchases")
+    formset = formset_factory(ImportGRNItemForm, extra=1)
+    formset = formset(prefix="GRN_items")
+
+    context = {
+        'grn_form': grn_form,
+        'formset': formset,
+    }
+    return render(request, 'create_import_grn.html', context)
+
+def create_import_grn_items(request):
+    print("second")
+    if request.method == 'POST':
+        formset = formset_factory(ImportGRNItemForm, extra=1, min_num=1)
+        
+        formset = formset(request.POST or None,prefix="GRN_items")
+        print(formset.data,"r")
+      
+        if formset.errors:
+            print(formset.errors)   
+        
+        non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
+
+        print(non_empty_forms,"forms")
+        if non_empty_forms:
+            if formset.is_valid():
+                grn_no = request.POST.get('GRN_no')
+                grn = import_GRN.objects.get(GRN_no = grn_no)
+                for form in non_empty_forms:
+                    form.instance.GRN_no = grn
+                    print("yessir")
+                    item_name = form.cleaned_data['item_name'] 
+                    quantity = form.cleaned_data['quantity']
+                    no_of_unit = form.cleaned_data['no_of_unit']
+                    try:
+                        inventory_item = inventory.objects.get(item_name = item_name)
+                        inventory_item.quantity += quantity
+                        inventory_item.no_of_unit += no_of_unit
+                        inventory_item.save()
+                    except inventory.DoesNotExist:
+                        print(item_name, quantity, "yes")
+                        inventory_item = inventory(item_name = item_name, quantity = quantity)
+                        inventory_item.save()
+
+                    form.save()
+                grn.save()
+            return redirect('create_grn_items')
+    else:
+       
+        formset = formset_factory(ImportGRNItemForm, extra=1)
+        formset = formset(prefix="GRN_items")
+
+    context = {
+        'formset': formset,
+    }
+    return render(request, 'create_grn_items.html', context)
