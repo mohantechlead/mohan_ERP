@@ -22,8 +22,11 @@ class FGRN_item(models.Model):
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)
-    quantity = quantity = models.FloatField()
-
+    quantity = quantity = models.FloatField(blank=True, null=True)
+    no_of_unit = models.FloatField(blank=True, null=True)
+    unit_type = models.TextField(blank=True, null=True)
+    measurement_type = models.TextField(blank=True, null=True)
+    
     def __str__(self):
         return self.item_name
     
