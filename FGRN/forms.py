@@ -24,46 +24,25 @@ class FGRNForm(forms.ModelForm):
         choices = STORE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),)
     
-    # Description_CHOICES =( 
-    #     ("", ""),
-    # ("", "Filler Compound"), 
-    # ("", "Master batch"),
-    # ("R", "Rubb Outer Comp"),
-    # ("", "Rubber Sole Com"),
-    # ("Rub Comp ", "Rub Comp"),
-    # ("Endure 6032 ", "Endure 6032"),
-    # ("Eva Compound", "Eva Compound"),
-    # ("Eva Sheet 101", "Eva Sheet 101"),
-    # ("B Grade Filler", "B Grade Filler"),
-    # ("PVC Compound", "PVC Compound")) 
-    
-
-    description = forms.ModelChoiceField(
-        queryset=finished_goods.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),)
-    
-      
     class Meta:
         model = FGRN
-        fields = ['FGRN_no','date','recieved_from','recieved_by', 'description']
+        fields = ['FGRN_no','date','recieved_from','recieved_by']
    
 class FGRNItemForm(forms.ModelForm):
     
-    # item_name = forms.CharField(
-    #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Name', 'id': 'item_name','id': 'item_name',})
-    # )
     item_name= forms.ModelChoiceField(
         queryset=items_list.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
-    description = forms.CharField(
-        required = False,
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
-    )
+    description = forms.ModelChoiceField(
+        queryset=finished_goods.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),)
+    
     no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
     )
+
     UNIT_CHOICES =( 
         ("", ""),
     ("Bag", "Bag"), 
@@ -81,14 +60,21 @@ class FGRNItemForm(forms.ModelForm):
     quantity = forms.IntegerField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Quantity',  'id':'quantity'})
     )
-    measurement_unit = forms.CharField(
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add measurement units'})
+
+    Measurement_unit_choices =( 
+        ("", ""),
+    ("kgs", "kgs")) 
+
+    # measurement_unit = forms.CharField(
+    #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add measurement units'})
+    # )
+    measurement_unit = forms.ChoiceField(
+        choices = Measurement_unit_choices,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        
     )
-    remarks = forms.CharField(
-        required = False,
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Remark'})
-    )
+   
     class Meta:
         model = FGRN_item
-        fields = ['item_name','no_of_unit','unit_type','per_unit_kg','quantity','measurement_unit','remarks']
+        fields = ['description','item_name','no_of_unit','unit_type','per_unit_kg','quantity','measurement_unit']
        

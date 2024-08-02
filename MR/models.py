@@ -14,7 +14,7 @@ class MR_item(models.Model):
     item_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     measurement_type = models.TextField(blank=True, null=True)
     remarks = models.TextField(blank=True, null= True)
-    description = models.TextField(blank=True, null= True)
+    # description = models.TextField(blank=True, null= True)
     measurement_unit = models.TextField(blank=True, null= True)
     no_of_bags = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
