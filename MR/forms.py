@@ -66,5 +66,5 @@ class InventoryItemForm(forms.ModelForm):
     class Meta:
    
         model = inventory
-        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type','branch']
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
    
