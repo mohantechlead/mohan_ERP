@@ -27,7 +27,8 @@ class MRItemForm(forms.ModelForm):
         ("", ""),
     ("Bag", "Bag"), 
     ("Pkg", "Pkg"),
-    ("Crt", "Crt"),) 
+    ("Crt", "Crt"),
+    ("Drum", "Drum"),) 
     
     unit_type = forms.ChoiceField(
         choices = UNIT_CHOICES,
@@ -65,5 +66,5 @@ class InventoryItemForm(forms.ModelForm):
     class Meta:
    
         model = inventory
-        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type','branch']
    
