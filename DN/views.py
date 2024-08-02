@@ -131,6 +131,8 @@ def input_orders(request):
     return render(request, 'input_orders.html', {'form': form ,'orders':my_orders,'the_orders':the_orders, 
                                                  'my_goods': my_goods})
 
+
+
 def display_orders(request):
     my_orders = orders.objects.all()
     the_orders = orders.objects.all()

@@ -6,6 +6,7 @@ class MR(models.Model):
     MR_date = models.DateField(blank= False)
     desc = models.TextField(blank=True)
     MR_store = models.TextField(blank=True)
+    total_quantity = models.FloatField(blank=True, null=True)
 
 class MR_item(models.Model):
     MR_no = models.ForeignKey('MR',on_delete= models.CASCADE,db_column = 'MR_no')
@@ -26,7 +27,7 @@ class inventory(models.Model):
     measurement_type = models.TextField(blank=True, null=True)
     quantity = models.FloatField(blank=True)
     inventory_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # branch = models.TextField(blank=True)
+    branch = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.item_name

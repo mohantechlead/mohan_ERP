@@ -111,15 +111,15 @@
                                                         <td style="font-weight: bold;">0{{ forloop.counter }}</td>
                                                         <td>
                                                             <div>
-                                                                <h5 class="text-truncate font-size-14 mb-1">{{item.item_name}}</h5>
+                                                                <h5 class="text-truncate font-size-14 mb-1">{{item.description}}</h5>
                                                                 <!-- <p class="text-muted mb-0">HS-code:{{item.hs_code}}</p> -->
                                                             </div>
                                                         </td>
                                 
                                                         
-                                                        <td> {{item.no_of_bags}}</td>
+                                                        <td> {{item.no_of_unit}} {{item.unit_type}}</td>
                                                         <td>{{item.per_unit_kg}}</td>
-                                                        <td> {{item.quantity}} </td>
+                                                        <td> {{item.quantity}} {{item.measurement_unit}}</td>
                                                         
                                                     </tr>
                                                     {% endfor %}
