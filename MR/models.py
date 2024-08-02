@@ -26,6 +26,7 @@ class inventory(models.Model):
     measurement_type = models.TextField(blank=True, null=True)
     quantity = models.FloatField(blank=True)
     inventory_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    branch = models.TextField(blank=True)
 
     def __str__(self):
         return self.item_name
