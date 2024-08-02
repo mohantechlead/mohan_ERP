@@ -12,7 +12,7 @@ class MRForm(forms.ModelForm):
 class MRItemForm(forms.ModelForm):
 
     item_name= forms.ModelChoiceField(
-        queryset=inventory.objects.all(),
+        queryset=inventory.objects.all().order_by('item_name'),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
     # description = forms.CharField(

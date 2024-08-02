@@ -92,6 +92,7 @@
                                                     <tr>
                                                         <th style="width: 70px;">No.</th>
                                                         <th>Item</th>
+                                                        <th>No of Bag</th>
                                                         <th>Quantity</th>
                                                     </tr>
                                                 </thead><!-- end thead -->
@@ -108,8 +109,8 @@
                                                             </div>
                                                         </td>
                                 
-                                                        
-                                                        <td> {{item.quantity}}</td>
+                                                        <td> {{item.no_of_bags}}{{item.measurement_unit}}</td>
+                                                        <td> {{item.quantity}}{{item.measurement_type}}</td>
                                                         
                                                         
                                                     </tr>

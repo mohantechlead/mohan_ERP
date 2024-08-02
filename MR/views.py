@@ -129,7 +129,7 @@ def display_inventory(request):
             return redirect('display_inventory')
     
     form = InventoryItemForm()
-    items = inventory.objects.all()
+    items = inventory.objects.all().order_by('item_name')
     print(items)
     context = {
         'items':items,
