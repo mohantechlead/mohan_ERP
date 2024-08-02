@@ -4,25 +4,25 @@ from .models import *
 
 class FGRNForm(forms.ModelForm):
 
-    STORE_CHOICES =( 
-        ("", ""),
-    ("STORE 1", "STORE 1"), 
-    ("STORE 2", "STORE 2"),
-    ("STORE 3 ", "STORE 3"),
-    ("STORE 4 ", "STORE 4"),
-    ("STORE 1 & 2 ", "STORE 1 & 2"),
-    ("STORE 1 & 3 ", "STORE 1 & 3"),
-    ("STORE 1 & 4 ", "STORE 1 & 4"),
-    ("STORE 2 & 4 ", "STORE 2 & 4"),
-    ("STORE 2 & 3 ", "STORE 2 & 3"),
-    ("STORE 3 & 4 ", "STORE 3 & 4"),
-    ("STORE 1, 2 & 3 ", "STORE 1, 2 & 3"),
-    ("STORE 1, 2 & 4 ", "STORE 1, 2 & 4"),
-    ("STORE 2, 3 & 4 ", "STORE 2, 3 & 4"),) 
+    # STORE_CHOICES =( 
+    #     ("", ""),
+    # ("STORE 1", "STORE 1"), 
+    # ("STORE 2", "STORE 2"),
+    # ("STORE 3 ", "STORE 3"),
+    # ("STORE 4 ", "STORE 4"),
+    # ("STORE 1 & 2 ", "STORE 1 & 2"),
+    # ("STORE 1 & 3 ", "STORE 1 & 3"),
+    # ("STORE 1 & 4 ", "STORE 1 & 4"),
+    # ("STORE 2 & 4 ", "STORE 2 & 4"),
+    # ("STORE 2 & 3 ", "STORE 2 & 3"),
+    # ("STORE 3 & 4 ", "STORE 3 & 4"),
+    # ("STORE 1, 2 & 3 ", "STORE 1, 2 & 3"),
+    # ("STORE 1, 2 & 4 ", "STORE 1, 2 & 4"),
+    # ("STORE 2, 3 & 4 ", "STORE 2, 3 & 4"),) 
 
-    recieved_by = forms.ChoiceField(
-        choices = STORE_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),)
+    # recieved_by = forms.ChoiceField(
+    #     choices = STORE_CHOICES,
+    #     widget=forms.Select(attrs={'class': 'form-control'}),)
     
     class Meta:
         model = FGRN
