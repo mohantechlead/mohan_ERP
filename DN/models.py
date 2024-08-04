@@ -1,10 +1,3 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
 class trial_delivery(models.Model):
@@ -55,9 +48,12 @@ class orders(models.Model):
     date = models.DateField(blank=True, null=True)
     invoice = models.TextField(unique=True, blank=True, null=True)
     invoice_type = models.TextField(blank=True, null=True)
-    total_price = models.FloatField(blank=True, null=True)
+    total_bags = models.TextField(blank=True, null=True)
+    final_price = models.FloatField(blank=True, null=True)
     before_vat = models.FloatField(blank=True, null=True)
     withholding_amount = models.FloatField(blank=True, null=True)
+    vat_amount = models.FloatField(blank=True, null=True)
+    reciveable = models.FloatField(blank=True, null=True)
 
     # measurement = models.TextField(blank=True, null=True)
     # price = models.FloatField(blank=True, null=True)  # This field type is a guess.
@@ -71,10 +67,11 @@ class orders(models.Model):
 class orders_items(models.Model):
     description = models.TextField(blank=True, null=True)
     no_of_unit = models.FloatField(blank=True, null=True)
-    unit_type = models.FloatField(blank=True, null=True)
-    order_quantity = models.FloatField(blank=True, null=True)
-    price_per_kg = models.FloatField(blank=True, null=True)
-    price = models.FloatField(blank=True, null=True)  
+    unit_type = models.TextField(blank=True, null=True)
+    quantity = models.FloatField(blank=True, null=True)
+    per_unit_kg = models.FloatField(blank=True, null=True)
+    unit_price = models.FloatField(blank=True, null=True)
+    total_price = models.FloatField(blank=True, null=True)  
     order_quantity = models.FloatField(blank=True, null=True)
     remaining_quantity =  models.FloatField(blank=True, null=True) 
     remaining_unit = models.FloatField(blank=True, null=True)

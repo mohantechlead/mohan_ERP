@@ -6,7 +6,7 @@
 <h2 class="text-center">Order Confirmation Form</h2>
 <br>
 
-<form action="{% url 'input_orders' %}"  oninput="vat_amount.value = parseFloat(price.value)*parseFloat(order_quantity.value)*0.15,before_vat.value = parseFloat(price.value)*parseFloat(order_quantity.value),total_price.value=parseFloat(price.value)*parseFloat(order_quantity.value) + ((parseFloat(price.value)*parseFloat(order_quantity.value))* 0.15)" method="post">
+<form action="{% url 'input_orders' %}"  method="post" id="form1">
     {% csrf_token %}
    
     <div class="col-sm-6" >
@@ -14,7 +14,7 @@
           <label class="control-label col-sm-4" > Order Number</label>
           <div class="col-sm-8">
             <!-- <input type="text" class="form-control" value="{{ next_order_number }}" readonly> -->
-            <input type="text" class="form-control" name="serial_no">
+            <input type="text" class="form-control" name="serial_no" id="serial_no">
           </div>
         </span> 
         <div class="form-group" >
@@ -47,23 +47,79 @@
         
       </div>
       <label class="control-label col-sm-4" style="margin-top: 10px;">Invoice Type</label>
-      <div class="col-sm-8" style="margin-top: 10px;">
-        
+      <div class="col-sm-8" style="margin-top: 10px;">      
         <input type="radio" name="invoice_type" value="cash"> Cash
-      <input type="radio" name="invoice_type" value="credit"> Credit
-    
-      
+      <input type="radio" name="invoice_type" value="credit"> Credit      
       </div>
-      <!-- <label class="control-label col-sm-4" style="margin-top: 10px;">Invoice Type</label>
-      <div class="col-sm-8" style="margin-top: 10px;">
-        <input type="text" class="form-control" name="invoice_type">
-        
-      </div> -->
     </div>
   </div>
  
  <br>
- <div class="col-sm-12" style="margin-bottom: 10px;">
+
+ <div class="col-sm-6"> 
+  <div class="form-group" style="margin-top: 10px;">
+    <label class="control-label col-sm-4" style="margin-top: 10px;"> Before VAT</label>
+    <div class="col-sm-8" style="margin-top: 10px;">
+      <output name="before_vat" id="before_vat" class="form-control">0</output>
+    </div>
+  </div> 
+  
+  
+  <div class="form-group" style="margin-top: 10px;">
+    <label class="control-label col-sm-2" style="margin-top: 30px;"> </label>
+    <div class="col-sm-5" style="margin-top: 40px;">
+      <input type="checkbox" id="withholdingCheckbox"> Apply Withholding<br>
+    
+     </div>
+  </div> 
+
+  <div class="form-group" style="margin-top: 10px;">
+    <label class="control-label col-sm-8" >Withholding amount</label>
+    
+    <div class="col-sm-8" style="margin-top: 10px;">
+      <output name="withholding_amount" id="withholding_amount" class="form-control" for="price before_vat">0</output>
+   
+    </div>
+  </div> 
+  
+</div>
+
+<div class="col-sm-5">
+
+  <div class="form-group" >
+    <label class="control-label col-sm-4" style="margin-top: 10px;">Final Price</label>
+    <div class="col-sm-8" style="margin-top: 10px;">
+      <output name="total_price" id="final_price" class="form-control" for="before_vat">0</output>
+   
+    </div>
+  </div>
+
+<div class="form-group" style="margin-top: 10px;">
+  <label class="control-label col-sm-4" style="margin-top: 10px;">VAT Amount</label>
+  <div class="col-sm-8" style="margin-top: 10px;">
+    <output name="vat_amount" id="vat_amount" class="form-control" for="before_vat">0</output>
+ 
+  </div>
+</div>
+
+<div class="form-group" style="margin-top: 10px;">
+  <label class="control-label col-sm-4" style="margin-top: 10px;">Receivable</label>
+  <div class="col-sm-8" style="margin-top: 10px;">
+    <output name="recievable_amount" id="recievable_amount" class="form-control" for="price order_quantity">0</output>
+ 
+  </div>
+</div>
+
+</div>
+
+<div class="col-sm-6">
+
+ 
+
+
+</div>
+
+ {% comment %} <div class="col-sm-12" style="margin-bottom: 10px;">
   <div class="form-group">
     <label class="control-label col-sm-2">Item Type</label>
     <div class="col-sm-10">
@@ -93,33 +149,11 @@
     </div>
   </div> 
 
-  <div class="form-group" style="margin-top: 10px;">
-    <label class="control-label col-sm-4" style="margin-top: 10px;"> Before VAT</label>
-    <div class="col-sm-8" style="margin-top: 10px;">
-      <output name="before_vat" id="before_vat" class="form-control" for="price order_quantity">0</output>
-    </div>
-  </div> 
-
-  <div class="form-group" style="margin-top: 10px;">
-    <label class="control-label col-sm-2" style="margin-top: 30px;"> </label>
-    <div class="col-sm-5" style="margin-top: 40px;">
-      <input type="checkbox" id="withholdingCheckbox"> Apply Withholding<br>
-    
-     </div>
-  </div> 
-
-  <div class="form-group" style="margin-top: 10px;">
-    <label class="control-label col-sm-8" >Withholding amount</label>
-    
-    <div class="col-sm-8" style="margin-top: 10px;">
-      <output name="withholding_amount" id="withholding_amount" class="form-control" for="price order_quantity">0</output>
-   
-    </div>
-  </div> 
-
-</div>
   
-  <div class="col-sm-5" style="margin-top: 10px;">
+
+</div> {% endcomment %}
+  
+  {% comment %} <div class="col-sm-5" style="margin-top: 10px;">
     <div class="form-group">
       <label class="control-label col-sm-4"> Unit Price</label>
       <div class="col-sm-8">
@@ -127,20 +161,8 @@
       </div>
     </div> 
 
-    <div class="form-group" style="margin-top: 10px;">
-      <label class="control-label col-sm-4" style="margin-top: 10px;">VAT Amount</label>
-      <div class="col-sm-8" style="margin-top: 10px;">
-        <output name="vat_amount" class="form-control" for="price order_quantity">0</output>
-     
-      </div>
-    </div>
-    <div class="form-group" >
-      <label class="control-label col-sm-4" style="margin-top: 10px;">Total Price</label>
-      <div class="col-sm-8" style="margin-top: 10px;">
-        <output name="total_price" id="total_price" class="form-control" for="price order_quantity">0</output>
-     
-      </div>
-    </div>
+    
+    
     <div class="form-group" style="margin-top: 10px;">
       <label class="control-label col-sm-4" style="margin-top: 10px;">Receivable</label>
       <div class="col-sm-8" style="margin-top: 10px;">
@@ -149,35 +171,99 @@
       </div>
     </div>
   
- </div>
+ </div> {% endcomment %}
 
  <div class="col-sm-10" style="margin-top: 10px;">
-  <div class="form-group">
+  {% comment %} <div class="form-group">
     <label class="control-label col-sm-8">Remarks</label>
     <div class="col-sm-10">
       <textarea type="text" class="form-control" id="comment" name="comment"></textarea>
     </div>
-  </div> 
+  </div>  {% endcomment %}
+</form>
 
+<form method="post" action="{% url 'input_orders_items' %}" id="form2">
+                  {% csrf_token %}
 
+                  {{ formset.management_form }}
+
+                  <div id="form-lists">
+                      {% for form in formset %}
+
+                      <div class="card-body row item-list form-group col-md-4">
+
+                          {{form.as_p}}
+
+                      </div>
+
+                      {% endfor %}
+                  </div>
+
+                  <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+                  <button id="add-more" class="btn btn-primary" type="button"
+                      style="background-image:url('../static/back1.PNG');color: aliceblue;">Add
+                      Item</button>
+</form>
+</br>
 
 </div>
+<div>
+{% comment %} </div>
+</div>
+</div>
+</div> {% endcomment %}
+ {% comment %} <div style="justify-content: center;">
 
-<span class="col-sm-4"></span>
- <div style="justify-content: center;">
-  <button type="submit"  class="col-sm-2 btn-lg " style="color: #6d7fcc; background-color: white;">
+  <button type="submit" id="calculate_total"  {% endcomment %}
+                        {% comment %} class="text-white bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:outline-none mb-8
+                         focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800"> {% endcomment %}
+                        {% comment %} >Calculate Total</button> <br>
+                         <span class=" col-sm-4">
+                            <p id="total_quantity" name="total_quantity"
+                                style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
+                        </span>
+                        <br>
+
+  <button type="submit"  class="col-sm-2 btn-lg " style="color: #6d7fcc; background-color: white;" id="submit"> 
     
     Submit
 </button>
- </div>
-</form>
+ </div> {% endcomment %}
+
+ <div class="container" style="font-size: medium;margin-top: 0px;">
+
+  <button type="submit" id="calculate_total" 
+  class="text-white bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:outline-none mb-8
+   focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800">
+  Calculate Total</button> <br>
+   <span class=" col-sm-4">
+      <p id="total_quantity" name="total_quantity"
+          style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
+  </span>
+  <br>
+
+  <div class="row">
+      <div class="col-sm-3"></div>
+      <div class="col-sm-5">
+
+          <button id="submit" class="col-sm-7 btn-lg "
+              style="background-image:url('../static/back1.PNG');color: aliceblue; margin-left: 100px;font-size: 24px; height: 62px; font-weight: bolder;">
+              Submit
+          </button>
+         
+          <span style="margin: 10px;"></span>
+          <!-- <a href="" class="btn btn-default" style="font-size: large; margin-top: 5px;">Cancel</a> -->
+      </div>
+  </div>
+</div>
+
 
 
 <script>
 
   document.addEventListener("DOMContentLoaded", function () {
       const before_vat_element = document.getElementById("before_vat");
-      const total_price_element = document.getElementById("total_price");
+      const final_price_element = document.getElementById("final_price");
       const withholding_amount_element = document.getElementById("withholding_amount");
       const recievable_amount_element = document.getElementById("recievable_amount");
       const withholding_checkbox = document.getElementById("withholdingCheckbox");
@@ -185,13 +271,13 @@
       withholding_checkbox.addEventListener("click", function () {
           console.log("The withholding checkbox was clicked.");
           const before_vat = parseFloat(before_vat_element.textContent);
-          const total_price = parseFloat(total_price_element.textContent);
+          const final_price = parseFloat(final_price_element.textContent);
           const withholdingApplied = withholding_checkbox.checked;
 
           if (withholdingApplied) {
               const withholding_amount = before_vat * 0.02;
               withholding_amount_element.textContent = withholding_amount.toFixed(2);
-              const recievable_amount = total_price - withholding_amount
+              const recievable_amount = final_price - withholding_amount
               recievable_amount_element.textContent = recievable_amount.toFixed(2);
           } else {
               
@@ -201,5 +287,6 @@
       });
   });
 </script>
+<script src="../../static/js/dn/input_orders.js"></script>
 
 {% endblock %}

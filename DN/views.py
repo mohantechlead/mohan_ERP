@@ -1,7 +1,7 @@
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import orders, delivery
-from .forms import DeliveryForm, OrderForm
+from .forms import DeliveryForm, OrderForm, OrderItemForm
 from django.core.mail import EmailMessage, get_connection
 from django.conf import settings
 from django.db.models import Q
@@ -19,6 +19,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .models import *
 from FGRN.models import finished_goods
+from django.forms import formset_factory
 # Create your views here.
 @api_view(['GET','POST'])
 def order_list(request):
@@ -112,24 +113,92 @@ def input_orders(request):
             order_number = form.cleaned_data['serial_no']
            
             # Save the value to the database
-            form.instance.before_vat = float(form.instance.order_quantity) * float(form.instance.price) 
-            form.instance.before_vat = round(form.instance.before_vat, 2)
+            # form.instance.before_vat = float(form.instance.order_quantity) * float(form.instance.price) 
+            # form.instance.before_vat = round(form.instance.before_vat, 2)
             
-            form.instance.total_price = float(form.instance.order_quantity) * float(form.instance.price) + (float(form.instance.order_quantity) * float(form.instance.price) * 0.15)
-            form.instance.total_price = round(form.instance.total_price, 2)
+            # form.instance.total_price = float(form.instance.order_quantity) * float(form.instance.price) + (float(form.instance.order_quantity) * float(form.instance.price) * 0.15)
+            # form.instance.total_price = round(form.instance.total_price, 2)
             
-            form.instance.withholding_amount = float(form.instance.before_vat * 0.02)
-            form.instance.withholding_amount = round(form.instance.withholding_amount, 2)
+            # form.instance.withholding_amount = float(form.instance.before_vat * 0.02)
+            # form.instance.withholding_amount = round(form.instance.withholding_amount, 2)
             order = form.save()
-            order.remaining = form.cleaned_data['order_quantity']
+            # order.remaining = form.cleaned_data['order_quantity']
             order.save()
             return redirect('input_orders')
-    
-    else:
-        
-        form = OrderForm()
+  
+    form = OrderForm()
+    formset = formset_factory(OrderItemForm, extra= 1)
+    formset = formset(prefix="items")
     return render(request, 'input_orders.html', {'form': form ,'orders':my_orders,'the_orders':the_orders, 
-                                                 'my_goods': my_goods})
+                                                 'my_goods': my_goods, 'formset': formset})
+    
+def input_orders_items(request):
+    if request.method == 'POST':
+        formset = formset_factory(OrderItemForm, extra=1 , min_num= 1)
+        formset = formset(request.POST or None, prefix="items")
+
+        if formset.errors:
+            print(formset.errors)
+
+        non_empty_forms = [form for form in formset if form.cleaned_data.get('description')]
+        order_no = request.POST.get('serial_no')
+        print(order_no,"order_no")
+        if non_empty_forms:
+            if formset.is_valid():
+                Order_instance = orders.objects.get(serial_no = order_no)
+                final_quantity = 0.0
+                total_bag = 0.0
+                total_crt  = 0.0
+                total_pkg = 0.0
+                for form in non_empty_forms:
+                    form.instance.FGRN_no = Order_instance
+                   
+                    quantity = form.cleaned_data['quantity']
+                    unit_type = form.cleaned_data['unit_type']
+                    no_of_unit = form.cleaned_data['no_of_unit']
+                    description = form.cleaned_data['description']
+
+                    finished_item = finished_goods.objects.get(item_name = description)
+                    if unit_type == 'Bag':
+                        total_bag += no_of_unit
+                    elif unit_type == 'Crt':
+                        total_crt += no_of_unit
+                    elif unit_type == 'Pkg':
+                        total_pkg += no_of_unit
+                    final_quantity += quantity
+                    finished_item.quantity += quantity
+                    finished_item.no_of_unit += no_of_unit
+                    finished_item.save()
+                    form.save()
+         
+                    Order_instance.total_quantity = final_quantity
+                    Order_instance.save()
+                    
+                    
+            else:
+                print(formset.data,"nval")
+                errors = dict(formset.errors.items())
+                return JsonResponse({'form_errors': errors}, status=400)
+        
+            order_form = OrderForm(prefix="orders")
+            formset = formset_factory(OrderItemForm, extra=1)
+            formset = formset(prefix="items")
+
+            context = {
+                'order_form': order_form,
+                'formset': formset,
+                # 'message':success_message,
+            }
+            return render(request, 'input_orders.html', context)
+    else:
+       
+        formset = formset_factory(OrderItemForm, extra=1)
+        formset = formset(prefix="items")
+
+    context = {
+        'formset': formset,
+    }
+    return render(request, 'input_orders.html', context)
 
 
 
