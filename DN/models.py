@@ -65,6 +65,7 @@ class orders(models.Model):
     # withholding_amount = models.FloatField(blank=True, null=True)
 
 class orders_items(models.Model):
+    serial_no = models.ForeignKey('orders', on_delete=models.CASCADE,db_column = 'serial_no')
     description = models.TextField(blank=True, null=True)
     no_of_unit = models.FloatField(blank=True, null=True)
     unit_type = models.TextField(blank=True, null=True)
@@ -72,7 +73,7 @@ class orders_items(models.Model):
     per_unit_kg = models.FloatField(blank=True, null=True)
     unit_price = models.FloatField(blank=True, null=True)
     total_price = models.FloatField(blank=True, null=True)  
-    order_quantity = models.FloatField(blank=True, null=True)
+    # order_quantity = models.FloatField(blank=True, null=True)
     remaining_quantity =  models.FloatField(blank=True, null=True) 
     remaining_unit = models.FloatField(blank=True, null=True)
     

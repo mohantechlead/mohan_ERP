@@ -102,10 +102,6 @@ def deliveries(request):
 
 #for creating Orders
 def input_orders(request):
-    print(orders.objects.all()[1:10])
-    my_orders = orders.objects.all()
-    the_orders = orders.objects.all()
-    my_goods = finished_goods.objects.all()
     if request.method == 'POST':
         form = OrderForm(request.POST)
        
@@ -121,19 +117,22 @@ def input_orders(request):
             
             # form.instance.withholding_amount = float(form.instance.before_vat * 0.02)
             # form.instance.withholding_amount = round(form.instance.withholding_amount, 2)
-            order = form.save()
+            form.save()
             # order.remaining = form.cleaned_data['order_quantity']
-            order.save()
+            # order.save()
             return redirect('input_orders')
-  
+    # my_orders = orders.objects.all()
+    # the_orders = orders.objects.all()
+    my_goods = finished_goods.objects.all()
     form = OrderForm()
     formset = formset_factory(OrderItemForm, extra= 1)
     formset = formset(prefix="items")
-    return render(request, 'input_orders.html', {'form': form ,'orders':my_orders,'the_orders':the_orders, 
-                                                 'my_goods': my_goods, 'formset': formset})
+    context = {'form': form ,'my_goods': my_goods, 'formset': formset}
+    return render(request, 'input_orders.html', context)
     
 def input_orders_items(request):
     if request.method == 'POST':
+        print(request.POST)
         formset = formset_factory(OrderItemForm, extra=1 , min_num= 1)
         formset = formset(request.POST or None, prefix="items")
 
@@ -141,37 +140,46 @@ def input_orders_items(request):
             print(formset.errors)
 
         non_empty_forms = [form for form in formset if form.cleaned_data.get('description')]
-        order_no = request.POST.get('serial_no')
-        print(order_no,"order_no")
+        order_number = request.POST.get('serial_no')
+        # order_number = get_object_or_404(orders, serial_no=request.POST.get('serial_no'))
+        print(order_number,"order_no")
         if non_empty_forms:
             if formset.is_valid():
-                Order_instance = orders.objects.get(serial_no = order_no)
+                Order_instance = orders.objects.get(serial_no = order_number)
                 final_quantity = 0.0
                 total_bag = 0.0
                 total_crt  = 0.0
                 total_pkg = 0.0
                 for form in non_empty_forms:
-                    form.instance.FGRN_no = Order_instance
+                    form.instance.serial_no = Order_instance
                    
                     quantity = form.cleaned_data['quantity']
-                    unit_type = form.cleaned_data['unit_type']
                     no_of_unit = form.cleaned_data['no_of_unit']
-                    description = form.cleaned_data['description']
+                    total_price = form.cleaned_data['total_price']
+                    # description = form.cleaned_data['description']
 
-                    finished_item = finished_goods.objects.get(item_name = description)
-                    if unit_type == 'Bag':
-                        total_bag += no_of_unit
-                    elif unit_type == 'Crt':
-                        total_crt += no_of_unit
-                    elif unit_type == 'Pkg':
-                        total_pkg += no_of_unit
-                    final_quantity += quantity
-                    finished_item.quantity += quantity
-                    finished_item.no_of_unit += no_of_unit
-                    finished_item.save()
+                    # finished_item = finished_goods.objects.get(item_name = description)
+                    # if unit_type == 'Bag':
+                    #     total_bag += no_of_unit
+                    # elif unit_type == 'Crt':
+                    #     total_crt += no_of_unit
+                    # elif unit_type == 'Pkg':
+                    #     total_pkg += no_of_unit
+                    # final_quantity += quantity
+                    # finished_item.quantity += quantity
+                    # finished_item.no_of_unit += no_of_unit
+                    # finished_item.save()
+                    Order_instance.vat_amount = quantity * 0.15
+                    Order_instance.final_price = quantity + (quantity * 0.15)  
+                    Order_instance.before_vat += total_price
+                    
+                    Order_instance 
+                    form.remaining_quantity = quantity
+                    form.unit = no_of_unit
                     form.save()
          
-                    Order_instance.total_quantity = final_quantity
+                    # Order_instance.total_quantity = final_quantity
+                    
                     Order_instance.save()
                     
                     

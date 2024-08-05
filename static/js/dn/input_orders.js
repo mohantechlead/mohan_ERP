@@ -57,10 +57,10 @@ document.addEventListener('DOMContentLoaded', function () {
         
         const formData1 = new FormData(form1);
         const formData2 = new FormData(form2);
-        const prNoValue = formData1.get('FGRN_no');
+        const prNoValue = formData1.get('serial_no');
         const amount = 1
         console.log(prNoValue)
-        formData2.append('FGRN_no', prNoValue)
+        formData2.append('serial_no', prNoValue)
     
         fetch(form1.action, {
             method: 'POST',

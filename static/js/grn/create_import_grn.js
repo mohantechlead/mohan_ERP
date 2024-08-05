@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData2 = new FormData(form2);
 
        
-        const prNoValue = formData1.get('PR_no');
+        // const prNoValue = formData1.get('PR_no');
         const grnNoValue = formData1.get('GRN_no');
        
-        console.log(prNoValue)
-        formData2.append('PR_no', prNoValue)
+        // console.log(prNoValue)
+        // formData2.append('PR_no', prNoValue)
         formData2.append('GRN_no', grnNoValue)
         // Use fetch to submit both forms asynchronously
         fetch(form1.action, {

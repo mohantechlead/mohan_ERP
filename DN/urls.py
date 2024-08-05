@@ -22,10 +22,11 @@ from DN import views
 urlpatterns = [
     path('input_delivery/', views.input_delivery, name='input_delivery'), 
     path('display_orders/', views.display_orders, name='display_orders'),
+    path('input_orders_items/',views.input_orders_items, name='input_orders_items'),
     path('input_orders/', views.input_orders, name='input_orders'),
     path('display_delivery/', views.display_delivery, name='display_delivery'),
     path('deliveries/', views.deliveries, name='deliveries'),
-    path('input_orders_items',views.input_orders_items, name='input_orders_items'),
+   
     path('search_orders/', views.search_orders, name='search_orders'),
     path('search_delivery/', views.search_delivery, name='search_delivery'),
     path('search_customer/', views.search_customer, name='search_customer'),
