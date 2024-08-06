@@ -147,39 +147,30 @@ def input_orders_items(request):
             if formset.is_valid():
                 Order_instance = orders.objects.get(serial_no = order_number)
                 final_quantity = 0.0
-                total_bag = 0.0
-                total_crt  = 0.0
-                total_pkg = 0.0
+                vat_amount = 0.0
+                final_price  = 0.0
+                before_vat = 0.0
+                final_unit = 0.0
                 for form in non_empty_forms:
                     form.instance.serial_no = Order_instance
                    
                     quantity = form.cleaned_data['quantity']
                     no_of_unit = form.cleaned_data['no_of_unit']
                     total_price = form.cleaned_data['total_price']
-                    # description = form.cleaned_data['description']
-
-                    # finished_item = finished_goods.objects.get(item_name = description)
-                    # if unit_type == 'Bag':
-                    #     total_bag += no_of_unit
-                    # elif unit_type == 'Crt':
-                    #     total_crt += no_of_unit
-                    # elif unit_type == 'Pkg':
-                    #     total_pkg += no_of_unit
+            
                     # final_quantity += quantity
-                    # finished_item.quantity += quantity
-                    # finished_item.no_of_unit += no_of_unit
-                    # finished_item.save()
-                    Order_instance.vat_amount = quantity * 0.15
-                    Order_instance.final_price = quantity + (quantity * 0.15)  
-                    Order_instance.before_vat += total_price
+                    final_unit += no_of_unit
+                    vat_amount += quantity * 0.15
+                    Order_instance.vat_amount = vat_amount
+                    final_price += quantity + (quantity * 0.15)
+                    Order_instance.final_price = final_price
+                    before_vat += total_price  
+                    Order_instance.before_vat = before_vat
                     
-                    Order_instance 
-                    form.remaining_quantity = quantity
-                    form.unit = no_of_unit
+                    form.instance.remaining_quantity = quantity
+                    form.instance.remaining_unit = no_of_unit
                     form.save()
          
-                    # Order_instance.total_quantity = final_quantity
-                    
                     Order_instance.save()
                     
                     

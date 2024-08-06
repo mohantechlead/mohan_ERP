@@ -20,6 +20,9 @@ class MR_item(models.Model):
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.MR_no)
+
 class inventory(models.Model):
     item_name = models.TextField(blank=True)
     no_of_unit = models.FloatField(blank=True, null=True)
