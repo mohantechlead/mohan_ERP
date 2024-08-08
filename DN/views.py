@@ -65,84 +65,11 @@ def input_delivery(request):
             
             if form.errors:
                 print(form.errors)
-    else:
-        form = DeliveryForm()
-        formset = formset_factory(DeliverItemForm, extra= 1)
-        formset = formset(prefix="items")
+   
+    form = DeliveryForm()
+    formset = formset_factory(DeliverItemForm, extra= 1)
+    formset = formset(prefix="items")
     return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 'formset':formset})
-
-# def input_delivery_items(request):
-#     if request.method == 'POST':
-#         print(request.POST)
-#         formset = formset_factory(DeliverItemForm, extra=1 , min_num= 1)
-#         formset = formset(request.POST or None, prefix="items")
-
-#         if formset.errors:
-#             print(formset.errors)
-
-#         non_empty_forms = [form for form in formset if form.cleaned_data.get('description')]
-#         delivery_no= request.POST.get('delivery_number')
-#         order_no= request.POST.get('serial_no')
-#         print(delivery_no,"delivery number")
-#         print(order_no,"order_no number")
-#         if non_empty_forms:
-#             if formset.is_valid():
-#                 Delivery_instance = delivery.objects.get(delivery_number = delivery_no)
-#                 print(Delivery_instance)
-#                 order_ins = orders.objects.get(serial_no = order_no)
-#                 Order_instance = orders_items.objects.filter(serial_no = order_no)
-#                 print(Order_instance)
-#                 final_quantity = 0.0
-#                 final_unit = 0.0
-#                 for form in non_empty_forms:
-#                     form.instance.delivery_number = Delivery_instance
-#                     form.instance.serial_no = Order_instance.serial_no
-                   
-#                     quantity = form.cleaned_data['quantity']
-#                     no_of_unit = form.cleaned_data['no_of_unit']
-#                     description = form.cleaned_data['description']
-                    
-                    
-#                     for order in Order_instance:
-#                         if description == order.description:
-#                             order.remaining_quantity -= quantity
-#                             order.remaining_unit_unit -= no_of_unit
-#                             return redirect('input_delivery')
-                        
-#                         if order.remaining_quantity or order.remaining_unit < 0:
-#                             error_message = 'Over Delivery'
-#                             form.save()
-#                             return render(request, 'input_delivery.html', {'form': form, 'error_message': error_message})
-#                         else:
-#                             form.save()
-                    
-#                         order.save()
-#                         Delivery_instance.save()    
-                    
-#             else:
-#                 print(formset.data,"nval")
-#                 errors = dict(formset.errors.items())
-#                 return JsonResponse({'form_errors': errors}, status=400)
-        
-#             order_form = DeliveryForm(prefix="orders")
-#             formset = formset_factory(DeliverItemForm, extra=1)
-#             formset = formset(prefix="items")
-
-#             context = {
-#                 'order_form': order_form,
-#                 'formset': formset,
-#                 # 'message':success_message,
-#             }
-#             return render(request, 'input_delivery.html', context)
-#     else:
-       
-#         formset = formset_factory(DeliverItemForm, extra=1)
-#         formset = formset(prefix="items")
-
-#     context = {
-#         'formset': formset,
-#     }
-#     return render(request, 'input_delivery.html', context)
 
 def input_delivery_items(request):
     if request.method == 'POST':
@@ -178,21 +105,23 @@ def input_delivery_items(request):
                     return JsonResponse({'error': 'Order not found'}, status=404)
 
                 for form in non_empty_forms:
-                    form.instance.delivery_number = Delivery_instance
-
+                    # Assign the actual delivery number, not the delivery instance
+                    form.instance.delivery_number = Delivery_instance.delivery_number
+                    
                     for order in Order_instance:
+                        print("here")
+                        print(order.serial_no)
                         print(order.description)
-                        print(description)
                         print(form.cleaned_data['description'])
+                        
                         if form.cleaned_data['description'] == order.description:
+                            print("I am here")
                             form.instance.serial_no = order.serial_no  # Correctly assign the serial_no
 
                             # Adjust quantities
                             order.remaining_quantity -= form.cleaned_data['quantity']
                             order.remaining_unit -= form.cleaned_data['no_of_unit']
-                        else:
-                            print("item not found")
-
+                            
                             # Prevent over-delivery
                             if order.remaining_quantity < 0 or order.remaining_unit < 0:
                                 error_message = 'Over Delivery'
@@ -203,6 +132,8 @@ def input_delivery_items(request):
                             order.save()
                             form.save()
                             Delivery_instance.save()
+                        else:
+                            print("item not found")
 
                 return redirect('input_delivery')
             else:
