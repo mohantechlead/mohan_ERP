@@ -119,67 +119,11 @@
 
 </div>
 
- {% comment %} <div class="col-sm-12" style="margin-bottom: 10px;">
-  <div class="form-group">
-    <label class="control-label col-sm-2">Item Type</label>
-    <div class="col-sm-10">
-      <input type="textarea" list="my_goods" class="form-control" rows="3"  name="description" >
-      <datalist id="my_goods">
-        {% for good in my_goods %}
-        <option value="{{good.item_name}}"></option>
-        {% endfor %}
-      </datalist>
-      <!-- {{form.description}} -->
-    </div>
-  </div>
-  <div class="col-sm-8" style="margin-top: 10px;">
-        
-    <input type="radio" name="measurement" value="pcs" style="margin: 6px;"> Pcs
-    <input type="radio" name="measurement" value="pairs" style="margin: 6px;"> Pairs
-    <input type="radio" name="measurement" value="kgs" style="margin: 6px;"> Kgs
-
-  
-  </div>
-</div>
-<div class="col-sm-5" style="margin-top: 10px; display: inline-block;">
-  <div class="form-group">
-    <label class="control-label col-sm-4"> Quantity</label>
-    <div class="col-sm-8">
-      <input type="text" class="form-control col-sm-2" id="order_quantity" name="order_quantity">
-    </div>
-  </div> 
-
-  
-
-</div> {% endcomment %}
-  
-  {% comment %} <div class="col-sm-5" style="margin-top: 10px;">
-    <div class="form-group">
-      <label class="control-label col-sm-4"> Unit Price</label>
-      <div class="col-sm-8">
-        <input type="text" class="form-control" id="price" name="price">
-      </div>
-    </div> 
-
-    
-    
-    <div class="form-group" style="margin-top: 10px;">
-      <label class="control-label col-sm-4" style="margin-top: 10px;">Receivable</label>
-      <div class="col-sm-8" style="margin-top: 10px;">
-        <output name="recievable_amount" id="recievable_amount" class="form-control" for="price order_quantity">0</output>
-     
-      </div>
-    </div>
-  
- </div> {% endcomment %}
+ 
+ 
 
  <div class="col-sm-10" style="margin-top: 10px;">
-  {% comment %} <div class="form-group">
-    <label class="control-label col-sm-8">Remarks</label>
-    <div class="col-sm-10">
-      <textarea type="text" class="form-control" id="comment" name="comment"></textarea>
-    </div>
-  </div>  {% endcomment %}
+ 
 </form>
 
 <form method="post" action="{% url 'input_orders_items' %}" id="form2">
@@ -208,27 +152,8 @@
 
 </div>
 <div>
-{% comment %} </div>
-</div>
-</div>
-</div> {% endcomment %}
- {% comment %} <div style="justify-content: center;">
 
-  <button type="submit" id="calculate_total"  {% endcomment %}
-                        {% comment %} class="text-white bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:outline-none mb-8
-                         focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800"> {% endcomment %}
-                        {% comment %} >Calculate Total</button> <br>
-                         <span class=" col-sm-4">
-                            <p id="total_quantity" name="total_quantity"
-                                style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
-                        </span>
-                        <br>
 
-  <button type="submit"  class="col-sm-2 btn-lg " style="color: #6d7fcc; background-color: white;" id="submit"> 
-    
-    Submit
-</button>
- </div> {% endcomment %}
 
  <div class="container" style="font-size: medium;margin-top: 0px;">
 

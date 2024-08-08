@@ -124,7 +124,8 @@ def create_grn_items(request):
         formset = formset_factory(GRNItemForm, extra=1, min_num=1)
         formset = formset(request.POST or None,prefix="GRN_items")
         print(formset.data,"r")
-      
+        final_quantity = 0.0
+        final_unit = 0.0
         if formset.errors:
                         print(formset.errors) 
         # Check if 'PR_no' field is empty in each form within the formset
@@ -145,8 +146,10 @@ def create_grn_items(request):
                    
                     try:
                         inventory_item = inventory.objects.get(item_name = item_name)
-                        inventory_item.quantity += quantity
-                        inventory_item.no_of_unit += no_of_unit
+                        final_quantity += quantity
+                        inventory_item.quantity += final_quantity
+                        final_unit += no_of_unit
+                        inventory_item.no_of_unit += final_unit
                         inventory_item.save()
                     except inventory.DoesNotExist:
                         print(item_name, quantity, "yes")
