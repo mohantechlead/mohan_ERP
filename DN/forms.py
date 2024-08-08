@@ -58,7 +58,7 @@ class DeliverItemForm(forms.ModelForm):
     )
     
     class Meta:
-        model = orders_items
+        model = delivery
         fields = ['description', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit']
 
 

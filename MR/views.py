@@ -81,7 +81,7 @@ def create_MR_items(request):
                 'formset': formset,
                 # 'message':success_message,
             }
-            return render(request, 'create_MR.html', context)
+            return render(request, 'create_mr.html', context)
     else:
        
         formset = formset_factory(MRItemForm, extra=1)
@@ -90,7 +90,7 @@ def create_MR_items(request):
     context = {
         'formset': formset,
     }
-    return render(request, 'create_MR.html', context)
+    return render(request, 'create_mr.html', context)
 
 def display_MR(request):
     mr_list = MR.objects.all()

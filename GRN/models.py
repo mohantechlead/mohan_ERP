@@ -51,6 +51,9 @@ class GRN_item(models.Model):
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.GRN_no)
+
 class import_GRN(models.Model):
     GRN_no = models.TextField(primary_key=True)
     grn_date = models.DateField(blank=True, null=True)

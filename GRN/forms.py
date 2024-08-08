@@ -151,7 +151,7 @@ class GRNItemForm(forms.ModelForm):
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Remark'})
     )
     class Meta:
-        model = MR_item
+        model = GRN_item
         fields = ['item_name','no_of_unit','unit_type','per_unit_kg','quantity','measurement_unit','remarks']
 
 class approvalForm(forms.Form):
