@@ -15,10 +15,7 @@ class MRItemForm(forms.ModelForm):
         queryset=inventory.objects.all().order_by('item_name'),
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
-    # description = forms.CharField(
-    #     required = False,
-    #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
-    # )
+  
     no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})

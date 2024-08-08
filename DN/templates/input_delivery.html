@@ -4,10 +4,10 @@
     <h1>Input Delivery Information</h1>
     <div>
       <div  class="col-md-6">
-        <form action="{% url 'search_orders' %}">
+        {% comment %} <form action="{% url 'search_orders' %}">
           <input type="text" name="serial_no">
           <input style="color: #6d7fcc;"  type="submit" value="Search Order">
-      </form>
+      </form> {% endcomment %}
       </div>
       
     </div>
@@ -30,14 +30,14 @@
       {{ error_message }}
     </div>
     {% endif %}
-    <form action="{% url 'input_delivery' %}" method="post">
+    <form action="{% url 'input_delivery' %}" method="post" id="form1">
         {% csrf_token %}
 
 
-        <div>
+        <div class="col-sm-6" style="margin-top: 10px;">
           <div class="form-group">
-          <label class="control-label col-sm-3" style="margin-left: 50px;" > Order Number</label>
-          <div class="col-sm-3" style="margin-left: 50px;" >
+          <label class="control-label col-sm-6" > Order Number</label>
+          <div class="col-sm-8">
             <!-- <input type="text" class="form-control" value="{{ next_order_number }}" readonly> -->
             <input type="text" list="my_orders" placeholder="Order No" name="serial_no" class="form-control "
                   style="width: 100%;">
@@ -47,9 +47,17 @@
                   {% endfor %}
                 </datalist>
           </div>
-        </div> </div>
+        </div> 
+
+        <div class="form-group">
+          <label class="control-label col-sm-6"> Recipient Name</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="recipient_name">
+          </div>
+        </div> 
+      </div>
 <br>
-        <div class="col-sm-6" style="margin-top: 10px;">
+        <div class="col-sm-5" style="margin-top: 10px;">
             <div class="form-group" style="margin-bottom: 10px;">
               <label class="control-label col-sm-4" > Delivery Number</label>
               <div class="col-sm-8">
@@ -68,25 +76,21 @@
           </div>
     
       <div class="col-sm-5" style="margin-top: 10px;">
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label class="control-label col-sm-6"> Delivery Quantity</label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" name="delivery_quantity">
-          </div>
-        </div> 
-    
-    
-      </div>
-      <div class="col-sm-6" style="margin-top: 10px;">
+       
         <div class="form-group" style="margin-bottom: 10px;">
           <label class="control-label col-sm-4"> Driver Name</label>
           <div class="col-sm-8">
             <input type="text" class="form-control" name="driver_name">
           </div>
         </div> 
+      </div>
+
+      <div class="col-sm-6" style="margin-top: 10px;">
+        
     
     
       </div>
+
       <div class="col-sm-6" style="margin-top: 10px;">
         <div class="form-group" >
           <label class="control-label col-sm-6">Truck Number</label>
@@ -94,37 +98,73 @@
             <input type="text" class="form-control" name="truck_number">
           </div>
         </div>
-      </div>
-      <div class="col-sm-5" >
+     
         <div class="form-group">
-          <label class="control-label col-sm-6"> Recipient Name</label>
-          <div class="col-sm-8">
-            <input type="text" class="form-control" name="recipient_name">
-          </div>
-        </div> 
-    
-       
-    
-      </div>
-      <div class="col-sm-10" style="margin-top: 10px;">
-        <div class="form-group">
-          <label class="control-label col-sm-8">Remarks</label>
+          <label class="control-label col-sm-6">Remarks</label>
           <div class="col-sm-10">
             <textarea type="text" class="form-control" id="comment" name="comment"></textarea>
           </div>
-        </div> 
-      
-      
-      
+        </div>
       </div>
-      <span class="col-sm-4"></span>
-      <div style="justify-content: center;">
-        <button type="submit"  class="col-sm-2 btn-lg " style="color: #6d7fcc; background-color: white;">
-          
-          Submit
-      </button>
-       </div>
+      
     </form>
+      
+    <div class="col-sm-12" style="margin-top: 10px;">
+  <form method="post" action="{% url 'input_delivery_items' %}" id="form2">
+        {% csrf_token %}
+  
+        {{ formset.management_form }}
+  
+        <div id="form-lists">
+            {% for form in formset %}
+  
+            <div class="card-body row item-list form-group col-md-4">
+  
+                {{form.as_p}}
+  
+            </div>
+  
+            {% endfor %}
+        </div>
+  
+        <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+        <button id="add-more" class="btn btn-primary" type="button"
+            style="background-image:url('../static/back1.PNG');color: aliceblue;">Add
+            Item</button>
+  </form>
 
+  </div>
+ 
+ 
+
+  <div class="container" style="font-size: medium;margin-top: 0px;">
+
+    <button type="submit" id="calculate_total" 
+    class="text-white bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:outline-none mb-8
+     focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-gray-700 dark:focus:ring-blue-800">
+    Calculate Total</button> <br>
+     <span class=" col-sm-4">
+        <p id="total_quantity" name="total_quantity"
+            style="height:50px; font-weight:bolder; font-size: 22px; color: black;"></p>
+    </span>
+    <br>
+  
+    <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-5">
+  
+            <button id="submit" class="col-sm-7 btn-lg "
+                style="background-image:url('../static/back1.PNG');color: aliceblue; margin-left: 100px;font-size: 24px; height: 62px; font-weight: bolder;">
+                Submit
+            </button>
+           
+            <span style="margin: 10px;"></span>
+            <!-- <a href="" class="btn btn-default" style="font-size: large; margin-top: 5px;">Cancel</a> -->
+        </div>
+    </div>
+  </div>
+   
+    
+<script src="../../static/js/dn/input_delivery.js"></script>
 
 {% endblock %}

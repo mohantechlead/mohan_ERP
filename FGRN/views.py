@@ -59,20 +59,30 @@ def create_fgrn_items(request):
             if formset.is_valid():
                 FGRN_instance = FGRN.objects.get(FGRN_no = pr_no)
                 final_quantity = 0.0
+                total_bag = 0.0
+                total_crt  = 0.0
+                total_pkg = 0.0
                 for form in non_empty_forms:
                     form.instance.FGRN_no = FGRN_instance
-                    # description = FGRN_instance.description
+                   
                     quantity = form.cleaned_data['quantity']
+                    unit_type = form.cleaned_data['unit_type']
                     no_of_unit = form.cleaned_data['no_of_unit']
                     description = form.cleaned_data['description']
 
-
                     finished_item = finished_goods.objects.get(item_name = description)
+                    if unit_type == 'Bag':
+                        total_bag += no_of_unit
+                    elif unit_type == 'Crt':
+                        total_crt += no_of_unit
+                    elif unit_type == 'Pkg':
+                        total_pkg += no_of_unit
+                    final_quantity += quantity
                     finished_item.quantity += quantity
                     finished_item.no_of_unit += no_of_unit
                     finished_item.save()
                     form.save()
-                                    
+         
                     FGRN_instance.total_quantity = final_quantity
                     FGRN_instance.save()
                     

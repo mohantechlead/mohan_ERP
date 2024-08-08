@@ -8,6 +8,9 @@ class FGRN(models.Model):
     description = models.TextField(blank=True, null= True)
     date = models.DateField()
     total_quantity = models.FloatField(blank=True, null=True)
+    total_bags = models.FloatField(blank=True, null=True)
+    total_crt = models.FloatField(blank=True, null=True)
+    total_Pkg = models.FloatField(blank=True, null=True)
 
 class FGRN_item(models.Model):
     FGRN_no = models.ForeignKey('FGRN', on_delete=models.CASCADE,db_column = 'FGRN_no')
@@ -19,6 +22,7 @@ class FGRN_item(models.Model):
     measurement_unit = models.TextField(blank=True, null= True)
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
+    unit_type = models.TextField(blank=True, null= True)
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)

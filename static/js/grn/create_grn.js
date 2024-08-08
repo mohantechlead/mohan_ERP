@@ -17,11 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData2 = new FormData(form2);
 
        
-        const prNoValue = formData1.get('PR_no');
+        // const prNoValue = formData1.get('PR_no');
         const grnNoValue = formData1.get('GRN_no');
        
-        console.log(prNoValue)
-        formData2.append('PR_no', prNoValue)
+        // console.log(prNoValue)
+        // formData2.append('PR_no', prNoValue)
         formData2.append('GRN_no', grnNoValue)
         // Use fetch to submit both forms asynchronously
         fetch(form1.action, {
@@ -71,4 +71,33 @@ document.addEventListener('DOMContentLoaded', function() {
         totalNewForms.value = currentFormsCount + 1;
         copyFormTarget.appendChild(copyEmptyForm);
                 }
-            });
+
+                function updateTotalPrice(form) {
+                    var per_unit_kg = parseFloat(form.find('#per_unit_kg').val());
+                    // var unit_price = parseFloat(form.find('#unit_price').val());
+                    var no_of_unit = parseFloat(form.find('#no_of_unit').val());
+                    // var quantity = parseFloat(form.find('#quantity').val());
+            
+                         
+                    var total = per_unit_kg * no_of_unit  || 0;
+                    // var final_price = unit_price * quantity || 0;   
+                    
+            
+                    form.find('#quantity').val(total.toFixed(2));
+                    // form.find('#total_price').val(final_price.toFixed(2));
+                }
+            
+                $(document).on('input', '.item-list #per_unit_kg, .item-list #no_of_unit', function () {
+                    var form = $(this).closest('.item-list');
+                    updateTotalPrice(form);
+                });
+            
+                // Apply initial calculation for existing forms
+                $('.item-list').each(function () {
+                    var form = $(this);
+                    updateTotalPrice(form);
+                });
+             });
+        
+
+
