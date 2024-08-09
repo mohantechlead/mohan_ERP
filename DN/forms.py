@@ -9,7 +9,53 @@ class DateInput(forms.DateInput):
         widget=forms.Select(attrs={'class': 'form-control'}),)
 
 class DeliveryForm(forms.ModelForm):
-    delivery_number = forms.IntegerField(required=True)
+    delivery_number = forms.IntegerField(required=True,
+                                        widget = forms.TextInput(attrs={'class': 'form-control', 
+                                        'type':'text',
+                                        'placeholder': 'Add a Truck Number', 
+                                        'id':'delivery_number'}))
+    
+    serial_no = forms.IntegerField(required=True,
+                                        widget = forms.TextInput(attrs={'class': 'form-control', 
+                                        # 'type':'select',
+                                        # 'placeholder': 'Add a Truck Number', 
+                                        'id':'serial_no'}))
+    
+    delivery_date = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'placeholder': 'Select a date',
+                'id':'delivery_date'
+            }
+        )
+    )
+
+    truck_number = forms.CharField(
+        label="Truck Number",
+        required=False, 
+        widget = forms.TextInput(attrs={'class': 'form-control', 
+                                        'type':'text',
+                                        'placeholder': 'Add a Truck Number', 
+                                        'id':'truck_number'}))
+    
+    driver_name = forms.CharField(
+        required=False,
+        widget = forms.TextInput(attrs={'class': 'form-control', 
+                                        'placeholder': 'Add a Driver Name', 
+                                        'id':'driver_name'})
+                                  )
+    recipient_name = forms.CharField(required=False,
+                                    widget = forms.TextInput(attrs={'class': 'form-control', 
+                                        'placeholder': 'Add a Recipient Name', 
+                                        'id':'recipient_name'}))
+    
+    delivery_comment = forms.CharField(required=False,
+                                       widget = forms.TextInput(attrs={
+                                        'class': 'form-control', 
+                                        'placeholder': 'Add a Delivery Comment', 
+                                        'id':'delivery_comment'}))
     class Meta:
         model = delivery
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
