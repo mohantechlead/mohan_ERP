@@ -83,6 +83,16 @@ class HS_code(models.Model):
     def __str__(self):
      return self.item_name
     
+class inventory_GRN_items(models.Model):
+    item_name = models.TextField(blank=True)
+    total_no_of_unit = models.FloatField(blank=True, null=True)
+    total_quantity = models.FloatField(blank=True)
+    inventory_GRN_items_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    branch = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.item_name
+    
 
 
     

@@ -20,6 +20,7 @@ class MRItemForm(forms.ModelForm):
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
     )
+
     UNIT_CHOICES =( 
         ("", ""),
     ("Bag", "Bag"), 
@@ -63,5 +64,35 @@ class InventoryItemForm(forms.ModelForm):
     class Meta:
    
         model = inventory
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
+
+class OpeningBalanceItemForm(forms.ModelForm):
+
+    UNIT_CHOICES =( 
+        ("", ""),
+    ("Bag", "Bag"), 
+    ("Pkg", "Pkg"),
+    ("Crt", "Crt"),
+    ("Drum", "Drum"),) 
+    
+    unit_type = forms.ChoiceField(
+        choices = UNIT_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        
+    )
+
+    measurement_choice =( 
+        ("", ""),
+    ("kgs", "kgs")) 
+    
+    measurement_type = forms.ChoiceField(
+        choices = measurement_choice,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        
+    )
+    
+    class Meta:
+   
+        model = opening_balance
         fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
    
