@@ -98,3 +98,24 @@ body {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Adjust the space between the fields */
+}
+
+.form-group {
+  flex: 1;
+  min-width: 200px; /* Adjust based on your layout needs */
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+}
+

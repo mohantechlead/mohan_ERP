@@ -9,6 +9,7 @@ urlpatterns = [
     # path('display_pr', views.display_pr, name='display_pr'),
     path('display_search_items', views.display_search_items, name='display_search_items'),
     path('display_grn', views.display_grn, name='display_grn'),
+    path('display_grn_item', views.display_grn_item, name='display_grn_item'),
     path('display_grns', views.display_grns, name='display_grns'),
     path('print_format', views.print_format, name='print_format'),
     path('print_pr', views.print_pr, name='print_pr'), 

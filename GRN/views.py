@@ -550,3 +550,27 @@ def create_import_grn_items(request):
         'formset': formset,
     }
     return render(request, 'create_grn_items.html', context)
+
+def display_grn_item(request):
+
+    item_quantities = GRN_item.objects.values('item_name').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+  
+    for item in item_quantities:
+        inventory_GRN_items.objects.update_or_create(
+            item_name=item['item_name'],
+            defaults={'total_quantity': item['total_quantity'],
+                      'total_no_of_unit': item['total_no_of_unit']}
+            
+        )
+        print(f"Name: {item['item_name']}, Total Quantity: {item['total_quantity']}, Total No of Unit: {item['total_no_of_unit']}")
+    
+
+    items = inventory_GRN_items.objects.all().order_by('item_name')    
+    print(items)
+    context = {
+        # 'total_quantity':item_quantities,
+        'items':items,
+        
+    }
+
+    return render(request,'display_MR_items.html',context)

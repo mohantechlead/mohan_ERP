@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import *
+from .models import opening_balance
 from .forms import *
 from django.shortcuts import render, redirect,get_object_or_404
 from django.conf import settings
@@ -10,6 +11,7 @@ from django.http import JsonResponse,HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import User, auth
 from num2words import num2words
+from GRN.models import inventory_GRN_items
 
 # Create your views here.
 def create_MR(request):
@@ -129,6 +131,53 @@ def display_inventory(request):
             return redirect('display_inventory')
     
     form = InventoryItemForm()
+
+    # # my_balance = opening_balance.objects.all()
+    # my_inventory = inventory_MR_items.objects.all()
+    # grn_inventory = inventory_GRN_items.objects
+    
+    # for item_a in my_inventory:
+    #     item_b = opening_balance.objects.filter(item_name=item_a.item_name).first()
+        
+    #     if item_b:
+    #         # Calculate the result
+    #         result_quantity =  item_b.quantity - item_a.total_quantity 
+    #     else:
+    #         # If item_b doesn't exist, the result is just the negative of item_a's quantity
+    #         result_quantity = -item_a.total_quantity
+
+    #     # Save the result in ModelC
+    #     inventory.objects.update_or_create(
+    #         item_name=item_a.item_name,
+    #         defaults={'quantity': result_quantity}
+    #     )
+
+    names_a = set(inventory_GRN_items.objects.values_list('item_name', flat=True))
+    names_b = set(inventory_MR_items.objects.values_list('item_name', flat=True))
+    names_c = set(opening_balance.objects.values_list('item_name', flat=True))
+
+    all_names = names_a.union(names_b).union(names_c)
+
+    for name in all_names:
+        # Get the quantity from each model
+        quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
+        quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
+        quantity_c = opening_balance.objects.filter(item_name=name).first()
+        
+        # Initialize the quantities or set to 0 if not found
+        quantity_a_value = quantity_a.total_quantity if quantity_a else 0
+        quantity_b_value = quantity_b.total_quantity if quantity_b else 0
+        quantity_c_value = quantity_c.quantity if quantity_c else 0
+        
+        # Calculate the result: Subtract ModelA and ModelC, and add ModelB
+        result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value 
+        
+        # Save or update the result in ModelD
+        inventory.objects.update_or_create(
+            item_name=name,
+            defaults={'quantity': result_quantity}
+        )
+
     items = inventory.objects.all().order_by('item_name')
     print(items)
     context = {
@@ -137,6 +186,51 @@ def display_inventory(request):
     }
 
     return render(request,'display_inventory.html',context)
+
+def opening_balances(request):
+    if request.method == 'POST':
+        form = OpeningBalanceItemForm(request.POST)
+
+        if form.errors:
+            print(form.errors)
+
+        if form.is_valid():
+            form.save()
+            return redirect('opening_balances')
+    
+    form = OpeningBalanceItemForm()
+    items = opening_balance.objects.all().order_by('item_name')    
+    print(items)
+    context = {
+        'items':items,
+        'form':form,
+    }
+
+    return render(request,'opening_balances.html',context)
+
+def display_MR_items(request):
+
+    item_quantities = MR_item.objects.values('item_name').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+  
+    for item in item_quantities:
+        inventory_MR_items.objects.update_or_create(
+            item_name=item['item_name'],
+            defaults={'total_quantity': item['total_quantity'],
+                      'total_no_of_unit': item['total_no_of_unit']}
+            
+        )
+        print(f"Name: {item['item_name']}, Total Quantity: {item['total_quantity']}, Total No of Unit: {item['total_no_of_unit']}")
+    
+
+    items = inventory_MR_items.objects.all().order_by('item_name')    
+    print(items)
+    context = {
+        # 'total_quantity':item_quantities,
+        'items':items,
+        
+    }
+
+    return render(request,'display_MR_items.html',context)
 
 def display_single_mr(request):
     if request.method == 'GET':

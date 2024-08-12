@@ -371,3 +371,31 @@ a.article:hover {
         display: none;
     }
 }
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Adjust the space between the fields */
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px; /* Adjust based on your layout needs */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="date"] {
+    /* Customize the appearance of the date picker */
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 300px;
+}
+
+/* .form-group input {
+    width: 100px;
+} */

@@ -612,3 +612,55 @@ def sales_contract(request):
     else:
         
         return render(request,'sales_contract.html')
+    
+
+def create_delivery(request):
+    my_orders = orders.objects.all()  # Orders model should start with an uppercase letter
+
+    if request.method == 'POST':
+        form = DeliveryForm(request.POST)
+        formset_class = formset_factory(DeliverItemForm, extra=1, min_num=1)
+        formset = formset_class(request.POST, prefix="items")
+        delivery_number = request.POST['delivery_number']
+
+        # Validate the form and formset
+        if form.is_valid() and formset.is_valid():
+            # serial_no_value = request.POST.get('serial_no')
+            serial_no_value = form.cleaned_data['serial_no']
+            order_instance = orders.objects.get(serial_no=serial_no_value)  # Ensure this is the correct field name
+
+            # Check for duplicate delivery number
+            if delivery.objects.filter(delivery_number__icontains=delivery_number).exists():
+                messages.error(request, 'Delivery Number already exists')
+                return redirect('input_delivery')
+
+            # Save the Delivery instance
+            delivery_instance = form.save(commit=False)
+            delivery_instance.serial_no = order_instance  # Assign the Orders instance
+            delivery_instance.save()  # Save the Delivery instance
+
+            # Save the valid forms in the formset
+            for form in formset:
+                if form.cleaned_data.get('description'):  # Check if description exists
+                    item_instance = form.save(commit=False)
+                    item_instance.delivery = delivery_instance  # Link the item to the delivery
+                    item_instance.save()
+
+            return redirect('input_delivery')
+
+        # If form is not valid, print errors for debugging
+        if form.errors:
+            print(form.errors)
+
+    else:
+        form = DeliveryForm()
+        formset_class = formset_factory(DeliverItemForm, min_num=1)
+        formset = formset_class(prefix="items")
+
+    context = {
+        'form': form,
+        'formset': formset,
+        'my_orders': my_orders
+    }
+
+    return render(request, 'create_delivery.html', context)
