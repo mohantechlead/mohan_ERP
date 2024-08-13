@@ -9,5 +9,6 @@ urlpatterns = [
     path('opening_balances',views.opening_balances, name= 'opening_balances'),
     path('display_single_mr',views.display_single_mr, name= 'display_single_mr'),
     path('display_MR_items',views.display_MR_items, name= 'display_MR_items'),
-
+    path('export_mr',views.export_mr, name= 'export_mr'),
+    path('export_mr_pdf', views.export_mr_pdf, name='export_mr_pdf'),
 ]
