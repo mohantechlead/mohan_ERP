@@ -7,6 +7,10 @@ class MR(models.Model):
     desc = models.TextField(blank=True)
     MR_store = models.TextField(blank=True)
     total_quantity = models.FloatField(blank=True, null=True)
+    branch = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return str(self.MR_no)
 
 class MR_item(models.Model):
     MR_no = models.ForeignKey('MR',on_delete= models.CASCADE,db_column = 'MR_no')

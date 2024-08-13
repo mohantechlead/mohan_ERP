@@ -12,6 +12,11 @@ from django.template.loader import get_template
 from django.contrib.auth.models import User, auth
 from num2words import num2words
 from GRN.models import inventory_GRN_items
+from django import template
+from openpyxl import Workbook
+from openpyxl.styles import *
+import openpyxl
+
 
 # Create your views here.
 def create_MR(request):
@@ -245,3 +250,108 @@ def display_single_mr(request):
                         'my_mr': mr,
                     }
     return render(request, 'display_single_mr.html')
+
+def export_mr(request):
+
+    # my_mr_items = MR_item.objects.all().order_by('item_name')
+
+    # for item in my_mr_items:
+    #     mr_details = get_object_or_404(MR, MR_no=item.MR_no)
+    items = MR_item.objects.select_related('MR_no').all().order_by('MR_no__MR_date','item_name')
+    # my_inventory = inventory.objects.all()
+
+    context = {
+        'items':items,
+        # 'my_inventory':my_inventory
+        # 'detail':mr_details
+    }
+    return render(request, 'export_mr.html', context)
+
+def export_mr_pdf(request):
+    # Create a workbook and add a worksheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'Exported Data'
+
+    # Add headers to the worksheet
+    headers = ['MR Date', 'Item Name', 'MR No', 'Quantity', 'No of Units']
+    worksheet.append(headers)
+
+    # Filter data based on request parameters
+    selected_month = request.GET.get('month')
+    selected_branch = request.GET.get('branch')
+    
+    # Replace with your actual query
+    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
+
+    # Apply filters if provided
+    if selected_month:
+        items = items.filter(MR_no__MR_date__month=selected_month)
+    if selected_branch:
+        items = items.filter(MR_no__branch=selected_branch)
+
+    if items.exists():
+        month_year = items.first().MR_no.MR_date.strftime("%B %Y")  # Example format: "August 2024"
+    else:
+        month_year = "N/A"
+
+    # Add the title to the worksheet
+    title = f"List of MR in the Month {month_year}"
+    worksheet.merge_cells('A1:E1')  # Merge cells for the title
+    worksheet['A1'] = title
+    worksheet['A1'].font = openpyxl.styles.Font(size=14, bold=True)  # Set font size and bold
+
+
+    # Variables to keep track of totals
+    current_item_name = None
+    total_quantity = 0
+    total_no_of_units = 0
+
+    for item in items:
+        if item.item_name != current_item_name:
+            # If moving to a new item name, append totals of the previous item
+            if current_item_name is not None:
+                worksheet.append([
+                    '',  # Empty MR Date for totals row
+                    f'Total for {current_item_name}',
+                    '',  # Empty MR No for totals row
+                    total_quantity,
+                    total_no_of_units
+                ])
+
+            # Reset totals and update current item name
+            current_item_name = item.item_name
+            total_quantity = 0
+            total_no_of_units = 0
+
+        # Add the current item's values to the totals
+        total_quantity += item.quantity
+        total_no_of_units += item.no_of_unit
+
+        # Write the current item's data to the worksheet
+        worksheet.append([
+            item.MR_no.MR_date.strftime("%d/%m/%Y"),  # Adjust based on your model's date field
+            item.item_name,
+            item.MR_no.MR_no,  # Adjust based on your model's MR number field
+            item.quantity,
+            item.no_of_unit
+        ])
+
+    # Append the totals for the last group of items
+    if current_item_name is not None:
+        worksheet.append([
+            '',  # Empty MR Date for totals row
+            f'Total for {current_item_name}',
+            '',  # Empty MR No for totals row
+            total_quantity,
+            total_no_of_units
+        ])
+
+    # Create an HTTP response with the Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="exported_data.xlsx"'
+
+    # Save the workbook to the response
+    workbook.save(response)
+
+    return response
