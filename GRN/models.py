@@ -37,6 +37,12 @@ class GRN(models.Model):
     store_name =  models.TextField(blank=True, null=True) # This field type is a guess.
     store_keeper = models.TextField(blank=True, null=True)
     status = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['GRN_no'] 
+
+    def __str__(self):
+        return str(self.GRN_no)
     
 class GRN_item(models.Model):
     # PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no')
@@ -51,8 +57,11 @@ class GRN_item(models.Model):
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
 
+    class Meta:
+        ordering = ['GRN_no'] 
+
     def __str__(self):
-        return str(self.GRN_no)
+        return f'{self.GRN_no} - {self.item_name}'
 
 class import_GRN(models.Model):
     GRN_no = models.TextField(primary_key=True)
@@ -62,6 +71,9 @@ class import_GRN(models.Model):
     truck_no = models.TextField(blank=True, null=True)
     store_name =  models.TextField(blank=True, null=True) # This field type is a guess.
     store_keeper = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['GRN_no'] 
 
 class import_GRN_item(models.Model):
     GRN_no = models.ForeignKey('import_GRN', on_delete=models.CASCADE, db_column='GRN_no')
@@ -74,11 +86,20 @@ class import_GRN_item(models.Model):
     measurement_unit = models.TextField(blank=True, null= True)
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['GRN_no'] 
+
+    def __str__(self):
+        return f'{self.GRN_no} - {self.item_name}'
     
 class HS_code(models.Model):
     number = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     hs_code = models.TextField(blank=True, null=True)
     item_name = models.TextField(blank=False, null=False)
+
+    class Meta:
+        ordering = ['item_name']
 
     def __str__(self):
      return self.item_name
@@ -89,6 +110,12 @@ class inventory_GRN_items(models.Model):
     total_quantity = models.FloatField(blank=True)
     inventory_GRN_items_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     branch = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name']
+
+    def __str__(self):
+     return self.item_name
 
     def __str__(self):
         return self.item_name

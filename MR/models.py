@@ -9,6 +9,9 @@ class MR(models.Model):
     total_quantity = models.FloatField(blank=True, null=True)
     branch = models.IntegerField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['MR_no'] 
+
     def __str__(self):
         return str(self.MR_no)
 
@@ -24,8 +27,11 @@ class MR_item(models.Model):
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
 
+    class Meta:
+        ordering = ['MR_no'] 
+
     def __str__(self):
-        return str(self.MR_no)
+        return f'{self.MR_no} - {self.item_name}'
 
 class inventory(models.Model):
     item_name = models.TextField(blank=True)
@@ -35,6 +41,9 @@ class inventory(models.Model):
     quantity = models.FloatField(blank=True)
     inventory_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     branch = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name'] 
 
     def __str__(self):
         return self.item_name
@@ -48,6 +57,9 @@ class opening_balance(models.Model):
     balance_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     branch = models.TextField(blank=True, null=True)
 
+    class Meta:
+        ordering = ['item_name'] 
+
     def __str__(self):
         return self.item_name
 
@@ -57,6 +69,9 @@ class inventory_MR_items(models.Model):
     total_quantity = models.FloatField(blank=True)
     balance_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     branch = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name'] 
 
     def __str__(self):
         return self.item_name
