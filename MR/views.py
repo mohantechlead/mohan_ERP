@@ -257,7 +257,7 @@ def export_mr(request):
 
     # for item in my_mr_items:
     #     mr_details = get_object_or_404(MR, MR_no=item.MR_no)
-    items = MR_item.objects.select_related('MR_no').all().order_by('MR_no__MR_date','item_name')
+    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
     # my_inventory = inventory.objects.all()
 
     context = {
@@ -282,7 +282,7 @@ def export_mr_pdf(request):
     selected_branch = request.GET.get('branch')
     
     # Replace with your actual query
-    items = MR_item.objects.select_related('MR_no').all().order_by('MR_no__MR_date','item_name')
+    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
 
     # Apply filters if provided
     if selected_month:
