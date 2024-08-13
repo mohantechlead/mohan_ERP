@@ -132,26 +132,6 @@ def display_inventory(request):
     
     form = InventoryItemForm()
 
-    # # my_balance = opening_balance.objects.all()
-    # my_inventory = inventory_MR_items.objects.all()
-    # grn_inventory = inventory_GRN_items.objects
-    
-    # for item_a in my_inventory:
-    #     item_b = opening_balance.objects.filter(item_name=item_a.item_name).first()
-        
-    #     if item_b:
-    #         # Calculate the result
-    #         result_quantity =  item_b.quantity - item_a.total_quantity 
-    #     else:
-    #         # If item_b doesn't exist, the result is just the negative of item_a's quantity
-    #         result_quantity = -item_a.total_quantity
-
-    #     # Save the result in ModelC
-    #     inventory.objects.update_or_create(
-    #         item_name=item_a.item_name,
-    #         defaults={'quantity': result_quantity}
-    #     )
-
     names_a = set(inventory_GRN_items.objects.values_list('item_name', flat=True))
     names_b = set(inventory_MR_items.objects.values_list('item_name', flat=True))
     names_c = set(opening_balance.objects.values_list('item_name', flat=True))
@@ -168,14 +148,20 @@ def display_inventory(request):
         quantity_a_value = quantity_a.total_quantity if quantity_a else 0
         quantity_b_value = quantity_b.total_quantity if quantity_b else 0
         quantity_c_value = quantity_c.quantity if quantity_c else 0
+
+        units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
+        units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
+        units_c_value = quantity_c.no_of_unit if quantity_c else 0
         
         # Calculate the result: Subtract ModelA and ModelC, and add ModelB
         result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value 
+        result_units = units_c_value - units_b_value + units_a_value
         
         # Save or update the result in ModelD
         inventory.objects.update_or_create(
             item_name=name,
-            defaults={'quantity': result_quantity}
+            defaults={'quantity': result_quantity,
+                      'no_of_unit': result_units}
         )
 
     items = inventory.objects.all().order_by('item_name')
