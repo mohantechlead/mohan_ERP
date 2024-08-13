@@ -282,7 +282,7 @@ def export_mr_pdf(request):
     selected_branch = request.GET.get('branch')
     
     # Replace with your actual query
-    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
+    items = MR_item.objects.select_related('MR_no').all().order_by('MR_no__MR_date','item_name')
 
     # Apply filters if provided
     if selected_month:
