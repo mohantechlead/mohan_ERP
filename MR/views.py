@@ -363,3 +363,16 @@ def export_mr_pdf(request):
     workbook.save(response)
 
     return response
+
+
+def stock_card(request):
+    # form = ItemListForm()
+    items = inventory.objects.all()
+    MR_items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
+
+    context = {
+        # 'form': form
+        'items':items
+    }
+
+    return render(request,'stock_card.html', context)
