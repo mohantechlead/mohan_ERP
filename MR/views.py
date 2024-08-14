@@ -271,7 +271,7 @@ def export_mr_pdf(request):
     # Create a workbook and add a worksheet
     workbook = openpyxl.Workbook()
     worksheet = workbook.active
-    worksheet.title = 'Exported Data'
+    worksheet.title = 'MR'
 
     # Add headers to the worksheet
     headers = ['MR Date', 'Item Name', 'MR No', 'Quantity', 'No of Units']
@@ -301,6 +301,12 @@ def export_mr_pdf(request):
     worksheet['A1'] = title
     worksheet['A1'].font = openpyxl.styles.Font(size=14, bold=True)  # Set font size and bold
 
+    worksheet['A2'] = 'Date'
+    worksheet['B2'] = 'Description'
+    worksheet['C2'] = 'MR No'
+    worksheet['D2'] = 'Quantity'
+    worksheet['E2'] = 'No of Unit'
+
 
     # Variables to keep track of totals
     current_item_name = None
@@ -312,8 +318,9 @@ def export_mr_pdf(request):
             # If moving to a new item name, append totals of the previous item
             if current_item_name is not None:
                 worksheet.append([
-                    '',  # Empty MR Date for totals row
-                    f'Total for {current_item_name}',
+                    # '',  # Empty MR Date for totals row
+                    'Total',
+                    '',
                     '',  # Empty MR No for totals row
                     total_quantity,
                     total_no_of_units
@@ -340,12 +347,13 @@ def export_mr_pdf(request):
     # Append the totals for the last group of items
     if current_item_name is not None:
         worksheet.append([
-            '',  # Empty MR Date for totals row
-            f'Total for {current_item_name}',
-            '',  # Empty MR No for totals row
-            total_quantity,
-            total_no_of_units
-        ])
+                    # '',  # Empty MR Date for totals row
+                    'Total',
+                    '',
+                    '',  # Empty MR No for totals row
+                    total_quantity,
+                    total_no_of_units
+                ])
 
     # Create an HTTP response with the Excel content
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
