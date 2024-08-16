@@ -22,14 +22,13 @@
                       <th>MR Number</th>
                       <th>Date</th>
                       <th>Items </th>
-                      <th>Quantity</th>
-                      
+                      <th>Quantity</th>  
                     </tr>
                     
                     {% for order in my_order %}
                     <tr>
                       <td><a href="#" class="order-link" data-order-id="{{ order.MR_no }}">{{ order.MR_no }}</a></td>
-                      <td>{{ order.MR_date }}</td>
+                      <td>{{ order.date }}</td>
                       <td>
                         {% for item in order.mr_items.all %}
                             {{ item.item_name }}

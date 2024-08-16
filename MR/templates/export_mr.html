@@ -66,7 +66,7 @@
                             {% for group in grouped_items %}
                                 {% for item in group.list %}
                                     <tr>
-                                        <td>{{ item.MR_no.MR_date|date:"d/m/Y" }}</td>
+                                        <td>{{ item.MR_no.date|date:"d/m/Y" }}</td>
                                         <td>{{ item.item_name }}</td>
                                         <td>{{ item.MR_no }}</td>
                                         <td>{{ item.quantity }}</td>

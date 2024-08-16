@@ -64,12 +64,12 @@ class PRItemForm(forms.ModelForm):
 class GRNForm(forms.ModelForm):
     class Meta:
         model = GRN
-        fields = ['GRN_no','grn_date','recieved_from','store_name','store_keeper','status','transporter_name','truck_no']
+        fields = ['GRN_no','date','recieved_from','store_name','store_keeper','status','transporter_name','truck_no']
 
 class ImportGRNForm(forms.ModelForm):
     class Meta:
         model = import_GRN
-        fields = ['GRN_no','grn_date','recieved_from','store_name','store_keeper','transporter_name','truck_no']
+        fields = ['GRN_no','date','recieved_from','store_name','store_keeper','transporter_name','truck_no']
 
 class ImportGRNItemForm(forms.ModelForm):
     item_name= forms.ModelChoiceField(

@@ -3,7 +3,7 @@ import uuid
 # Create your models here.
 class MR(models.Model):
     MR_no = models.TextField(primary_key= True)
-    MR_date = models.DateField(blank= False)
+    date = models.DateField(blank= False)
     desc = models.TextField(blank=True)
     MR_store = models.TextField(blank=True)
     total_quantity = models.FloatField(blank=True, null=True)
