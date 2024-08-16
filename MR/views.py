@@ -11,11 +11,12 @@ from django.http import JsonResponse,HttpResponse
 from django.template.loader import get_template
 from django.contrib.auth.models import User, auth
 from num2words import num2words
-from GRN.models import inventory_GRN_items
+from GRN.models import inventory_GRN_items, GRN_item
 from django import template
 from openpyxl import Workbook
 from openpyxl.styles import *
 import openpyxl
+from itertools import chain
 
 
 # Create your views here.
@@ -110,7 +111,7 @@ def display_MR(request):
 
         mr_data = {
                 'MR_no': mr.MR_no,
-                'MR_date': mr.MR_date,  # Assuming 'date' is a field in CosmicOrder
+                'date': mr.date,  # Assuming 'date' is a field in CosmicOrder
                 'mr_items': items,  # Assuming a related name 'order_items' on CosmicOrder pointing to OrderItem
                 'MR_store': mr.MR_store,  # Assuming 'PR_before_vat' is a field in CosmicOrder
                 'desc': mr.desc,  # A  # Assuming 'status' is a field in CosmicOrder
@@ -257,7 +258,7 @@ def export_mr(request):
 
     # for item in my_mr_items:
     #     mr_details = get_object_or_404(MR, MR_no=item.MR_no)
-    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
+    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__date')
     # my_inventory = inventory.objects.all()
 
     context = {
@@ -282,16 +283,16 @@ def export_mr_pdf(request):
     selected_branch = request.GET.get('branch')
     
     # Replace with your actual query
-    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
+    items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__date')
 
     # Apply filters if provided
     if selected_month:
-        items = items.filter(MR_no__MR_date__month=selected_month)
+        items = items.filter(MR_no__date__month=selected_month)
     if selected_branch:
         items = items.filter(MR_no__branch=selected_branch)
 
     if items.exists():
-        month_year = items.first().MR_no.MR_date.strftime("%B %Y")  # Example format: "August 2024"
+        month_year = items.first().MR_no.date.strftime("%B %Y")  # Example format: "August 2024"
     else:
         month_year = "N/A"
 
@@ -337,7 +338,7 @@ def export_mr_pdf(request):
 
         # Write the current item's data to the worksheet
         worksheet.append([
-            item.MR_no.MR_date.strftime("%d/%m/%Y"),  # Adjust based on your model's date field
+            item.MR_no.date.strftime("%d/%m/%Y"),  # Adjust based on your model's date field
             item.item_name,
             item.MR_no.MR_no,  # Adjust based on your model's MR number field
             item.quantity,
@@ -364,15 +365,90 @@ def export_mr_pdf(request):
 
     return response
 
+def get_date(item):
+    if hasattr(item, 'GRN_no') and item.GRN_no:
+        return getattr(item.GRN_no, 'date', None)
+    elif hasattr(item, 'MR_no') and item.MR_no:
+        return getattr(item.MR_no, 'date', None)
+    return None
+
 
 def stock_card(request):
-    # form = ItemListForm()
+    selected_item = request.GET.get('item_name')
     items = inventory.objects.all()
-    MR_items = MR_item.objects.select_related('MR_no').all().order_by('item_name','MR_no__MR_date')
+
+    print('selected_item', selected_item)
+
+    # Fetch items and related dates
+    grn_items = GRN_item.objects.filter(item_name=selected_item).select_related('GRN_no')
+    mr_items = MR_item.objects.filter(item_name=selected_item).select_related('MR_no')
+
+    for item in mr_items:
+        print(f"MR Item ID: {item.MR_no}, Date: {item.MR_no.date}")
+
+    for item in grn_items:
+        date = getattr(item.GRN_no, 'date', 'No date available')
+        print(f"GRN Item ID: {item.GRN_no}, Date: {date}")
+
+    # Combine querysets
+    # combined_items = list(chain(grn_items, mr_items))
+
+    # print(combined_items)
+
+    # Sort combined list by date
+    # sorted_items = sorted(
+    #     combined_items,
+    #     key=lambda item: (
+    #         getattr(item.GRN_no, 'date', None) if hasattr(item, 'GRN_no') else None,
+    #         getattr(item.MR_no, 'date', None) if hasattr(item, 'MR_no') else None
+    #     )
+    # )
+
+    sorted_grn_items = sorted(
+        grn_items,
+        key=lambda item: getattr(item.GRN_no, 'date', None) if hasattr(item, 'GRN_no') else None,
+    )
+    
+    sorted_mr_items = sorted(
+        mr_items,
+         key=lambda item: getattr(item.MR_no, 'date', None) if hasattr(item, 'MR_no') else None
+
+    )
+
+    combined_items = list(chain(sorted_grn_items, sorted_mr_items))
+
+    sorted_combined_items = sorted(
+        combined_items,
+        key=get_date
+    )
+
+    print(combined_items)
+
+    for item in sorted_combined_items:
+        if hasattr(item, 'GRN_no'):
+            print(f"Sorted GRN Item ID: {item.GRN_no}, Date: {item.GRN_no.date if item.GRN_no else 'No date'}")
+        elif hasattr(item, 'MR_no'):
+            print(f"Sorted MR Item ID: {item.MR_no}, Date: {item.MR_no.date if item.MR_no else 'No date'}")
+
+    # Get the opening balance, or default to 0 if it doesn't exist
+    opening_balance_obj = opening_balance.objects.filter(item_name=selected_item).first()
+    opening_balances = opening_balance_obj.quantity if opening_balance_obj else 0
+
+    current_balance = opening_balances
+    for item in sorted_combined_items:
+        if hasattr(item, 'GRN_no'):  # If it's a GRN_item
+            item.received = item.quantity
+            current_balance += item.received
+            item.balance = current_balance
+        elif hasattr(item, 'MR_no'):  # If it's a MR_item
+            item.issued = item.quantity
+            current_balance -= item.issued
+            item.balance = current_balance
 
     context = {
-        # 'form': form
-        'items':items
+        'orders': sorted_combined_items,
+        'opening_balance': opening_balances,
+        'items': items,
     }
 
-    return render(request,'stock_card.html', context)
+    return render(request, 'stock_card.html', context)

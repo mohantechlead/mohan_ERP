@@ -7,7 +7,7 @@ class MRForm(forms.ModelForm):
     class Meta:
    
         model = MR
-        fields = ['MR_no','desc','MR_date','MR_store']
+        fields = ['MR_no','desc','date','MR_store']
    
 class MRItemForm(forms.ModelForm):
 

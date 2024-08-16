@@ -30,7 +30,7 @@ class PR_item(models.Model):
 class GRN(models.Model):
     GRN_no = models.TextField(primary_key=True)
     # PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no', null=True, blank=True)
-    grn_date = models.DateField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
     recieved_from = models.TextField(blank=True, null=True)
     transporter_name = models.TextField(blank=True, null=True)
     truck_no = models.TextField(blank=True, null=True)
@@ -65,7 +65,7 @@ class GRN_item(models.Model):
 
 class import_GRN(models.Model):
     GRN_no = models.TextField(primary_key=True)
-    grn_date = models.DateField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
     recieved_from = models.TextField(blank=True, null=True)
     transporter_name = models.TextField(blank=True, null=True)
     truck_no = models.TextField(blank=True, null=True)
