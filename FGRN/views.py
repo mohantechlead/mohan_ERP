@@ -15,6 +15,7 @@ from .decorators import allowed_users
 # Create your views here.
 # @login_required(login_url='login_user')
 # @allowed_users(allowed_roles=['admin'])
+@login_required(login_url="login_user")
 def create_fgrn(request):
     if request.method == 'POST':
         form = FGRNForm(request.POST)
@@ -44,6 +45,7 @@ def create_fgrn(request):
     }
     return render(request,'create_fgrn.html',context)
 
+@login_required(login_url="login_user")
 def create_fgrn_items(request):
     if request.method == 'POST':
         formset = formset_factory(FGRNItemForm, extra=1 , min_num= 1)
@@ -112,6 +114,7 @@ def create_fgrn_items(request):
     }
     return render(request, 'create_fgrn.html', context)
 
+@login_required(login_url="login_user")
 def display_FGRN(request):
     mr_list = FGRN.objects.all()
     mr_list = mr_list.order_by('FGRN_no')
@@ -137,6 +140,7 @@ def display_FGRN(request):
 
     return render(request,'display_fgrn.html', context)
 
+@login_required(login_url="login_user")
 def display_single_fgrn(request):
     if request.method == 'GET':
         fgrn_no = request.GET['FGRN_no']
@@ -165,7 +169,7 @@ def display_single_fgrn(request):
                     }
     return render(request, 'display_single_fgrn.html')
 
-
+@login_required(login_url="login_user")
 def display_goods(request):
     goods = finished_goods.objects.all()
     return render(request, 'display_goods.html',{'goods':goods})
