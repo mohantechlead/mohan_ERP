@@ -70,11 +70,16 @@
                     <ul class="collapse list-unstyled" id="goodsSubmenu">
                        
                         <li style="font-size: large;">
-                            <a href="{% url 'display_goods'%}">Finished Goods</a>
+                            <a href="{% url 'display_goods'%}">Display Inventory</a>
+                        </li>
+
+                        <li style="font-size: large;">
+                            <a href="{% url 'fgrn_opening_balance'%}">Opening Balance</a>
                         </li>
                      
                     </ul>
                 </li> 
+                
             </ul>
 
         </nav>
@@ -83,10 +88,9 @@
         <div id="content">
 
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container-fluid d-flex justify-content-between align-items-center" style="font-size:larger; font-weight: 500;color: grey;word-spacing: 13px;">
+                <div class="container-fluid d-flex" style="font-size:larger; font-weight: 500;color: grey;word-spacing: 13px;">
                     
-                    <!-- Left side with navigation links -->
-                    <div class="d-flex align-items-center">
+                   
                         <button type="button" id="sidebarCollapse" class="btn toggle">
                             <i class="fa fa-bars"></i>
                             <span style="color: white;"></span>
@@ -95,17 +99,20 @@
                         <a href="{% url 'create_MR'%}" class="mx-2">MR |</a>
                         <a href="{% url 'create_fgrn'%}" class="mx-2" style="font-size:30px; font-weight: 600; color: #2470dc;">FGRN |</a>
                         <a href="{% url 'input_delivery'%}" class="mx-2">DN</a>
-                    </div>
+
+                        
+                    
             
                     <!-- Right side with welcome and logout -->
-                    <div class="d-flex align-items-center ms-auto">
-                        <p class="mb-0 me-2" style="white-space: nowrap;">Welcome, {{ user.username }}!</p>
+                    <div style="float: right;">
                         <form action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary ms-2">Logout</button>
-                        </form>
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary ms-2">Logout</button>
+                    </form>
                     </div>
                 </div>
+
+                
             </nav>
             
             

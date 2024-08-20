@@ -585,4 +585,4 @@ def display_grn_item(request):
         
     }
 
-    return render(request,'display_MR_items.html',context)
+    return render(request,'display_grn_item.html',context)

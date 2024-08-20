@@ -169,3 +169,11 @@ class approvalForm(forms.Form):
         required=False  # You can omit this line as TextInput is the default widget for CharField
     )
 
+class InventoryItemForm(forms.ModelForm):
+    
+    class Meta:
+   
+        model = inventory
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
+
+
