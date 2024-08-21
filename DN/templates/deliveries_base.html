@@ -113,6 +113,11 @@
                     <a href="{% url 'create_fgrn'%}">FGRN      |</a>
                     <a style=" font-size:30px; font-weight: 600; color: #2470dc;" href="{% url 'input_delivery'%}">DN</a>
                    
+                <div style="float: right;">
+                    <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary ms-2">Logout</button>
+                </form>
                 </div>
                 
             </nav>

@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 
 # Create your models here.
 class FGRN(models.Model):
@@ -37,6 +38,21 @@ class finished_goods(models.Model):
 class items_list(models.Model):
     id = models.AutoField(primary_key=True)
     item_name = models.TextField(null=False, blank=False)
+
+    def __str__(self):
+        return self.item_name
+    
+class FGRNopening_balance(models.Model):
+    item_name = models.TextField(blank=True)
+    no_of_unit = models.FloatField(blank=True, null=True)
+    unit_type = models.TextField(blank=True, null=True)
+    measurement_type = models.TextField(blank=True, null=True)
+    quantity = models.FloatField(blank=True)
+    balance_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    branch = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name'] 
 
     def __str__(self):
         return self.item_name

@@ -20,7 +20,9 @@ from django.contrib import messages
 from .models import *
 from FGRN.models import finished_goods
 from django.forms import formset_factory
+from django.contrib.auth.decorators import login_required
 # Create your views here.
+
 @api_view(['GET','POST'])
 def order_list(request):
     if request.method == 'GET':
@@ -34,7 +36,9 @@ def order_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
+
 @api_view(['GET','POST'])
+
 def delivery_list(request):
     if request.method == 'GET':
         my_deliveries = orders.objects.all()
@@ -47,6 +51,7 @@ def delivery_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
+@login_required(login_url="login_user")
 def input_delivery(request):
     my_orders = orders.objects.all()
     
@@ -71,6 +76,7 @@ def input_delivery(request):
     formset = formset(prefix="items")
     return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 'formset':formset})
 
+@login_required(login_url="login_user")
 def input_delivery_items(request):
     if request.method == 'POST':
         print(request.POST)
@@ -159,7 +165,7 @@ def input_delivery_items(request):
     }
     return render(request, 'input_delivery.html', context)
 
-
+@login_required(login_url="login_user")
 #To display the delivery notes for a specific order number
 def deliveries(request):
   my_orders = orders.objects.all()
@@ -175,7 +181,7 @@ def deliveries(request):
   }
 
   return render(request, 'deliveries.html', context)
-
+@login_required(login_url="login_user")
 #for creating Orders
 def input_orders(request):
     if request.method == 'POST':
@@ -190,7 +196,8 @@ def input_orders(request):
     formset = formset(prefix="items")
     context = {'form': form ,'my_goods': my_goods, 'formset': formset}
     return render(request, 'input_orders.html', context)
-    
+
+@login_required(login_url="login_user")
 def input_orders_items(request):
     if request.method == 'POST':
         print(request.POST)
@@ -260,7 +267,7 @@ def input_orders_items(request):
     return render(request, 'input_orders.html', context)
 
 
-
+@login_required(login_url="login_user")
 def display_orders(request):
     my_orders = orders.objects.all()
     the_orders = orders.objects.all()
@@ -283,16 +290,19 @@ def display_orders(request):
         the_orders = the_orders.order_by('-serial_no')
     return render(request, 'display_orders.html', {'my_orders': my_orders,'the_orders': the_orders,'my_customers':my_customers})
 
+@login_required(login_url="login_user")
 def display_remaining(request):
     my_orders = orders.objects.filter(remaining__gt=0)
     return render(request, 'display_remaining.html', {'my_orders': my_orders})
-    
+
+@login_required(login_url="login_user")  
 def display_single_order(request, serial_no):
     my_order = get_object_or_404(orders, serial_no=serial_no)
     
     #deliveries = orders.delivery_set.prefetch_related('delivery_date')
     return render(request, 'single_order.html', {'my_order': my_order})
 
+@login_required(login_url="login_user")
 def display_delivery(request):
     my_customers = orders.objects.all()
     deliveries = delivery.objects.all()
@@ -318,6 +328,7 @@ def display_delivery(request):
     
     return render(request, 'display_delivery.html', {'my_delivery': my_delivery,'my_order':my_order,'my_customers':my_customers})
 
+@login_required(login_url="login_user")
 def search_customer(request):
     if request.method == 'GET':
         customer_name = request.GET['customer_name']
@@ -341,6 +352,7 @@ def search_customer(request):
         return render(request, 'customer_details.html', context)
 # Create your views here.
 
+@login_required(login_url="login_user")
 def customer_date(request):
     customer_name = request.GET.get('customer_name')
     my_order = orders.objects.filter(customer_name__icontains= customer_name)
@@ -374,6 +386,8 @@ def customer_date(request):
                         'my_order': my_order,
                     }
         return render(request, 'customer_details.html', context)
+
+@login_required(login_url="login_user")
 def search_orders(request):
     print("in")
     if request.method == 'GET':
@@ -401,6 +415,7 @@ def search_orders(request):
                     }
         return render(request, 'display_orders.html')
 # Create your views here.
+@login_required(login_url="login_user")
 def search_delivery(request):
     if request.method == 'GET':
         serial_no = request.GET['serial_no']
@@ -425,6 +440,7 @@ def search_delivery(request):
                     }
         return render(request, 'single_delivery.html', context)
 
+@login_required(login_url="login_user")
 def search_customer_delivery(request):
     
     start_date = request.GET.get('start_date')
@@ -457,15 +473,17 @@ def search_customer_delivery(request):
         }
         return render(request, 'customer_delivery.html', context)
 
+@login_required(login_url="login_user")
 def dashboard_with_pivot(request):
     return render(request, 'analytics_dashboard.html', {})
 
-
+@login_required(login_url="login_user")
 def pivot_data(request):
     dataset = orders.objects.all()
     data = serializers.serialize('json', dataset)
     return JsonResponse(data, safe=False)
 
+@login_required(login_url="login_user")
 def dashboards(request):
     my_order = orders.objects.all()
     limit = 10
@@ -523,7 +541,7 @@ def dashboards(request):
     }
     return render(request, 'dashboard.html', {'json_data': json_data})
 
-
+@login_required(login_url="login_user")
 def customer_table(request):
     my_customers = orders.objects.all()
   
@@ -583,6 +601,7 @@ def customer_table(request):
     }
     return render(request, 'dashboard_tables.html', {'json_data': json_data, })
 
+@login_required(login_url="login_user")
 def item_table(request):
     item_data = orders.objects.filter(measurement='pairs').values('description').annotate(
         total_sales=Sum('total_price'),
@@ -601,6 +620,7 @@ def item_table(request):
     }
     return render(request, 'item_table.html', {'json_data': json_data})
 
+@login_required(login_url="login_user")
 def sales_contract(request):
     if request.method == 'GET':
     
@@ -613,7 +633,7 @@ def sales_contract(request):
         
         return render(request,'sales_contract.html')
     
-
+@login_required(login_url="login_user")
 def create_delivery(request):
     my_orders = orders.objects.all()  # Orders model should start with an uppercase letter
 

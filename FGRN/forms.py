@@ -77,4 +77,42 @@ class FGRNItemForm(forms.ModelForm):
     class Meta:
         model = FGRN_item
         fields = ['description','item_name','no_of_unit','unit_type','per_unit_kg','quantity','measurement_unit']
+
+class OpeningBalanceItemForm(forms.ModelForm):
+
+    UNIT_CHOICES =( 
+        ("", ""),
+    ("Bag", "Bag"), 
+    ("Pkg", "Pkg"),
+    ("Crt", "Crt"),
+    ("Drum", "Drum"),) 
+    
+    unit_type = forms.ChoiceField(
+        choices = UNIT_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        
+    )
+
+    measurement_choice =( 
+        ("", ""),
+    ("kgs", "kgs")) 
+    
+    measurement_type = forms.ChoiceField(
+        choices = measurement_choice,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        
+    )
+    
+    class Meta:
+   
+        model = FGRNopening_balance
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
+    
+class InventoryItemForm(forms.ModelForm):
+    
+    class Meta:
+   
+        model = finished_goods
+        fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
+
        

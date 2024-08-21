@@ -61,9 +61,7 @@
                         <li style="font-size:larger; font-weight: 500;">
                             <a href="{% url 'display_grn' %}">Display GRN</a>
                         </li>
-                        <li style="font-size:larger; font-weight: 500;">
-                            <a href="{% url 'display_grn_item' %}">Display GRN Item</a>
-                        </li>
+                        
                      
                     </ul>
                 </li>
@@ -71,7 +69,13 @@
                 
 
                 <li style="font-size:larger; font-weight: 500;">
-                    <a href="{% url 'display_search_items' %}">Display Items</a>
+                    <a href="#itempageSubmenu" data-toggle="collapse" aria-expanded="false"
+                    class="dropdown-toggle"> Display Items </a>
+                    <ul class="collapse list-unstyled" id="itempageSubmenu">
+                        <li style="font-size:larger; font-weight: 500;">
+                            <a href="{% url 'display_grn_item' %}">Display GRN Item</a>
+                        </li>
+                    </ul>
                 </li>
                 
                 
@@ -79,7 +83,6 @@
 
         </nav>
 
-        <!-- Page Content  -->
         <div id="content">
 
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -94,6 +97,13 @@
                     <a href="{% url 'input_delivery'%}">DN</a>
                     
 
+               
+
+                <div style="float: right;">
+                    <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary ms-2">Logout</button>
+                </form>
                 </div>
                 
             </nav>

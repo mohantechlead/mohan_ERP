@@ -18,8 +18,7 @@ from openpyxl.styles import *
 import openpyxl
 from itertools import chain
 
-
-# Create your views here.
+@login_required(login_url="login_user")
 def create_MR(request):
     if request.method == 'POST':
         form = MRForm(request.POST)
@@ -43,6 +42,7 @@ def create_MR(request):
     print(formset)
     return render(request,'create_mr.html',{'form': form, 'formset': formset})
 
+@login_required(login_url="login_user")
 def create_MR_items(request):
     if request.method == 'POST':
         formset = formset_factory(MRItemForm, extra=1 , min_num= 1)
@@ -100,6 +100,7 @@ def create_MR_items(request):
     }
     return render(request, 'create_mr.html', context)
 
+@login_required(login_url="login_user")
 def display_MR(request):
     mr_list = MR.objects.all()
     mr_list = mr_list.order_by('MR_no')
@@ -125,6 +126,7 @@ def display_MR(request):
 
     return render(request,'display_MR.html', context)
 
+@login_required(login_url="login_user")
 def display_inventory(request):
     if request.method == 'POST':
         form = InventoryItemForm(request.POST)
@@ -179,6 +181,7 @@ def display_inventory(request):
 
     return render(request,'display_inventory.html',context)
 
+@login_required(login_url="login_user")
 def opening_balances(request):
     if request.method == 'POST':
         form = OpeningBalanceItemForm(request.POST)
@@ -200,6 +203,7 @@ def opening_balances(request):
 
     return render(request,'opening_balances.html',context)
 
+@login_required(login_url="login_user")
 def display_MR_items(request):
 
     item_quantities = MR_item.objects.values('item_name').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
@@ -224,6 +228,7 @@ def display_MR_items(request):
 
     return render(request,'display_MR_items.html',context)
 
+@login_required(login_url="login_user")
 def display_single_mr(request):
     if request.method == 'GET':
         mr_no = request.GET['MR_no']
@@ -252,6 +257,7 @@ def display_single_mr(request):
                     }
     return render(request, 'display_single_mr.html')
 
+@login_required(login_url="login_user")
 def export_mr(request):
 
     # my_mr_items = MR_item.objects.all().order_by('item_name')
@@ -268,6 +274,7 @@ def export_mr(request):
     }
     return render(request, 'export_mr.html', context)
 
+@login_required(login_url="login_user")
 def export_mr_pdf(request):
     # Create a workbook and add a worksheet
     workbook = openpyxl.Workbook()
@@ -365,6 +372,7 @@ def export_mr_pdf(request):
 
     return response
 
+@login_required(login_url="login_user")
 def get_date(item):
     if hasattr(item, 'GRN_no') and item.GRN_no:
         return getattr(item.GRN_no, 'date', None)
@@ -372,7 +380,7 @@ def get_date(item):
         return getattr(item.MR_no, 'date', None)
     return None
 
-
+@login_required(login_url="login_user")
 def stock_card(request):
     selected_item = request.GET.get('item_name')
     items = inventory.objects.all()

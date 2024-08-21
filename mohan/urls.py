@@ -35,6 +35,6 @@ urlpatterns = [
     path('GRN/', include('GRN.urls')),
     path('FGRN/', include('FGRN.urls')),
     path('DN/', include('DN.urls')),
-    path('members/', include('members.urls')),
-    path('members/', include('django.contrib.auth.urls')),
+    path('', include('members.urls')),
+    path('', include('django.contrib.auth.urls')),
     ]

@@ -117,8 +117,6 @@ class inventory_GRN_items(models.Model):
     def __str__(self):
      return self.item_name
 
-    def __str__(self):
-        return self.item_name
     
 
 

@@ -13,6 +13,7 @@ def is_admin(user):
     return user.is_superuser
 # Create your views here.
 
+@login_required(login_url="login_user")
 def grn_number(request):
     context = {}
     if request.method == 'GET':
@@ -41,6 +42,7 @@ def grn_number(request):
         return render(request, 'create_grn.html', context)
     return render(request, 'trial_grn.html', context)
 
+@login_required(login_url="login_user")
 def create_trial_grn(request):
     context = {}
     if request.method == 'GET':
@@ -85,7 +87,7 @@ def create_trial_grn(request):
     }
     return render(request, 'trial_submit_grn.html', context)
 
-
+@login_required(login_url="login_user")
 def create_grn(request):
     if request.method == 'POST':
         form = GRNForm(request.POST)
@@ -166,7 +168,7 @@ def create_grn(request):
 #         'formset': formset,
 #     }
 #     return render(request, 'create_GRN.html', context)
-
+@login_required(login_url="login_user")
 def create_grn_items(request):
     if request.method == 'POST':
         formset = formset_factory(GRNItemForm, extra=1, min_num=1)
@@ -229,7 +231,7 @@ def create_grn_items(request):
     }
     return render(request, 'create_GRN.html', context)
 
-
+@login_required(login_url="login_user")
 def display_items(request,pr_no):
     if request.method == 'GET':
         pr_no = pr_no
@@ -254,7 +256,7 @@ def display_items(request,pr_no):
         return render(request, 'single_delivery.html', context)
 
 
-
+@login_required(login_url="login_user")
 def display_search_items(request):
     if request.method == 'GET':
         items = PR_item.objects.all()
@@ -266,6 +268,7 @@ def display_search_items(request):
           
         return render(request, 'display_items.html', context)
 
+@login_required(login_url="login_user")
 def display_grn(request):
     if request.method == 'GET':
         orders = GRN.objects.all().order_by('GRN_no')
@@ -274,7 +277,8 @@ def display_grn(request):
 
         my_order = get_object_or_404(purchase_orders, PR_no=pr_no)
         my_order = get_object_or_404(purchase_orders, PR_no=pr_no)
-   
+
+@login_required(login_url="login_user")   
 def display_grns(request):
     if request.method == 'GET':
         grn_no = request.GET['GRN_no']
@@ -295,6 +299,7 @@ def display_grns(request):
                     }
     return render(request, 'display_grns.html', context)
 
+@login_required(login_url="login_user")
 def search_prs(request,pr_no):
     
     if request.method == 'GET':
@@ -347,6 +352,7 @@ def search_prs(request,pr_no):
 #                     }
 #         return render(request, 'display_pr.html')
 
+@login_required(login_url="login_user")
 def search_customer(request):
     if request.method == 'GET':
         customer_name = request.GET['vendor_name']
@@ -371,6 +377,7 @@ def search_customer(request):
                     }
         return render(request, 'customer_details_page.html', context)
 
+@login_required(login_url="login_user")
 def search_items(request):
     if request.method == 'GET':
         item_name = request.GET['item_name']
@@ -395,7 +402,7 @@ def search_items(request):
                     }
         return render(request, 'item_details_page.html', context)
 
-
+@login_required(login_url="login_user")
 def search_pr_item(request):
     if request.method == 'GET':
         pr_no = request.GET['PR_no']
@@ -418,7 +425,8 @@ def search_pr_item(request):
                         'deliveries': deliveries,
                     }
         return render(request, 'print_pr.html', context)
-
+    
+@login_required(login_url="login_user")
 def print_format(request):
     orders = purchase_orders.objects.get(PR_no="123")
     context = {
@@ -426,6 +434,7 @@ def print_format(request):
             }
     return render(request, 'print_format.html', context)
 
+@login_required(login_url="login_user")
 def print_pr(request):
     if request.method == 'GET':
         pr_no = request.GET['PR_no']
@@ -454,7 +463,7 @@ def print_pr(request):
                     }
     return render(request, 'print_pr.html', context)
 
-
+@login_required(login_url="login_user")
 def search_grns(request):
     if request.method == 'GET':
         PR_no = request.GET['PR_no']
@@ -478,7 +487,8 @@ def search_grns(request):
                         'deliveries': deliveries,
                     }
         return render(request, 'single_delivery.html', context)
-    
+
+@login_required(login_url="login_user")    
 def create_import_grn(request):
     
     if request.method == 'POST':
@@ -504,6 +514,7 @@ def create_import_grn(request):
     }
     return render(request, 'create_import_grn.html', context)
 
+@login_required(login_url="login_user")
 def create_import_grn_items(request):
     print("second")
     if request.method == 'POST':
@@ -551,6 +562,7 @@ def create_import_grn_items(request):
     }
     return render(request, 'create_grn_items.html', context)
 
+@login_required(login_url="login_user")
 def display_grn_item(request):
 
     item_quantities = GRN_item.objects.values('item_name').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
@@ -573,4 +585,4 @@ def display_grn_item(request):
         
     }
 
-    return render(request,'display_MR_items.html',context)
+    return render(request,'display_grn_item.html',context)
