@@ -1,0 +1,9 @@
+<form method="post">
+    {% csrf_token %}
+    {{ parent_form.as_p }}
+    {{ child_formset.management_form }}
+    {% for form in child_formset %}
+        {{ form.as_p }}
+    {% endfor %}
+    <button type="submit">Save</button>
+</form>
