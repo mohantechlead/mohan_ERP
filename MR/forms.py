@@ -3,7 +3,6 @@ from .models import *
 
 class MRForm(forms.ModelForm):
     
-    
     class Meta:
    
         model = MR

@@ -187,7 +187,7 @@ def display_goods(request):
     
     form = InventoryItemForm()
 
-    names_a = set(FGRN_item.objects.values_list('item_name', flat=True))
+    names_a = set(FGRN_item.objects.values_list('description', flat=True))
     names_b = set(delivery_items.objects.values_list('description', flat=True))
     names_c = set(FGRNopening_balance.objects.values_list('item_name', flat=True))
 
@@ -195,7 +195,7 @@ def display_goods(request):
 
     for name in all_names:
         # Get the quantity from each model
-        quantity_a = FGRN_item.objects.filter(item_name=name).first()
+        quantity_a = FGRN_item.objects.filter(description=name).first()
         quantity_b = delivery_items.objects.filter(description=name).first()
         quantity_c = FGRNopening_balance.objects.filter(item_name=name).first()
         

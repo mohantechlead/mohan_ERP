@@ -101,6 +101,30 @@ def create_MR_items(request):
     return render(request, 'create_mr.html', context)
 
 @login_required(login_url="login_user")
+def edit_parent_and_children(request, MR_no):
+    parent = get_object_or_404(MR, MR_no=MR_no)
+    if request.method == 'POST':
+        parent_form = MRForm(request.POST, instance=parent)
+        child_formset = MRItemForm(request.POST, queryset=parent.children.all())
+
+        if parent_form.is_valid() and child_formset.is_valid():
+            parent_form.save()
+            child_formset.save()
+            return redirect('some-view-name')
+    else:
+        parent_form = MRItemForm(instance=parent)
+        child_formset = MRItemForm(queryset=parent.children.all())
+
+    context = {
+        'parent_form': parent_form,
+        'child_formset': child_formset,
+    }
+
+    return render(request, 'edit_mr.html', context )
+
+    
+
+@login_required(login_url="login_user")
 def display_MR(request):
     mr_list = MR.objects.all()
     mr_list = mr_list.order_by('MR_no')
@@ -460,3 +484,4 @@ def stock_card(request):
     }
 
     return render(request, 'stock_card.html', context)
+

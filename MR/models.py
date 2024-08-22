@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-# Create your models here.
+
 class MR(models.Model):
     MR_no = models.TextField(primary_key= True)
     date = models.DateField(blank= False)
@@ -22,7 +22,6 @@ class MR_item(models.Model):
     item_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     measurement_type = models.TextField(blank=True, null=True)
     remarks = models.TextField(blank=True, null= True)
-    # description = models.TextField(blank=True, null= True)
     unit_type = models.TextField(blank=True, null= True)
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)

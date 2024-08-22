@@ -23,6 +23,7 @@
                       <th>Date</th>
                       <th>Items </th>
                       <th>Quantity</th>  
+                      <th>Actions</th>
                     </tr>
                     
                     {% for order in my_order %}
@@ -39,6 +40,11 @@
                       {{ item.quantity }}
                       {% if not forloop.last %}<br>{% endif %}
                   {% endfor %}</td>
+                      <td>
+                      <button class="btn btn-success">
+                          <a href="{% url 'edit_mr' order.MR_no %}">Edit</a>
+                      </button>
+                    </td>
                     
                     </tr>
                     {% endfor %}

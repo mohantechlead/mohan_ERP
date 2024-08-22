@@ -38,7 +38,7 @@
                       <td>{{ order.date }}</td>
                       <td>
                         {% for item in order.FGRN_items.all %}
-                            {{ item.item_name }}
+                            {{ item.description }}
                             {% if not forloop.last %}<br>{% endif %}
                         {% endfor %}
                     </td>
