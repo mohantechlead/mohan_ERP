@@ -269,26 +269,26 @@ def input_orders_items(request):
 
 @login_required(login_url="login_user")
 def display_orders(request):
-    my_orders = orders.objects.all()
+   
     the_orders = orders.objects.all()
-    my_customers = orders.objects.all()
 
-    sort_param = request.GET.get('sort')
+    order_data = []
+    for order in the_orders:
+
+        items = orders_items.objects.filter(serial_no=order.serial_no)
+
+        orders_data = {
+                'serial_no': order.serial_no,
+                'date': order.date,  # Assuming 'date' is a field in CosmicOrder
+                'order_item': items,  # Assuming a related name 'order_items' on CosmicOrder pointing to OrderItem
+                # 'MR_store': mr.MR_store,  # Assuming 'PR_before_vat' is a field in CosmicOrder
+                # 'desc': mr.desc,  # A  # Assuming 'status' is a field in CosmicOrder
+            }
+        order_data.append(orders_data)
 
     # Sort the orders based on the selected parameter
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-
-    if start_date and end_date:
-        the_orders = the_orders.filter(date__range=[start_date, end_date])
-        the_orders = the_orders.order_by('date')
-    elif sort_param == 'date':
-        the_orders = the_orders.order_by('date')
-    elif sort_param == 'customer name':
-        the_orders = the_orders.order_by('customer_name')
-    else :
-        the_orders = the_orders.order_by('-serial_no')
-    return render(request, 'display_orders.html', {'my_orders': my_orders,'the_orders': the_orders,'my_customers':my_customers})
+    the_orders = the_orders.order_by('-serial_no')
+    return render(request, 'display_orders.html', {'the_orders': the_orders,'orders_data':orders_data})
 
 @login_required(login_url="login_user")
 def display_remaining(request):
