@@ -33,6 +33,7 @@ urlpatterns = [
     path('search_customer/', views.search_customer, name='search_customer'),
     path('display_remaining/', views.display_remaining, name='display_remaining'),
     path('search_customer_delivery/', views.search_customer_delivery, name='search_customer_delivery'),
+    path('display_single_order/', views.display_single_order, name='display_single_order'), 
     path('pivot/', views.dashboard_with_pivot, name='dashboard_with_pivot'),
     path('data', views.pivot_data, name='pivot_data'),
     path('dashboards/', views.dashboards, name='dashboards'),

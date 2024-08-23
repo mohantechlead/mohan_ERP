@@ -1,0 +1,165 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+
+    <div class="form-group pull-left" style="margin-left: 0;">
+        <div style="display: flex; justify-content: center;">
+            <div style="display: flex;">
+                <div class="mb-4">
+                    
+                    <div class="text-muted" style="text-align: center;">
+                       
+                            <img src="../../static/header mohan.PNG" alt="" style="margin: 0px; padding: 0px;">               
+            
+                    </div>
+                    <h4 class="mb-1 text-muted" style="margin-left: 132px;">Material Requisition</h4>
+            
+                </div>
+            </div>
+                         </div>
+                        
+                            <div class="table-responsive " >
+                                <table class="table table-nowrap mb-0" style="margin-bottom: 0;margin-left: 0;">
+                                            <thead>
+                                              
+                                                <tr>
+                                                    <th style="width: 550px;">
+                                                         <div class="text-muted">
+                                                            <p class="mb-1" style="line-height: 1.9;font-size: small;">Bole Sub city, Kebele 02,House No. 393/2<br>
+                                                                Mohan Building, Mohan Block 
+                                                                ADDIS ABABA, ETHIOPIA <br>
+                                                                <i> TEL.+251-6620329 / + 251-6621848 </i>
+                                                                P.O.BOX : 1873 
+                                                             </p>
+                                
+                                                        </div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="col-sm-5" style="width: 100px;padding: 0;">
+                                                            <div class="text-muted text-sm-end">
+                                                                <div>
+                                                                    <h5 class="font-size-15 mb-1">MR No</h5>
+                                                                    <p>{{my_mr.MR_no}}</p>
+                                                                </div>
+                                                                   
+                                                                                                  
+                                
+                                                            </div>
+                                                        </div>
+                                                    </th>
+                                                    <th>
+                                                        <div class="text-muted text-sm-end" style="width: 250px;padding: 0;">
+                                                            
+                                                            <div class="mt-4">
+                                                                <div>
+                                                                    <h5 class="font-size-15 mb-1">Date</h5>
+                                                                    
+                                                                    <p>{{my_mr.date}}</p>
+                                                                </div>
+                                                                   
+                                                                                                                               
+                                                        <div class="text-muted">
+                                                            <h5 class=" mb-1" style="line-height: 1.9;font-size: small;">Recieved From</h5>
+                                                                        <p>{{my_mr.MR_store}}</p>
+                                                        </div>
+                                                       
+                                                            </div>
+                                                            
+                                                            
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                            </thead><!-- end thead -->
+                                            
+                                            <tbody>
+                                                
+                                               
+                                                <tr>
+                                                    <p></p>
+                                                </tr>
+                                                <!-- end tr -->
+                                            </tbody><!-- end tbody -->
+                                        </table><!-- end table -->
+                                    </div>
+
+                                    <div class="py-2">
+                                        <!-- <h5 class="font-size-15">Purchase Order Summary</h5> -->
+                
+                                        <div class="table-responsive">
+                                            <table class="table align-middle table-nowrap table-centered mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 70px;">No.</th>
+                                                        <th>Item</th>
+                                                        <th>No of Bag</th>
+                                                        <th>Quantity</th>
+                                                    </tr>
+                                                </thead><!-- end thead -->
+                                                <tbody>
+                                                                                                     
+                                                    {% if mr_item %}
+                                                    {% for item in mr_item %}
+                                                    <tr>
+                                                        <td style="font-weight: bold;">0{{ forloop.counter }}</td>
+                                                        <td>
+                                                            <div>
+                                                                <h5 class="text-truncate font-size-14 mb-1">{{item.item_name}}</h5>
+                                                                <p class="text-muted mb-0">HS-code:{{item.hs_code}}</p>
+                                                            </div>
+                                                        </td>
+                                
+                                                        <td> {{item.no_of_unit}} {{item.unit_type}}</td>
+                                                        <td> {{item.quantity}} {{item.measurement_type}}</td>
+                                                        
+                                                        
+                                                    </tr>
+                                                    {% endfor %}
+                                                   
+            
+                                                    <tr>
+                                                        <th scope="row" colspan="4" class="text-end">Total Quantity</th>
+                                                        <td class="text-end" id="total_price">{{my_fgrn.total_quantity}}</td>
+                                                    </tr>
+                                                    {% endif %}
+                                                  
+                                                    
+                                                    </tr>
+                                                    <!-- end tr -->
+                                                </tbody><!-- end tbody -->
+                                            </table><!-- end table -->
+                                        </div><!-- end table responsive -->
+                                       
+                                    </div>
+                       
+                        <!-- end row -->
+                        
+                       
+                   
+                </div>
+            
+   
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-eMNCOe7tC1doHpGoWe/6oMVemdAVTMs2xqW4mwXrXsW0L84Iytr2wi5v2QjrP/xp" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const totalPrice = document.getElementById('total_price')
+    const shippingPriceElement = document.getElementById('shipping_price');
+    const finalPrice = document.getElementById('final_price')
+    
+    var total_price = parseFloat(totalPrice.textContent);
+    var shippingPrice = parseFloat(shippingPriceElement.textContent);
+    console.log(shippingPrice)
+    shippingPrice =shippingPrice.toString()
+    var modifiedValue = shippingPrice.replace('$', '');
+    console.log(modifiedValue)
+    const price = total_price + final_price
+    
+    finalPrice.innerHTML = price
+    
+})
+        
+</script>
+{% endblock %}

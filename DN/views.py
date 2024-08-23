@@ -269,26 +269,60 @@ def input_orders_items(request):
 
 @login_required(login_url="login_user")
 def display_orders(request):
-   
-    the_orders = orders.objects.all()
+ 
+    the_order = orders.objects.all().order_by('serial_no')
+    orders_data = []
 
-    order_data = []
-    for order in the_orders:
-
+    for order in the_order:
         items = orders_items.objects.filter(serial_no=order.serial_no)
-
-        orders_data = {
+        order_data = {
                 'serial_no': order.serial_no,
-                'date': order.date,  # Assuming 'date' is a field in CosmicOrder
-                'order_item': items,  # Assuming a related name 'order_items' on CosmicOrder pointing to OrderItem
-                # 'MR_store': mr.MR_store,  # Assuming 'PR_before_vat' is a field in CosmicOrder
-                # 'desc': mr.desc,  # A  # Assuming 'status' is a field in CosmicOrder
+                'before_vat': order.before_vat,
+                'invoice':order.invoice,
+                'date': order.date,
+                'final_price': order.final_price,
+                'order_item': items,
+                'customer_name': order.customer_name 
             }
-        order_data.append(orders_data)
+        orders_data.append(order_data)
 
-    # Sort the orders based on the selected parameter
-    the_orders = the_orders.order_by('-serial_no')
-    return render(request, 'display_orders.html', {'the_orders': the_orders,'orders_data':orders_data})
+    print(items)
+
+    context = {
+        'my_order': the_order,
+        'orders_data': orders_data 
+    }
+
+    return render(request,'display_orders.html', context)
+
+@login_required(login_url="login_user")
+def display_single_order(request):
+    if request.method == 'GET':
+        serial_no = request.GET['serial_no']
+        
+        try:
+            order = orders.objects.get(serial_no=serial_no)
+            order_items = order_items.objects.all()
+            order_items = order_items.filter(serial_no=serial_no)
+            print(order_items)
+
+            if order_items.exists():
+                print(order_items,"yes")
+                context = {
+                            'order_items': order_items,
+                            'order': order,
+                        }
+                return render(request, 'display_single_order.html', context)
+        
+        except orders.DoesNotExist:
+                order = None 
+       
+        print("no")
+        
+        context = {
+                        'order': order,
+                    }
+    return render(request, 'display_single_order.html')
 
 @login_required(login_url="login_user")
 def display_remaining(request):

@@ -90,11 +90,8 @@
       <th>Before VAT</th>
       <th>Total Price</th>
       <th>Customer</th>
-      <th>Remaining</th>
-      <th>Type</th>
-      <th>Measurement</th>
     </tr>
-    {% for order in the_orders %}
+    {% for order in orders_data %}
     <tr>
       <td><a href="#" class="order-link" data-order-id="{{ order.serial_no }}">{{ order.serial_no }}</a></td>
 
@@ -109,14 +106,25 @@
         {% endfor %}
       </td>
 
+      <td>
+        {% for item in order.order_item.all %}
+            {{ item.unit_price }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </td>
+
+      <td>
+        {% for item in order.order_item.all %}
+            {{ item.quantity }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </td>
+
      
       <td>{{ order.before_vat }}</td>
-      <td>{{ order.total_price }}</td>
+      <td>{{ order.final_price }}</td>
       <td>{{ order.customer_name }}</td>
-      <td>{{ order.measurement }}</td>
-      <td>{{ order.remaining }}</td> 
-      <td>{{ order.invoice_type }}</td>
-      <!-- <td>{{ order.comment }}</td> -->
+    
       
     </tr>
     {% endfor %}
@@ -132,7 +140,7 @@
               event.preventDefault();
               console.log("p2")
               const orderID = this.getAttribute('data-order-id');
-              window.location.href = `/DN/search_orders/?serial_no=${orderID}`;
+              window.location.href = `/DN/display_single_order/?serial_no=${orderID}`;
           });
       });
   });
