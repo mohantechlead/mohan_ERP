@@ -70,6 +70,38 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="text-center h2">Add Items</div>
+
+                <div>
+
+                    {{ formset.management_form }}
+                                   
+                    <div id="form-lists">
+                        {% for form in formset %}
+
+                        <div class="card-body row item-list form-group col-md-5">
+
+                            {{ form.as_p }}
+                            {% if formset.can_delete %}
+                                <div class="form-delete">
+                                    {{ form.DELETE.label_tag }} {{ form.DELETE }}
+                                    <button type="button" class="delete-button" data-form-id="{{ form.prefix }}">Delete</button>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+                    </div>
+
+                    <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+
+                </div>
+              
+                <button id="add-more" class="btn btn-primary" type="button"
+                                    style="background-color: #1F2833;color: white;">Add
+                                        Item</button>
             </form>
 
             <div class="container d-flex justify-content-center align-items-center" style="font-size: small;margin-top: 30PX; ">
@@ -91,28 +123,6 @@
                                 {% endif %}
 
 
-                                <form method="post" action="{% url 'create_MR_items' %}" id="form2">
-                                    {% csrf_token %}
-
-                                    {{ formset.management_form }}
-                                   
-                                    <div id="form-lists">
-                                        {% for form in formset %}
-
-                                        <div class="card-body row item-list form-group col-md-4">
-
-                                            {{form.as_p}}
-
-                                        </div>
-
-                                        {% endfor %}
-                                    </div>
-
-                                    <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
-                                    <button id="add-more" class="btn btn-primary" type="button"
-                                        style="background-color: #1F2833;color: white;">Add
-                                        Item</button>
-                                </form>
                             </div>
                         </div>
 
@@ -146,4 +156,20 @@
             </div>
         </div>
         <script src="../../static/js/mr/create_MR.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const deleteButtons = document.querySelectorAll('.delete-button');
+            
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const formId = this.getAttribute('data-form-id');
+                        const deleteCheckbox = document.querySelector(`input[name=${formId}-DELETE]`);
+                        if (deleteCheckbox) {
+                            deleteCheckbox.checked = true;
+                            this.parentElement.parentElement.style.display = 'none'; // Hide the form row
+                        }
+                    });
+                });
+            });
+            </script>
         {% endblock %}
