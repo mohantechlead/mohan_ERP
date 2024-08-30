@@ -18,87 +18,139 @@ from openpyxl.styles import *
 import openpyxl
 from itertools import chain
 
+# @login_required(login_url="login_user")
+# def create_MR(request):
+#     if request.method == 'POST':
+#         form = MRForm(request.POST)
+        
+#         if form.errors:
+#             print(form.errors)
+
+#         if form.is_valid():
+#             print(form.data,"val")
+
+#             form.save()
+#             return redirect('create_MR')
+#         else:
+#             print(form.data,"nval")
+#             errors = dict(form.errors.items())
+#             print(errors,"errors")
+#             return JsonResponse({'form_errors': errors}, status=400)
+#     form = MRForm()
+#     formset = formset_factory(MRItemForm, extra= 1)
+#     formset = formset(prefix="items")
+#     print(formset)
+#     return render(request,'create_mr.html',{'form': form, 'formset': formset})
+
+# @login_required(login_url="login_user")
+# def create_MR_items(request):
+#     if request.method == 'POST':
+#         formset = formset_factory(MRItemForm, extra=1 , min_num= 1)
+#         formset = formset(request.POST or None, prefix="items")
+
+#         if formset.errors:
+#             print(formset.errors)
+
+#         non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
+#         pr_no = request.POST.get('MR_no')
+#         print(pr_no,"pr")
+#         if non_empty_forms:
+#             if formset.is_valid():
+#                 MR_instance = MR.objects.get(MR_no = pr_no)
+#                 print(MR_instance,"inst")
+#                 for form in non_empty_forms:
+#                     form.instance.MR_no = MR_instance
+#                     item_name = form.cleaned_data['item_name']
+#                     quantity = form.cleaned_data['quantity']
+#                     no_of_unit = form.cleaned_data['no_of_unit']
+#                     # measurement_type = form.cleaned_data['measurement_type']
+#                     try:
+#                         inventory_item = inventory.objects.get(item_name = item_name)
+#                         inventory_item.quantity -= quantity
+#                         inventory_item.no_of_unit -= no_of_unit
+#                         # inventory_item.measurement_type = measurement_type
+#                         inventory_item.save()
+#                     except inventory.DoesNotExist:
+#                         # print(item_name, quantity, measurement_type, "yes")
+#                         inventory_item = inventory(item_name = item_name, quantity = -quantity)
+#                         inventory_item.save()
+#                     form.save()
+#             else:
+#                 print(formset.data,"nval")
+#                 errors = dict(formset.errors.items())
+#                 return JsonResponse({'form_errors': errors}, status=400)
+        
+#             pr_form = MRForm(prefix="orders")
+#             formset = formset_factory(MRItemForm, extra=1)
+#             formset = formset(prefix="items")
+
+#             context = {
+#                 'pr_form': pr_form,
+#                 'formset': formset,
+#                 # 'message':success_message,
+#             }
+#             return render(request, 'create_mr.html', context)
+#     else:
+       
+#         formset = formset_factory(MRItemForm, extra=1)
+#         formset = formset(prefix="items")
+
+#     context = {
+#         'formset': formset,
+#     }
+#     return render(request, 'create_mr.html', context)
+
 @login_required(login_url="login_user")
 def create_MR(request):
+    MRFormSet = formset_factory(MRItemForm, extra=1)
+
     if request.method == 'POST':
         form = MRForm(request.POST)
-        
-        if form.errors:
-            print(form.errors)
+        formset = MRFormSet(request.POST, prefix="items")
 
-        if form.is_valid():
-            print(form.data,"val")
+        if form.is_valid() and formset.is_valid():
+            # Save the MR form
+            MR_instance = form.save()
 
-            form.save()
+            # Process the formset
+            for form_item in formset:
+                if form_item.cleaned_data.get('DELETE'):
+                    # If delete checkbox is checked, delete the item
+                    if form_item.instance.pk:
+                        form_item.instance.delete()
+                else:
+                    item_name = form_item.cleaned_data.get('item_name')
+                    quantity = form_item.cleaned_data.get('quantity')
+                    no_of_unit = form_item.cleaned_data.get('no_of_unit')
+
+                    if item_name:
+                        try:
+                            inventory_item = inventory.objects.get(item_name=item_name)
+                            inventory_item.quantity -= quantity
+                            inventory_item.no_of_unit -= no_of_unit
+                            inventory_item.save()
+                        except inventory.DoesNotExist:
+                            inventory_item = inventory(item_name=item_name, quantity=-quantity)
+                            inventory_item.save()
+
+                        # Save each MRItem form with the corresponding MR instance
+                        form_item.instance.MR_no = MR_instance
+                        form_item.save()
+
             return redirect('create_MR')
+
         else:
-            print(form.data,"nval")
-            errors = dict(form.errors.items())
-            print(errors,"errors")
+            # Return the form errors if form or formset is invalid
+            form_errors = dict(form.errors.items())
+            formset_errors = {f"formset_{i}": dict(form_item.errors) for i, form_item in enumerate(formset) if form_item.errors}
+            errors = {**form_errors, **formset_errors}
             return JsonResponse({'form_errors': errors}, status=400)
-    form = MRForm()
-    formset = formset_factory(MRItemForm, extra= 1)
-    formset = formset(prefix="items")
-    print(formset)
-    return render(request,'create_mr.html',{'form': form, 'formset': formset})
 
-@login_required(login_url="login_user")
-def create_MR_items(request):
-    if request.method == 'POST':
-        formset = formset_factory(MRItemForm, extra=1 , min_num= 1)
-        formset = formset(request.POST or None, prefix="items")
-
-        if formset.errors:
-            print(formset.errors)
-
-        non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
-        pr_no = request.POST.get('MR_no')
-        print(pr_no,"pr")
-        if non_empty_forms:
-            if formset.is_valid():
-                MR_instance = MR.objects.get(MR_no = pr_no)
-                print(MR_instance,"inst")
-                for form in non_empty_forms:
-                    form.instance.MR_no = MR_instance
-                    item_name = form.cleaned_data['item_name']
-                    quantity = form.cleaned_data['quantity']
-                    no_of_unit = form.cleaned_data['no_of_unit']
-                    # measurement_type = form.cleaned_data['measurement_type']
-                    try:
-                        inventory_item = inventory.objects.get(item_name = item_name)
-                        inventory_item.quantity -= quantity
-                        inventory_item.no_of_unit -= no_of_unit
-                        # inventory_item.measurement_type = measurement_type
-                        inventory_item.save()
-                    except inventory.DoesNotExist:
-                        # print(item_name, quantity, measurement_type, "yes")
-                        inventory_item = inventory(item_name = item_name, quantity = -quantity)
-                        inventory_item.save()
-                    form.save()
-            else:
-                print(formset.data,"nval")
-                errors = dict(formset.errors.items())
-                return JsonResponse({'form_errors': errors}, status=400)
-        
-            pr_form = MRForm(prefix="orders")
-            formset = formset_factory(MRItemForm, extra=1)
-            formset = formset(prefix="items")
-
-            context = {
-                'pr_form': pr_form,
-                'formset': formset,
-                # 'message':success_message,
-            }
-            return render(request, 'create_mr.html', context)
     else:
-       
-        formset = formset_factory(MRItemForm, extra=1)
-        formset = formset(prefix="items")
+        form = MRForm()
+        formset = MRFormSet(prefix="items")
 
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'create_mr.html', context)
+    return render(request, 'create_mr.html', {'form': form, 'formset': formset})
 
 @login_required(login_url="login_user")
 def edit_parent_and_children(request, MR_no):

@@ -70,6 +70,32 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="text-center h2">Add Items</div>
+
+                <div>
+
+                      {{ formset.management_form }}
+                                   
+                                    <div id="form-lists">
+                                        {% for form in formset %}
+
+                                        <div class="card-body row item-list form-group col-md-4">
+
+                                            {{form.as_p}}
+
+                                        </div>
+
+                                        {% endfor %}
+                                    </div>
+
+                                    <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+
+                </div>
+              
+                                    <button id="add-more" class="btn btn-primary" type="button"
+                                        style="background-color: #1F2833;color: white;">Add
+                                        Item</button>
             </form>
 
             <div class="container d-flex justify-content-center align-items-center" style="font-size: small;margin-top: 30PX; ">
@@ -91,28 +117,6 @@
                                 {% endif %}
 
 
-                                <form method="post" action="{% url 'create_MR_items' %}" id="form2">
-                                    {% csrf_token %}
-
-                                    {{ formset.management_form }}
-                                   
-                                    <div id="form-lists">
-                                        {% for form in formset %}
-
-                                        <div class="card-body row item-list form-group col-md-4">
-
-                                            {{form.as_p}}
-
-                                        </div>
-
-                                        {% endfor %}
-                                    </div>
-
-                                    <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
-                                    <button id="add-more" class="btn btn-primary" type="button"
-                                        style="background-color: #1F2833;color: white;">Add
-                                        Item</button>
-                                </form>
                             </div>
                         </div>
 
