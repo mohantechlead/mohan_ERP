@@ -102,7 +102,7 @@ from itertools import chain
 
 @login_required(login_url="login_user")
 def create_MR(request):
-    MRFormSet = formset_factory(MRItemForm, extra=1, can_delete=True)
+    MRFormSet = formset_factory(MRItemForm, extra=1)
 
     if request.method == 'POST':
         form = MRForm(request.POST)
