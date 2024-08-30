@@ -269,26 +269,60 @@ def input_orders_items(request):
 
 @login_required(login_url="login_user")
 def display_orders(request):
-    my_orders = orders.objects.all()
-    the_orders = orders.objects.all()
-    my_customers = orders.objects.all()
+ 
+    the_order = orders.objects.all().order_by('serial_no')
+    orders_data = []
 
-    sort_param = request.GET.get('sort')
+    for order in the_order:
+        items = orders_items.objects.filter(serial_no=order.serial_no)
+        order_data = {
+                'serial_no': order.serial_no,
+                'before_vat': order.before_vat,
+                'invoice':order.invoice,
+                'date': order.date,
+                'final_price': order.final_price,
+                'order_item': items,
+                'customer_name': order.customer_name 
+            }
+        orders_data.append(order_data)
 
-    # Sort the orders based on the selected parameter
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    print(items)
 
-    if start_date and end_date:
-        the_orders = the_orders.filter(date__range=[start_date, end_date])
-        the_orders = the_orders.order_by('date')
-    elif sort_param == 'date':
-        the_orders = the_orders.order_by('date')
-    elif sort_param == 'customer name':
-        the_orders = the_orders.order_by('customer_name')
-    else :
-        the_orders = the_orders.order_by('-serial_no')
-    return render(request, 'display_orders.html', {'my_orders': my_orders,'the_orders': the_orders,'my_customers':my_customers})
+    context = {
+        'my_order': the_order,
+        'orders_data': orders_data 
+    }
+
+    return render(request,'display_orders.html', context)
+
+@login_required(login_url="login_user")
+def display_single_order(request):
+    if request.method == 'GET':
+        serial_no = request.GET['serial_no']
+        
+        try:
+            order = orders.objects.get(serial_no=serial_no)
+            order_items = order_items.objects.all()
+            order_items = order_items.filter(serial_no=serial_no)
+            print(order_items)
+
+            if order_items.exists():
+                print(order_items,"yes")
+                context = {
+                            'order_items': order_items,
+                            'order': order,
+                        }
+                return render(request, 'display_single_order.html', context)
+        
+        except orders.DoesNotExist:
+                order = None 
+       
+        print("no")
+        
+        context = {
+                        'order': order,
+                    }
+    return render(request, 'display_single_order.html')
 
 @login_required(login_url="login_user")
 def display_remaining(request):

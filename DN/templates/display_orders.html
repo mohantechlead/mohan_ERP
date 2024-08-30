@@ -7,15 +7,15 @@
   </strong>
   <div>
     <div>
-      <form action="/search_orders/">
+      <!-- <form action="/search_orders/">
         <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
           <input type="text" name="serial_no" placeholder="Order No" class="form-control" style=" margin-top: 10px; ">
           <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search Order</button></div>
         </div>
-      </form>
+      </form> -->
 
       <div class="col-md-6">
-        <form action="/search_customer/">
+        <!-- <form action="/search_customer/">
 
           <div class="form-group col-sm-8" style=" display: flex; ">
             <div>
@@ -31,13 +31,13 @@
 
           </div>
 
-        </form>
+        </form> -->
 
       </div>
     </div>
     <div>
       <div class="col-md-4">
-        <form method="get">
+        <!-- <form method="get">
           <label for="sort">Sort by:</label>
           <select class="form-select" name="sort" id="sort">
             <option value="date">Date</option>
@@ -45,17 +45,17 @@
             <option value="order number">Order Number</option>
           </select>
           <button type="submit" class="btn btn-primary" value="Sort"> Sort</button>
-        </form>
+        </form> -->
       </div>
       <div>
         <div class="col-md-6">
-          <form method="get">
+          <!-- <form method="get">
             <label for="start_date">Start Date:</label>
             <input type="date" name="start_date" id="start_date">
             <label for="end_date">End Date:</label>
             <input type="date" name="end_date" id="end_date">
             <button type="submit" class="btn btn-primary" value="Filter">Filter</button>
-          </form>
+          </form> -->
 
         </div>
       </div>
@@ -90,27 +90,42 @@
       <th>Before VAT</th>
       <th>Total Price</th>
       <th>Customer</th>
-      <th>Remaining</th>
-      <th>Type</th>
-      <th>Remarks</th>
-      <th>Measurement</th>
     </tr>
-    {% for order in the_orders %}
+    {% for order in orders_data %}
     <tr>
       <td><a href="#" class="order-link" data-order-id="{{ order.serial_no }}">{{ order.serial_no }}</a></td>
 
       <td>{{ order.date }}</td>
       <td>{{ order.invoice }}</td>
-      <td>{{ order.description }}</td>
-      <td>{{ order.price }}</td>
-      <td>{{ order.order_quantity }}</td>
+
+      
+      <td>
+        {% for item in order.order_item.all %}
+            {{ item.description }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </td>
+
+      <td>
+        {% for item in order.order_item.all %}
+            {{ item.unit_price }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </td>
+
+      <td>
+        {% for item in order.order_item.all %}
+            {{ item.quantity }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </td>
+
+     
       <td>{{ order.before_vat }}</td>
-      <td>{{ order.total_price }}</td>
+      <td>{{ order.final_price }}</td>
       <td>{{ order.customer_name }}</td>
-      <td>{{ order.remaining }}</td>
-      <td>{{ order.invoice_type }}</td>
-      <td>{{ order.comment }}</td>
-      <td>{{ order.measurement }}</td>
+    
+      
     </tr>
     {% endfor %}
   </table>
@@ -125,7 +140,7 @@
               event.preventDefault();
               console.log("p2")
               const orderID = this.getAttribute('data-order-id');
-              window.location.href = `/DN/search_orders/?serial_no=${orderID}`;
+              window.location.href = `/DN/display_single_order/?serial_no=${orderID}`;
           });
       });
   });
