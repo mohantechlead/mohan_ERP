@@ -9,7 +9,20 @@
     </strong>
 </div>
 <div id="error-container" style="height:50px;">
-    <!-- Errors will be displayed here -->
+</div>
+
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Confirm Submission</h2>
+        <p id="fgrnDisplay"></p>
+        <ul id="itemListDisplay"></ul>
+        <div class="align-right">
+            <button id="confirmSubmit" class="btn btn-primary">Confirm</button>
+            <button id="cancelSubmit" class="btn btn-secondary">Cancel</button>
+        </div>
+        
+    </div>
 </div>
 
 <div class="container d-flex justify-content-center align-items-center" style="font-size: small; margin: auto;">
@@ -64,6 +77,8 @@
                     </div>
 
                 </div>
+
+                <h2 class="text-center">Add Items Below</h2>
 
                             {{ formset.management_form }}
 

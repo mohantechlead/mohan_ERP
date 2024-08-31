@@ -151,7 +151,7 @@ def create_fgrn(request):
                         form_item.instance.FGRN_no = FGRN_instance
                         form_item.save()
 
-            return redirect('create_FGRN')
+            return redirect('create_fgrn')
 
         else:
             # Return the form errors if form or formset is invalid
