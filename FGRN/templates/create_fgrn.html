@@ -78,23 +78,41 @@
 
                 </div>
 
-                <h2 class="text-center">Add Items Below</h2>
-
-                            {{ formset.management_form }}
-
-                            <div id="form-lists">
-                                {% for form in formset %}
-
-                                <div class="card-body row item-list form-group col-md-4">
-
-                                    {{form.as_p}}
-
+                <h2 class="text-center m-4">Add Items Below</h2>
+                <div>
+                    {{ formset.management_form }}
+                    
+                    <div id="form-lists">
+                        {% for form in formset %}
+                        
+                        <div class="card-body row item-list form-group col-md-4">
+                            
+                            {% for field in form %}
+                                <div>
+                                    {{ field.label_tag }} 
+                                    {{ field }}
+                                    
+                                    {% if field.errors %}
+                                        <div class="error-message">
+                                            {% for error in field.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
+                            {% endfor %}
+                            
+                        </div>
+                        
+                        {% endfor %}
+                    </div>
+                </div>
 
-                                {% endfor %}
-                            </div>
+                        <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
 
-                            <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+            </div>
+
+                            
                             <button id="add-more" class="btn btn-primary" type="button"
                                 style="background-image:url('../static/back1.PNG');color: aliceblue;">Add
                                 Item</button>

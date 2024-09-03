@@ -116,21 +116,23 @@ document.addEventListener('DOMContentLoaded', function () {
         copyFormTarget.appendChild(copyEmptyForm);
     } 
 
-    function updateTotalPrice(form) {
-        const per_unit_kg = parseFloat(form.querySelector('#per_unit_kg').value);
-        const no_of_unit = parseFloat(form.querySelector('#no_of_unit').value);
-        const total = per_unit_kg * no_of_unit || 0;
-        form.querySelector('#quantity').value = total.toFixed(2);
+     function updateTotalPrice(form) {
+        var per_unit_kg = parseFloat(form.find('#per_unit_kg').val());
+        var no_of_unit = parseFloat(form.find('#no_of_unit').val());
+        var total = per_unit_kg * no_of_unit || 0;
+        // var total_price = total + (total * 0.15)
+        form.find('#quantity').val(total.toFixed(2));
+        // form.find('.total_price').val(total_price.toFixed(2));
     }
 
-    document.querySelectorAll('.item-list #per_unit_kg, .item-list #no_of_unit').forEach(function(element) {
-        element.addEventListener('input', function() {
-            const form = element.closest('.item-list');
-            updateTotalPrice(form);
-        });
+    $(document).on('input', '.item-list #per_unit_kg, .item-list #no_of_unit', function () {
+        var form = $(this).closest('.item-list');
+        updateTotalPrice(form);
     });
 
-    document.querySelectorAll('.item-list').forEach(function(form) {
+    // Apply initial calculation for existing forms
+    $('.item-list').each(function () {
+        var form = $(this);
         updateTotalPrice(form);
     });
 });
