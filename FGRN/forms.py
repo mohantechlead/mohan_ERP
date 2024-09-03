@@ -3,26 +3,6 @@ from .models import *
 
 
 class FGRNForm(forms.ModelForm):
-
-    # STORE_CHOICES =( 
-    #     ("", ""),
-    # ("STORE 1", "STORE 1"), 
-    # ("STORE 2", "STORE 2"),
-    # ("STORE 3 ", "STORE 3"),
-    # ("STORE 4 ", "STORE 4"),
-    # ("STORE 1 & 2 ", "STORE 1 & 2"),
-    # ("STORE 1 & 3 ", "STORE 1 & 3"),
-    # ("STORE 1 & 4 ", "STORE 1 & 4"),
-    # ("STORE 2 & 4 ", "STORE 2 & 4"),
-    # ("STORE 2 & 3 ", "STORE 2 & 3"),
-    # ("STORE 3 & 4 ", "STORE 3 & 4"),
-    # ("STORE 1, 2 & 3 ", "STORE 1, 2 & 3"),
-    # ("STORE 1, 2 & 4 ", "STORE 1, 2 & 4"),
-    # ("STORE 2, 3 & 4 ", "STORE 2, 3 & 4"),) 
-
-    # recieved_by = forms.ChoiceField(
-    #     choices = STORE_CHOICES,
-    #     widget=forms.Select(attrs={'class': 'form-control'}),)
     
     class Meta:
         model = FGRN
@@ -32,7 +12,7 @@ class FGRNItemForm(forms.ModelForm):
     
     item_name= forms.ModelChoiceField(
         queryset=items_list.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-control', 'id':'item_name'}),
     )
     description = forms.ModelChoiceField(
         queryset=finished_goods.objects.all(),

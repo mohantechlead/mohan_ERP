@@ -399,3 +399,41 @@ input[type="date"] {
 /* .form-group input {
     width: 100px;
 } */
+.modal {
+    display: none;
+    position: fixed; /* Use fixed positioning for better control */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 40%;
+    height: 100%;
+    overflow: auto;
+    background-color: transparent; /* Remove the black background */
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  #buttons{
+    margin-right: 10px;
+  }
