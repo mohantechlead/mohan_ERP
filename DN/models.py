@@ -23,7 +23,7 @@ class delivery(models.Model):
     total_bags = models.FloatField(blank=True, null=True)
 
 class delivery_items(models.Model):
-    serial_no = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'serial_no', related_name='orders')
+    # serial_no = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'serial_no', related_name='orders')
     delivery_number = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'delivery_number', related_name='delivery')
     description = models.TextField(blank=True, null=True)
     no_of_unit = models.FloatField(blank=True, null=True)

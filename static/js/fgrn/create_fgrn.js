@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Clear previous items
         itemListDisplay.innerHTML = '';
         document.querySelectorAll('.item-list').forEach(function(form) {
-            const itemName = form.querySelector('#item_name').value;
+            const itemName = form.querySelector('#description').value;
             const quantity = form.querySelector('#quantity').value;
             const listItem = document.createElement('li');
             listItem.textContent = `Item: ${itemName}, Quantity: ${quantity}`;
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let currentFormsCount = currentForms.length + 1;
         const copyFormTarget = document.getElementById('form-lists');
         const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
-        copyEmptyForm.setAttribute('class', 'item-list form-group col-md-4 text-dark');
+        copyEmptyForm.setAttribute('class', 'item-list form-group col-md-3 text-dark');
         copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`);
         const regex = new RegExp('__prefix__', 'g');
         copyEmptyForm.querySelectorAll('input').forEach(function (input) {
