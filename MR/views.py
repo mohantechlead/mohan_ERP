@@ -392,20 +392,6 @@ def stock_card(request):
         date = getattr(item.GRN_no, 'date', 'No date available')
         print(f"GRN Item ID: {item.GRN_no}, Date: {date}")
 
-    # Combine querysets
-    # combined_items = list(chain(grn_items, mr_items))
-
-    # print(combined_items)
-
-    # Sort combined list by date
-    # sorted_items = sorted(
-    #     combined_items,
-    #     key=lambda item: (
-    #         getattr(item.GRN_no, 'date', None) if hasattr(item, 'GRN_no') else None,
-    #         getattr(item.MR_no, 'date', None) if hasattr(item, 'MR_no') else None
-    #     )
-    # )
-
     sorted_grn_items = sorted(
         grn_items,
         key=lambda item: getattr(item.GRN_no, 'date', None) if hasattr(item, 'GRN_no') else None,
