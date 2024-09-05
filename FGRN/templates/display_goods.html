@@ -7,12 +7,6 @@
         <h2>FGRN Inventory Details</h2>
       </strong>
   </div>
-  <!-- <form action="/GRN/print_pr">
-    <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
-      <input type="text" name="PR_no" placeholder="PR No" class="form-control" style=" margin-top: 10px; ">
-      <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search Order</button></div>
-    </div>
-  </form> -->
  
   <br>
   <br>
@@ -51,7 +45,7 @@
     </div>
   </section>
   
-  <form method="post" action="{% url 'display_inventory' %}" id="form9">
+  <form method="post" action="{% url 'display_goods' %}" id="form">
     {% csrf_token %}
     <div>
       <div class="col-sm-18">
@@ -74,10 +68,6 @@
         <div class="col-sm-1">
           <input type="text" class="form-control col-sm-2" name = "unit_type" placeholder="unit type">
         </div>
-
-        <!-- <div class="col-sm-1">
-          <input type="text" class="form-control col-sm-2" name = "branch" placeholder="branch">
-        </div> -->
        
            </div>
       <button  class="col-sm-1 btn-sm " 
