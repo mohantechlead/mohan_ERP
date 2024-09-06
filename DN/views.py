@@ -681,7 +681,13 @@ def create_delivery(request):
         if form.is_valid() and formset.is_valid():
             # serial_no_value = request.POST.get('serial_no')
             serial_no_value = form.cleaned_data['serial_no']
-            order_instance = orders.objects.get(serial_no=serial_no_value)  # Ensure this is the correct field name
+
+            # Retrieve the Orders instance using the serial_no value
+            try:
+                order_instance = orders.objects.get(serial_no=serial_no_value)  # Make sure 'serial_no' is the correct field
+            except orders.DoesNotExist:
+                messages.error(request, 'Order not found.')
+                return redirect('input_delivery')
 
             # Check for duplicate delivery number
             if delivery.objects.filter(delivery_number__icontains=delivery_number).exists():
