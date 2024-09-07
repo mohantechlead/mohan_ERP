@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const delivery_number = document.getElementById('delivery_number');
-    const submitButton = document.querySelector('#submit-btn'); 
+    const submitButton = document.querySelector('#submit'); 
     const totalNewForms = document.getElementById('id_items-TOTAL_FORMS');
     const addMoreBtn = document.getElementById('add-more'); 
     const date = document.getElementById('date');
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
 
         // Populate the confirmation modal with FGRN number and item list
-        fgrnDisplay.textContent = "FGRN No: " + delivery_number.value;
+        fgrnDisplay.textContent = "Delivery No: " + delivery_number.value;
 
         // Clear previous items
         itemListDisplay.innerHTML = '';

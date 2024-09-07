@@ -3,7 +3,19 @@
 
 <h1>Input Delivery Information</h1>
 
-
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Confirm Submission</h2>
+        <p id="fgrnDisplay"></p>
+        <ul id="itemListDisplay"></ul>
+        <div class="align-right">
+            <button id="confirmSubmit" class="btn btn-primary">Confirm</button>
+            <button id="cancelSubmit" class="btn btn-secondary">Cancel</button>
+        </div>
+        
+    </div>
+</div>
 
 <form action="{% url 'create_delivery' %}" method="post" id="form1">
     {% csrf_token %}
@@ -76,7 +88,7 @@
         <button id="add-form-btn" >Add more</button>
     </div>
 
-    <button type="button" id="submit-btn" class="btn btn-primary">Submit</button>
+    <button type="button" id="submit" class="btn btn-primary">Submit</button>
    
 </form>
 
