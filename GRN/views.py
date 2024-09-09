@@ -244,6 +244,17 @@ def display_grns(request):
     return render(request, 'display_grns.html', context)
 
 @login_required(login_url="login_user")
+def display_pr(request):
+
+    if request.method == 'GET':
+        orders = purchase_orders.objects.all().order_by('PR_no')
+
+    context = {
+        'my_order': orders
+    }
+    return render(request,'display_pr.html', context)
+
+@login_required(login_url="login_user")
 def search_prs(request,pr_no):
     
     if request.method == 'GET':
@@ -530,3 +541,102 @@ def display_grn_item(request):
     }
 
     return render(request,'display_grn_item.html',context)
+
+def create_pr(request):
+    orders = purchase_orders.objects.all()
+    if request.method == 'POST':
+        pr_form = PRForm(request.POST )
+        excise = request.POST.get('excise_tax')
+        print(pr_form.data,"y")
+        if pr_form.errors:
+            print(pr_form.errors)  
+        print(request.POST) 
+        if pr_form.is_valid():
+            instance = pr_form.save(commit=False)
+            instance.status = "Pending"
+            #instance.PR_before_vat = 0.00
+            #instance.PR_total_price = 0.00
+            instance.excise_tax = excise
+
+            instance.save()
+            
+            
+    
+    pr_form = PRForm(prefix="purchases")
+    formset = formset_factory(PRItemForm, extra=1)
+    formset = formset(prefix="items")
+
+    context = {
+        'pr_form': pr_form,
+        'formset': formset,
+        'the_orders': orders,
+    }
+    return render(request, 'create_pr.html', context)
+
+def create_items(request):
+    
+    if request.method == 'POST':
+        formset = formset_factory(PRItemForm, extra=1, min_num=1)
+        
+        formset = formset(request.POST or None,prefix="items")
+        
+        if formset.errors:
+            print(formset.errors)   
+        
+        # Check if 'PR_no' field is empty in each form within the formset
+        for form in formset:
+            print(form,"form")
+        non_empty_forms = [form for form in formset if form.cleaned_data.get('item_name')]
+        vat_is_checked = request.POST.get('vat_is_checked')
+        
+        if non_empty_forms:
+            if formset.is_valid():
+                before_vat_price = 0.00
+                final_price = 0.00
+                final_quantity = 0
+                pr_no = request.POST.get('PR_no')
+                print(pr_no)
+                pr = purchase_orders.objects.get(PR_no = pr_no)
+                for form in non_empty_forms:
+                    if vat_is_checked:
+                        print("yessay")
+                        form.instance.total_price = form.cleaned_data['before_vat']
+                    form.instance.remaining = form.cleaned_data['quantity']
+                    form.instance.PR_no = pr
+                    items = form.cleaned_data['item_name']
+                    item = HS_code.objects.all()
+                    item = item.filter(item_name = items).first()
+                    code = item.hs_code
+                    form.instance.hs_code = code
+                    before_vat_price += float(form.cleaned_data['before_vat'])
+                    final_quantity += form.cleaned_data['quantity']
+                    if form.cleaned_data['total_price']:
+                        final_price += float(form.cleaned_data['total_price'])
+                    
+                    form.save()
+                print(final_price,before_vat_price)
+                
+                pr.total_quantity = final_quantity
+                pr.remaining = final_quantity
+                pr.save()    
+            pr_form = PRForm(prefix="purchases")
+            formset = formset_factory(PRItemForm, extra=1)
+            formset = formset(prefix="items")
+
+            context = {
+                'pr_form': pr_form,
+                'formset': formset,
+                'code': code,
+            }
+
+            return render(request, 'create_pr.html', context)
+    else:
+       
+        formset = formset_factory(PRItemForm, extra=1)
+        formset = formset(prefix="items")
+
+    context = {
+        'formset': formset,
+    }
+    return render(request, 'create_items.html', context)
+
