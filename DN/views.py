@@ -669,61 +669,7 @@ def sales_contract(request):
     
 @login_required(login_url="login_user")
 def create_delivery(request):
-    # my_orders = orders.objects.all()  # Orders model should start with an uppercase letter
-
-    # if request.method == 'POST':
-    #     form = DeliveryForm(request.POST)
-    #     formset_class = formset_factory(DeliverItemForm, extra=1, min_num=1)
-    #     formset = formset_class(request.POST, prefix="items")
-    #     delivery_number = request.POST['delivery_number']
-
-    #     # Validate the form and formset
-    #     if form.is_valid() and formset.is_valid():
-    #         # serial_no_value = request.POST.get('serial_no')
-    #         serial_no_value = form.cleaned_data['serial_no']
-
-    #         # Retrieve the Orders instance using the serial_no value
-    #         try:
-    #             order_instance = orders.objects.get(serial_no=serial_no_value)  # Make sure 'serial_no' is the correct field
-    #         except orders.DoesNotExist:
-    #             messages.error(request, 'Order not found.')
-    #             return redirect('input_delivery')
-
-    #         # Check for duplicate delivery number
-    #         if delivery.objects.filter(delivery_number__icontains=delivery_number).exists():
-    #             messages.error(request, 'Delivery Number already exists')
-    #             return redirect('input_delivery')
-
-    #         # Save the Delivery instance
-    #         delivery_instance = form.save(commit=False)
-    #         delivery_instance.serial_no = order_instance  # Assign the Orders instance
-    #         delivery_instance.save()  # Save the Delivery instance
-
-    #         # Save the valid forms in the formset
-    #         for form in formset:
-    #             if form.cleaned_data.get('description'):  # Check if description exists
-    #                 item_instance = form.save(commit=False)
-    #                 item_instance.delivery = delivery_instance  # Link the item to the delivery
-    #                 item_instance.save()
-
-    #         return redirect('input_delivery')
-
-    #     # If form is not valid, print errors for debugging
-    #     if form.errors:
-    #         print(form.errors)
-
-    # else:
-    #     form = DeliveryForm()
-    #     formset_class = formset_factory(DeliverItemForm, min_num=1)
-    #     formset = formset_class(prefix="items")
-
-    # context = {
-    #     'form': form,
-    #     'formset': formset,
-    #     'my_orders': my_orders
-    # }
-
-    # return render(request, 'create_delivery.html', context)
+   
     DNFormset = formset_factory(DeliverItemForm, extra=1)
 
     if request.method == 'POST':
@@ -762,7 +708,6 @@ def create_delivery(request):
             return redirect('create_delivery')
 
         else:
-            # Return the form errors if form or formset is invalid
             form_errors = dict(form.errors.items())
             formset_errors = {f"formset_{i}": dict(form_item.errors) for i, form_item in enumerate(formset) if form_item.errors}
             errors = {**form_errors, **formset_errors}
