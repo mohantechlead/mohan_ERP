@@ -17,6 +17,8 @@ from openpyxl import Workbook
 from openpyxl.styles import *
 import openpyxl
 from itertools import chain
+import plotly.graph_objs as go
+from plotly.offline import plot
 
 @login_required(login_url="login_user")
 def create_MR(request):
@@ -441,3 +443,30 @@ def stock_card(request):
 
     return render(request, 'stock_card.html', context)
 
+def inventory_chart(request):
+    # Fetch all inventory data
+    inventory_items = inventory.objects.all()
+
+    # Prepare data for the chart
+    item_names = [item.item_name for item in inventory_items]
+    quantities = [item.quantity for item in inventory_items]
+
+    # Create a Plotly bar chart for all items
+    fig = go.Figure(
+        data=[
+            go.Bar(x=item_names, y=quantities, marker_color='blue')
+        ],
+        layout=go.Layout(
+            title="Inventory Quantities for All Items",
+            xaxis_title="Item Name",
+            yaxis_title="Quantity"
+        )
+    )
+
+    # Generate the plot div
+    chart_div = plot(fig, output_type='div')
+
+    # Render the template
+    return render(request, 'inventory_chart.html', {
+        'chart_div': chart_div
+    })

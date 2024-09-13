@@ -13,4 +13,5 @@ urlpatterns = [
     path('stock_card',views.stock_card, name= 'stock_card'),
     path('edit_mr/<int:MR_no>',views.edit_parent_and_children, name="edit_mr"),
     path('export_mr_pdf', views.export_mr_pdf, name='export_mr_pdf'),
+    path('inventory_chart/', views.inventory_chart, name='inventory_chart'),
 ]
