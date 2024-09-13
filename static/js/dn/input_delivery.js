@@ -1,16 +1,22 @@
 document.addEventListener('DOMContentLoaded', function () {
     const delivery_number = document.getElementById('delivery_number');
-    const confirmationModal = document.getElementById('confirmationModal');
-    const confirmSubmitButton = document.getElementById('confirmSubmit');
-    const cancelSubmitButton = document.getElementById('cancelSubmit');
     const submitButton = document.querySelector('#submit'); 
     const totalNewForms = document.getElementById('id_items-TOTAL_FORMS');
     const addMoreBtn = document.getElementById('add-more'); 
-    const date = document.getElementById('date');
+    // const date = document.getElementById('date');
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmSubmitButton = document.getElementById('confirmSubmit');
+    const cancelSubmitButton = document.getElementById('cancelSubmit');
     const fgrnDisplay = document.getElementById('fgrnDisplay');
     const itemListDisplay = document.getElementById('itemListDisplay');
 
-    console.log(document.getElementById('confirmationModal'));
+    addMoreBtn.addEventListener('click', add_new_form);
+    const calculateTotalButton = document.querySelector('#calculate_total');
+
+    calculateTotalButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        calculateTotalPrice();
+    });
 
     function calculateTotalPrice() {
         let total = 0;
@@ -35,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
 
         // Populate the confirmation modal with FGRN number and item list
-        fgrnDisplay.textContent = "Delivery No: " + delivery_number.value;
+        fgrnDisplay.textContent = "FGRN No: " + delivery_number.value;
 
         // Clear previous items
         itemListDisplay.innerHTML = '';
