@@ -168,3 +168,24 @@ class OrderForm(forms.ModelForm):
         model = orders
         fields = ['serial_no','customer_name','date','invoice', 'final_price','invoice_type','before_vat','withholding_amount','vat_amount','reciveable']
         
+class CustomerForm(forms.ModelForm):
+    
+    name = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Name'})
+    )
+    
+    phone_number = forms.IntegerField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Company'})
+    )
+    
+    email = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Email'})
+    )
+    
+    company = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Company'})
+    )
+     
+    class Meta:
+        model = Customer
+        fields = ['name', 'phone_number', 'email', 'company']

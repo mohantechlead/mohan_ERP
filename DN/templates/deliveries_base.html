@@ -83,18 +83,34 @@
                             <a href="{% url 'display_delivery' %}">Display Delivery</a>
                         </li>
                     </ul>
-                </li>        
+                </li> 
                 
                 <li style="font-size:larger; font-weight: 500;">
-                    <a aria-expanded="false" a href="{% url 'dashboards' %}">Dashboards</a>
+                    <a href="#customerSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle">Customer</a>
+                    <ul class="collapse list-unstyled" id="customerSubmenu">
+                        <li style="font-size: large;">
+                            <a href="{% url 'create_customer' %}">Create Customer</a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'customer_list' %}">Display Customer</a>
+                        </li>
+                    </ul>
                 </li>
                 
                 <li style="font-size:larger; font-weight: 500;">
-                    <a aria-expanded="false" a href="{% url 'tables' %}">Customers</a>
+                    <a href="#dashboardSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle">Dashboard</a>
+                    <ul class="collapse list-unstyled" id="dashboardSubmenu">
+                        <li style="font-size: large;">
+                            <a href="{% url 'create_customer' %}">Orders </a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'customer_list' %}">Inventory</a>
+                        </li>
+                    </ul>
                 </li>
-
-
-
+                
             </ul>
 
         </nav>
