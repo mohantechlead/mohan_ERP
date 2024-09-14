@@ -3,10 +3,22 @@ from .models import *
 
 
 class FGRNForm(forms.ModelForm):
+    FGRN_no = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'FGRN Number', 'id': 'FGRN_no'})
+    )
+    date = forms.DateField(
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'id': 'date'})
+    )
+    recieved_from = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received From', 'id': 'recieved_from'})
+    )
+    recieved_by = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received By', 'id': 'recieved_by'})
+    )
     
     class Meta:
         model = FGRN
-        fields = ['FGRN_no','date','recieved_from','recieved_by']
+        fields = ['FGRN_no', 'date', 'recieved_from', 'recieved_by']
    
 class FGRNItemForm(forms.ModelForm):
     
@@ -16,7 +28,7 @@ class FGRNItemForm(forms.ModelForm):
     )
     description = forms.ModelChoiceField(
         queryset=finished_goods.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),)
+        widget=forms.Select(attrs={'class': 'form-control', 'id':'description'}),)
     
     no_of_unit = forms.FloatField(
         required = False,

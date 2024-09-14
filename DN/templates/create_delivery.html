@@ -3,7 +3,18 @@
 
 <h1>Input Delivery Information</h1>
 
-
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Confirm Submission</h2>
+        <p id="fgrnDisplay"></p>
+        <ul id="itemListDisplay"></ul>
+        <div class="align-right">
+            <button id="confirmSubmit" class="btn btn-primary">Confirm</button>
+            <button id="cancelSubmit" class="btn btn-secondary">Cancel</button>
+        </div> 
+    </div>
+</div>
 
 <form action="{% url 'create_delivery' %}" method="post" id="form1">
     {% csrf_token %}
@@ -76,7 +87,7 @@
         <button id="add-form-btn" >Add more</button>
     </div>
 
-    <button type="button" id="submit-btn" class="btn btn-primary">Submit</button>
+    <button type="button" id="submit" class="btn btn-primary">Submit</button>
    
 </form>
 
@@ -84,56 +95,6 @@
 
 
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const Formset = document.getElementById('item_formset');
-        const addFormBtn = document.getElementById('add-form-btn');
-        const totalForms = document.getElementById('id_form-TOTAL_FORMS');
-
-        addFormBtn.addEventListener('click', function () {
-            const formNum = parseInt(totalForms.value);
-            const newForm = Formset.querySelector('.item-list').cloneNode(true);
-
-            // Update form index numbers
-            const regex = new RegExp(`form-(\\d+)-`, 'g');
-            newForm.innerHTML = newForm.innerHTML.replace(regex, `form-${formNum}-`);
-
-            // Clear the inputs in the cloned form
-            const inputs = newForm.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                input.value = '';
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    input.checked = false;
-                }
-            });
-
-            // Append the new form to the formset
-            Formset.appendChild(newForm);
-
-            // Increment the total form count
-            totalForms.value = formNum + 1;
-        });
-    });
-
-    document.getElementById('submit-btn').addEventListener('click', function() {
-            // Optional: Validate the form before submitting
-            var formValid = true; // Assume form is valid for now
-
-            // Example: Check if delivery_date is filled
-            var deliveryDate = document.getElementById('delivery_date').value;
-            if (!deliveryDate) {
-                formValid = false;
-                alert('Delivery date is required!');
-            }
-
-            // You can add more custom validations here...
-
-            // If form is valid, submit it
-            if (formValid) {
-                document.getElementById('form1').submit();
-            }
-    });
-
-</script>
+<script src="../../static/js/dn/input_delivery.js"></script>
                 
 {% endblock %}

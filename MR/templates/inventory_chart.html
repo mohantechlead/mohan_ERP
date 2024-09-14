@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Chart</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Inventory Quantities for All Items</h1>
+
+    <h2>Chart</h2>
+    <div>
+        {{ chart_div|safe }}
+    </div>
+</body>
+</html>
+{% endblock %}

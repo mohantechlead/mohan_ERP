@@ -12,7 +12,7 @@ class trial_delivery(models.Model):
 
 class delivery(models.Model):
     delivery_number = models.IntegerField(primary_key=True)
-    serial_no = models.ForeignKey('Orders', models.DO_NOTHING, db_column='serial_no')
+    serial_no = models.ForeignKey('orders', models.DO_NOTHING, db_column='serial_no')
     delivery_date = models.DateField(blank=True)
     # delivery_quantity = models.IntegerField(blank=True)
     truck_number = models.TextField(blank=True, null=True)  # This field type is a guess.
@@ -23,7 +23,7 @@ class delivery(models.Model):
     total_bags = models.FloatField(blank=True, null=True)
 
 class delivery_items(models.Model):
-    serial_no = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'serial_no', related_name='orders')
+    # serial_no = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'serial_no', related_name='orders')
     delivery_number = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'delivery_number', related_name='delivery')
     description = models.TextField(blank=True, null=True)
     no_of_unit = models.FloatField(blank=True, null=True)
