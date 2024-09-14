@@ -5,8 +5,15 @@
 
     <form method="get" class="mb-4">
         <label for="item_name">Select Item:</label>
-        <input type="text" id="item_name" name="item_name" placeholder="Enter item description" required>
-        <button type="submit" class="btn btn-primary">Generate Chart</button>
+        <select id="item_name" name="item_name" class="form-control" required>
+            <option value="">--Select an item--</option>
+            {% for item in finished_items %}
+                <option value="{{ item.item_name }}" {% if item.item_name == request.GET.item_name %}selected{% endif %}>
+                    {{ item.item_name }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary mt-2">Generate Chart</button>
     </form>
 
     {% if chart_div %}

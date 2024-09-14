@@ -47,7 +47,7 @@
                 <br>
                 
                
-                <li style="font-size:larger; font-weight: 500;">
+                <!-- <li style="font-size:larger; font-weight: 500;">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false"
                         class="dropdown-toggle">Home</a>
                     <ul class="collapse list-unstyled" id="homeSubmenu">
@@ -57,7 +57,7 @@
                        
                      
                     </ul>
-                </li> 
+                </li>  -->
                 
                 <li style="font-size:larger; font-weight: 500;">
                     <a href="#ordersSubmenu" data-toggle="collapse" aria-expanded="false"
@@ -103,10 +103,16 @@
                         class="dropdown-toggle">Dashboard</a>
                     <ul class="collapse list-unstyled" id="dashboardSubmenu">
                         <li style="font-size: large;">
-                            <a href="{% url 'create_customer' %}">Orders </a>
+                            <a href="{% url 'order_chart' %}">Orders </a>
                         </li>
                         <li style="font-size: large;">
                             <a href="{% url 'customer_list' %}">Inventory</a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'customer_list' %}">Delivery</a>
+                        </li>
+                        <li style="font-size: large;"></li>
+                            <a href="{% url 'customer_list' %}">Customer</a>
                         </li>
                     </ul>
                 </li>

@@ -23,6 +23,7 @@ from FGRN.models import finished_goods
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 import plotly.graph_objs as go
+from plotly.offline import plot
 # Create your views here.
 
 @api_view(['GET','POST'])
@@ -737,12 +738,15 @@ def customer_list(request):
     return render(request, 'customer_list.html', {'customers': customers})
 
 def order_chart(request):
+    # Get all finished goods to populate the selection dropdown
+    finished_items = finished_goods.objects.all()
+
     # Get the selected item from the request
     selected_item = request.GET.get('item_name', None)
 
     chart_div = None
     if selected_item:
-        # Fetch data for the selected item
+        # Fetch data for the selected item from orders_items
         items = orders_items.objects.filter(description=selected_item).select_related('serial_no')
         
         # Prepare data for plotting
@@ -766,5 +770,6 @@ def order_chart(request):
 
     # Render the template
     return render(request, 'order_chart.html', {
-        'chart_div': chart_div
+        'finished_items': finished_items,
+        'chart_div': chart_div,
     })
