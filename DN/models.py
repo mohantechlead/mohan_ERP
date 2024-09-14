@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 
 class trial_delivery(models.Model):
     name = models.IntegerField(primary_key=True)
@@ -58,6 +59,15 @@ class orders_items(models.Model):
     remaining_quantity =  models.FloatField(blank=True, null=True) 
     remaining_unit = models.FloatField(blank=True, null=True)
 
+class Customer(models.Model):
+    customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    company = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 

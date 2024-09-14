@@ -18,9 +18,11 @@ from rest_framework import status
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import *
+from .forms import *
 from FGRN.models import finished_goods
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
+import plotly.graph_objs as go
 # Create your views here.
 
 @api_view(['GET','POST'])
@@ -718,3 +720,51 @@ def create_delivery(request):
         formset = DNFormset(prefix="items")
 
     return render(request, 'create_delivery.html', {'form': form, 'formset': formset})
+
+def create_customer(request):
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_list')  # Redirect to a list of customers (or wherever you prefer)
+    else:
+        form = CustomerForm()
+    
+    return render(request, 'create_customer.html', {'form': form})
+
+def customer_list(request):
+    customers = Customer.objects.all()
+    return render(request, 'customer_list.html', {'customers': customers})
+
+def order_chart(request):
+    # Get the selected item from the request
+    selected_item = request.GET.get('item_name', None)
+
+    chart_div = None
+    if selected_item:
+        # Fetch data for the selected item
+        items = orders_items.objects.filter(description=selected_item).select_related('serial_no')
+        
+        # Prepare data for plotting
+        dates = [item.serial_no.date for item in items if item.serial_no.date]  # Assuming orders have a date field
+        quantities = [item.quantity for item in items]
+
+        # Create a Plotly line chart
+        fig = go.Figure(
+            data=[
+                go.Scatter(x=dates, y=quantities, mode='lines+markers', name=selected_item)
+            ],
+            layout=go.Layout(
+                title=f"Quantity Variation Over Time for {selected_item}",
+                xaxis_title="Date",
+                yaxis_title="Quantity"
+            )
+        )
+        
+        # Generate the plot div
+        chart_div = plot(fig, output_type='div')
+
+    # Render the template
+    return render(request, 'order_chart.html', {
+        'chart_div': chart_div
+    })
