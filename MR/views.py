@@ -444,15 +444,15 @@ def stock_card(request):
     return render(request, 'stock_card.html', context)
 
 def inventory_chart(request):
-    # Fetch all inventory data
+    # Fetch all inventory items for the first chart
     inventory_items = inventory.objects.all()
 
-    # Prepare data for the chart
+    # Prepare data for the all-items chart
     item_names = [item.item_name for item in inventory_items]
     quantities = [item.quantity for item in inventory_items]
 
     # Create a Plotly bar chart for all items
-    fig = go.Figure(
+    fig_all_items = go.Figure(
         data=[
             go.Bar(x=item_names, y=quantities, marker_color='blue')
         ],
@@ -463,10 +463,39 @@ def inventory_chart(request):
         )
     )
 
-    # Generate the plot div
-    chart_div = plot(fig, output_type='div')
+    # Generate the plot div for all items
+    chart_all_items_div = plot(fig_all_items, output_type='div')
+
+    # Handle the quantity change chart for the selected item
+    selected_item = request.GET.get('item_name', None)
+    chart_quantity_change_div = None
+
+    if selected_item:
+        # Fetch all MR_items for the selected item
+        item_records = MR_item.objects.filter(item_name=selected_item).select_related('MR_no')
+        
+        # Prepare the data for the second chart
+        dates = [record.MR_no.date for record in item_records]
+        quantities_over_time = [record.quantity for record in item_records]
+
+        # Create a Plotly line chart for quantity change over time
+        fig_quantity_change = go.Figure(
+            data=[
+                go.Scatter(x=dates, y=quantities_over_time, mode='lines+markers', name=selected_item)
+            ],
+            layout=go.Layout(
+                title=f"Quantity Change Over Time for {selected_item}",
+                xaxis_title="Date",
+                yaxis_title="Quantity"
+            )
+        )
+
+        # Generate the plot div for quantity change
+        chart_quantity_change_div = plot(fig_quantity_change, output_type='div')
 
     # Render the template
     return render(request, 'inventory_chart.html', {
-        'chart_div': chart_div
+        'inventory_items': inventory_items,
+        'chart_all_items_div': chart_all_items_div,
+        'chart_quantity_change_div': chart_quantity_change_div
     })
