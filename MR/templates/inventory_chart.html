@@ -1,21 +1,41 @@
-{% extends 'base.html' %}
-{% load custom_filters %}
+{% extends "base.html" %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Chart</title>
+    <title>Inventory Charts</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <h1>Inventory Quantities for All Items</h1>
 
-    <h2>Chart</h2>
+    <!-- First chart for all items -->
     <div>
-        {{ chart_div|safe }}
+        {{ chart_all_items_div|safe }}
     </div>
+
+    <h1>Select an Inventory Item to See Quantity Used in MR Over Time</h1>
+
+    <form method="get">
+        <select name="item_name">
+            {% for item in inventory_items %}
+            <option value="{{ item.item_name }}" {% if item.item_name == request.GET.item_name %}selected{% endif %}>
+                {{ item.item_name }}
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit">Generate Chart</button>
+    </form>
+
+    <!-- Second chart for the quantity change over time -->
+    <h2>Quantity Change Over Time</h2>
+    {% if chart_quantity_change_div %}
+        <div>{{ chart_quantity_change_div|safe }}</div>
+    {% else %}
+        <p>Select an item to see the quantity change over time chart.</p>
+    {% endif %}
 </body>
 </html>
-{% endblock %}
+{%endblock%}
