@@ -23,6 +23,9 @@ class delivery(models.Model):
     total_quantity = models.FloatField(blank=True, null=True)
     total_bags = models.FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.delivery_number)
+    
 class delivery_items(models.Model):
     # serial_no = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'serial_no', related_name='orders')
     delivery_number = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'delivery_number', related_name='delivery')
@@ -32,7 +35,9 @@ class delivery_items(models.Model):
     quantity = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
     remark = models.TextField(blank=True, null=True)
-    
+
+    def __str__(self):
+        return f'{str(self.delivery_number)} - {self.description}'
 class orders(models.Model):
     customer_name = models.TextField()
     tin_no = models.TextField()
@@ -47,6 +52,9 @@ class orders(models.Model):
     vat_amount = models.FloatField(blank=True, null=True)
     reciveable = models.FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return self.serial_no
+
 class orders_items(models.Model):
     serial_no = models.ForeignKey('orders', on_delete=models.CASCADE,db_column = 'serial_no')
     description = models.TextField(blank=True, null=True)
@@ -58,6 +66,9 @@ class orders_items(models.Model):
     total_price = models.FloatField(blank=True, null=True)  
     remaining_quantity =  models.FloatField(blank=True, null=True) 
     remaining_unit = models.FloatField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{str(self.serial_no)} - {self.description}'
 
 class Customer(models.Model):
     customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

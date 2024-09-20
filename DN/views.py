@@ -24,7 +24,6 @@ from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 import plotly.graph_objs as go
 from plotly.offline import plot
-# Create your views here.
 
 @api_view(['GET','POST'])
 def order_list(request):
