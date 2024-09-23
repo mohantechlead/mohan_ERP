@@ -1,0 +1,14 @@
+{% extends 'grn_base.html' %}
+{% block content %}
+
+    <h1>Create a New Supplier</h1>
+
+    <form method="post" class="col-md-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary">Create Supplier</button>
+      
+    </form>
+
+{%endblock%}

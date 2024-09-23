@@ -170,7 +170,7 @@ class OrderForm(forms.ModelForm):
         
 class CustomerForm(forms.ModelForm):
     
-    name = forms.CharField(
+    contact_person = forms.CharField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Name'})
     )
     
@@ -185,7 +185,11 @@ class CustomerForm(forms.ModelForm):
     company = forms.CharField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Company'})
     )
+
+    address = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Address'})
+    )
      
     class Meta:
         model = Customer
-        fields = ['name', 'phone_number', 'email', 'company']
+        fields = [ 'company','contact_person', 'phone_number', 'email','address']

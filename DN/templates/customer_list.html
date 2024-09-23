@@ -11,16 +11,18 @@
                 <th>Phone Number</th>
                 <th>Email</th>
                 <th>Company</th>
+                <th>Address</th>
             </tr>
         </thead>
         <tbody>
             {% for customer in customers %}
             <tr>
                 <td>{{ customer.customer_id }}</td>
-                <td>{{ customer.name }}</td>
+                <td>{{ customer.contact_person }}</td>
                 <td>{{ customer.phone_number }}</td>
                 <td>{{ customer.email }}</td>
                 <td>{{ customer.company }}</td>
+                <td>{{ customer.address }}</td>
             </tr>
             {% empty %}
             <tr>

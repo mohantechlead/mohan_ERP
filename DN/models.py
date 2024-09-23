@@ -38,6 +38,7 @@ class delivery_items(models.Model):
 
     def __str__(self):
         return f'{str(self.delivery_number)} - {self.description}'
+    
 class orders(models.Model):
     customer_name = models.TextField()
     tin_no = models.TextField()
@@ -72,10 +73,11 @@ class orders_items(models.Model):
 
 class Customer(models.Model):
     customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
+    contact_person = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
     email = models.EmailField(unique=True)
     company = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name

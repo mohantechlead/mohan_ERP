@@ -640,3 +640,18 @@ def create_items(request):
     }
     return render(request, 'create_items.html', context)
 
+def create_supplier(request):
+    if request.method == 'POST':
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_supplier')  # Redirect to a list of customers (or wherever you prefer)
+    else:
+        form = SupplierForm()
+    
+    return render(request, 'create_supplier.html', {'form': form})
+
+def display_supplier(request):
+    suppliers = Supplier.objects.all()
+    return render(request, 'display_supplier.html', {'suppliers': suppliers})
+

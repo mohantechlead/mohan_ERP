@@ -116,6 +116,17 @@ class inventory_GRN_items(models.Model):
 
     def __str__(self):
      return self.item_name
+    
+class Supplier(models.Model):
+    supplier_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    contact_person = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    company = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
     
 

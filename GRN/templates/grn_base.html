@@ -90,7 +90,21 @@
                         </li>
                     </ul>
                 </li>
+
                 
+                <li style="font-size:larger; font-weight: 500;">
+                    <a href="#supplierSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle"> Supplier </a>
+                    <ul class="collapse list-unstyled" id="supplierSubmenu">
+                        <li style="font-size: large;">
+                            <a href="{% url 'create_supplier' %}">Create Supplier</a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'display_supplier' %}">Display Supplier</a>
+                        </li>                     
+                     
+                    </ul>
+                </li>
                 
             </ul>
 

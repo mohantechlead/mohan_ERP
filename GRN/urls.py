@@ -23,6 +23,8 @@ urlpatterns = [
     path('grn_number', views.grn_number, name='grn_number'),
     # path('admin/custom-report-page/', views.custom_report_page, name='custom_report_page'),
     path('search_grns', views.search_grns, name='search_grns'),
+    path('create_supplier', views.create_supplier, name="create_supplier"),
+    path('display_supplier', views.display_supplier, name="display_supplier")
 ]
 
 
