@@ -9,6 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import JsonResponse
 from MR.models import *
+from background_task import background
+from django.utils import timezone
+from datetime import timedelta
+from django.core.mail import send_mail
+
 def is_admin(user):
     return user.is_superuser
 # Create your views here.
