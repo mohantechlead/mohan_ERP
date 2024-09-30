@@ -15,6 +15,7 @@ class purchase_orders(models.Model):
     total_quantity = models.FloatField(blank=True, null=True)
     measurement_type = models.TextField(blank=True, null=True)
     remaining = models.FloatField(blank=True, null=True)
+    vat = models.FloatField(blank=True, null=True)
 
 class PR_item(models.Model):
     PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no',blank=True, null=True)
@@ -29,7 +30,7 @@ class PR_item(models.Model):
     
 class GRN(models.Model):
     GRN_no = models.TextField(primary_key=True)
-    # PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no', null=True, blank=True)
+    PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no', null=True, blank=True)
     date = models.DateField(blank=True, null=True)
     recieved_from = models.TextField(blank=True, null=True)
     transporter_name = models.TextField(blank=True, null=True)

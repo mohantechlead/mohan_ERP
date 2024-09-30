@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import JsonResponse
 from MR.models import *
-from background_task import background
 from django.utils import timezone
 from datetime import timedelta
 from django.core.mail import send_mail
@@ -558,7 +557,7 @@ def create_pr(request):
         print(request.POST) 
         if pr_form.is_valid():
             instance = pr_form.save(commit=False)
-            instance.status = "Pending"
+            instance.status = "Approved"
             #instance.PR_before_vat = 0.00
             #instance.PR_total_price = 0.00
             instance.excise_tax = excise

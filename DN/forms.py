@@ -15,11 +15,11 @@ class DeliveryForm(forms.ModelForm):
                                         'placeholder': 'Add a Truck Number', 
                                         'id':'delivery_number'}))
     
-    serial_no = forms.IntegerField(required=True,
-                                        widget = forms.TextInput(attrs={'class': 'form-control', 
-                                        # 'type':'select',
-                                        # 'placeholder': 'Add a Truck Number', 
-                                        'id':'serial_no'}))
+    # serial_no = forms.IntegerField(required=True,
+    #                                     widget = forms.TextInput(attrs={'class': 'form-control', 
+    #                                     # 'type':'select',
+    #                                     # 'placeholder': 'Add a Truck Number', 
+    #                                     'id':'serial_no'}))
     
     delivery_date = forms.DateField(
         widget=forms.DateInput(
@@ -67,6 +67,7 @@ class DeliverItemForm(forms.ModelForm):
             'class': 'form-control select2',
             'data-minimum-input-length': '0',  # Start filtering from the first character
             'data-placeholder': 'Select or type an item',
+            'id': 'description'
         }),
     )
     
@@ -83,7 +84,7 @@ class DeliverItemForm(forms.ModelForm):
     
     unit_type = forms.ChoiceField(
         choices = UNIT_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'unit_type'}),
         
     )
     per_unit_kg = forms.FloatField(
@@ -100,12 +101,12 @@ class DeliverItemForm(forms.ModelForm):
 
     measurement_unit = forms.ChoiceField(
         choices = Measurement_unit_choices,
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-control', 'id': 'measurement_unit'}),
         
     )
     remark = forms.CharField(
         required = False,
-        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Remark', 'id':'remark'})
     )
     
     class Meta:
