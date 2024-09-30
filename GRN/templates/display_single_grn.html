@@ -19,7 +19,7 @@
                         </p> -->
             
                     </div>
-                    <h4 class="mb-1 text-muted" style="margin-left: 132px;">Order Confirmation</h4>
+                    <h4 class="mb-1 text-muted" style="margin-left: 132px;">Goods Recieving Note</h4>
             
                 </div>
             </div>
@@ -45,8 +45,8 @@
                                                         <div class="col-sm-5" style="width: 100px;padding: 0;">
                                                             <div class="text-muted text-sm-end">
                                                                 <div>
-                                                                    <h5 class="font-size-15 mb-1">Order No</h5>
-                                                                    <p>{{my_fgrn.serial_no}}</p>
+                                                                    <h5 class="font-size-15 mb-1">GRN No</h5>
+                                                                    <p>{{my_fgrn.GRN_no}}</p>
                                                                 </div>
                                                                    
                                                                                                   
@@ -59,15 +59,15 @@
                                                             
                                                             <div class="mt-4">
                                                                 <div>
-                                                                    <h5 class="font-size-15 mb-1">Customer Name</h5>
+                                                                    <h5 class="font-size-15 mb-1">PR no</h5>
                                                                     
-                                                                    <p>{{my_fgrn.customer_name}}</p>
+                                                                    <p>{{my_fgrn.PR_no}}</p>
                                                                 </div>
                                                                    
                                                                                                                                
                                                         <div class="text-muted">
-                                                            <h5 class=" mb-1" style="line-height: 1.9;font-size: small;">Date</h5>
-                                                                        <p>{{my_fgrn.date}}</p>
+                                                            <h5 class=" mb-1" style="line-height: 1.9;font-size: small;">Recieved From</h5>
+                                                                        <p>{{my_fgrn.recieved_from}}</p>
                                                         </div>
                                                        
                                                             </div>
@@ -111,7 +111,7 @@
                                                         <td style="font-weight: bold;">0{{ forloop.counter }}</td>
                                                         <td>
                                                             <div>
-                                                                <h5 class="text-truncate font-size-14 mb-1">{{item.description}}</h5>
+                                                                <h5 class="text-truncate font-size-14 mb-1">{{item.item_name}}</h5>
                                                                 <!-- <p class="text-muted mb-0">HS-code:{{item.hs_code}}</p> -->
                                                             </div>
                                                         </td>

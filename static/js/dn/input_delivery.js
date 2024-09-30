@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const cancelSubmitButton = document.getElementById('cancelSubmit');
     const fgrnDisplay = document.getElementById('fgrnDisplay');
     const itemListDisplay = document.getElementById('itemListDisplay');
+    const serial_no = document.getElementById('serial_no')
 
     addMoreBtn.addEventListener('click', add_new_form);
     const calculateTotalButton = document.querySelector('#calculate_total');
@@ -36,12 +37,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
     calculateTotalPrice();
-
+    console.log(delivery_number.value)
     submitButton.addEventListener('click', function(event) {
         event.preventDefault();
 
         // Populate the confirmation modal with FGRN number and item list
-        fgrnDisplay.textContent = "FGRN No: " + delivery_number.value;
+        fgrnDisplay.textContent = "Delivery Number: " + delivery_number.value;
+        
 
         // Clear previous items
         itemListDisplay.innerHTML = '';

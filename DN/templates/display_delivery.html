@@ -91,8 +91,8 @@
             </tr>
             {% for delivery in my_delivery %}
         <tr>
-            <td>{{ delivery.serial_no.serial_no }}</td>
-            <td>{{ delivery.delivery_number }}</td>
+            <td>{{ delivery.serial_no.serial_no}}</td>
+            <td><a href="#" class="order-link" data-order-id="{{ delivery.delivery_number }}">{{ delivery.delivery_number }}</a>{{ delivery.delivery_number }}</td>
             <td>{{ delivery.delivery_date }}</td>
             <td>{{ delivery.delivery_quantity }}</td>
             <td>{{ delivery.truck_number }}</td>
@@ -101,6 +101,23 @@
         {% endfor %}
         </table>
     </div>
+
+  
+  <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const orderLinks = document.querySelectorAll('.order-link');
+        console.log("p1")
+        orderLinks.forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                event.preventDefault();
+                console.log("p2")
+                const fgrnID = this.getAttribute('data-order-id');
+                window.location.href = `/DN/display_single_delivery?delivery_number=${fgrnID}`;
+            });
+        });
+    });
+  </script>
+    
 
 
 {% endblock %}

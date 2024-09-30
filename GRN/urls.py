@@ -9,6 +9,7 @@ urlpatterns = [
     path('create_pr', views.create_pr, name='create_pr'),
     path('create_items', views.create_items, name='create_items'),
     path('display_pr', views.display_pr, name='display_pr'),
+    path('display_single_grn', views.display_single_grn, name='display_single_grn'),
     path('display_search_items', views.display_search_items, name='display_search_items'),
     path('display_grn', views.display_grn, name='display_grn'),
     path('display_grn_item', views.display_grn_item, name='display_grn_item'),
@@ -23,6 +24,8 @@ urlpatterns = [
     path('grn_number', views.grn_number, name='grn_number'),
     # path('admin/custom-report-page/', views.custom_report_page, name='custom_report_page'),
     path('search_grns', views.search_grns, name='search_grns'),
+    path('create_supplier', views.create_supplier, name="create_supplier"),
+    path('display_supplier', views.display_supplier, name="display_supplier")
 ]
 
 

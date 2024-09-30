@@ -9,6 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.http import JsonResponse
 from MR.models import *
+from django.utils import timezone
+from datetime import timedelta
+from django.core.mail import send_mail
+
 def is_admin(user):
     return user.is_superuser
 # Create your views here.
@@ -164,7 +168,7 @@ def create_grn_items(request):
                 'pr_form': pr_form,
                 'formset': formset,
             }
-            return render(request, 'create_GRN.html', context)
+            return render(request, 'create_grn.html', context)
 
     else:
         formset = formset_factory(GRNItemForm, extra=1)
@@ -173,7 +177,7 @@ def create_grn_items(request):
     context = {
         'formset': formset,
     }
-    return render(request, 'create_GRN.html', context)
+    return render(request, 'create_grn.html', context)
 
 @login_required(login_url="login_user")
 def display_items(request,pr_no):
@@ -419,6 +423,33 @@ def print_pr(request):
     return render(request, 'print_pr.html', context)
 
 @login_required(login_url="login_user")
+def display_single_grn(request):
+    if request.method == 'GET':
+        grn_no = request.GET.get('GRN_no')  # Use .get() to avoid KeyError if GRN_no is missing
+        
+        try:
+            fgrns = GRN.objects.get(GRN_no=grn_no)
+            fgrn_items = GRN_item.objects.filter(GRN_no=grn_no)  # Filter directly on GRN_no
+            print('fgrns:', fgrns)
+            print('fgrn items:', fgrn_items)
+
+            context = {
+                'fgrn_item': fgrn_items,
+                'my_fgrn': fgrns,
+            }
+
+            return render(request, 'display_single_grn.html', context)
+
+        except GRN.DoesNotExist:
+            print("GRN not found")
+            context = {
+                'my_fgrn': None,
+            }
+
+    return render(request, 'display_single_grn.html', context)
+
+
+@login_required(login_url="login_user")
 def search_grns(request):
     if request.method == 'GET':
         PR_no = request.GET['PR_no']
@@ -468,6 +499,9 @@ def create_import_grn(request):
         'formset': formset,
     }
     return render(request, 'create_import_grn.html', context)
+
+
+
 
 @login_required(login_url="login_user")
 def create_import_grn_items(request):
@@ -553,7 +587,7 @@ def create_pr(request):
         print(request.POST) 
         if pr_form.is_valid():
             instance = pr_form.save(commit=False)
-            instance.status = "Pending"
+            instance.status = "Approved"
             #instance.PR_before_vat = 0.00
             #instance.PR_total_price = 0.00
             instance.excise_tax = excise
@@ -639,4 +673,19 @@ def create_items(request):
         'formset': formset,
     }
     return render(request, 'create_items.html', context)
+
+def create_supplier(request):
+    if request.method == 'POST':
+        form = SupplierForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('create_supplier')  # Redirect to a list of customers (or wherever you prefer)
+    else:
+        form = SupplierForm()
+    
+    return render(request, 'create_supplier.html', {'form': form})
+
+def display_supplier(request):
+    suppliers = Supplier.objects.all()
+    return render(request, 'display_supplier.html', {'suppliers': suppliers})
 

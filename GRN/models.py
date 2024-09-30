@@ -15,6 +15,7 @@ class purchase_orders(models.Model):
     total_quantity = models.FloatField(blank=True, null=True)
     measurement_type = models.TextField(blank=True, null=True)
     remaining = models.FloatField(blank=True, null=True)
+    vat = models.FloatField(blank=True, null=True)
 
 class PR_item(models.Model):
     PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no',blank=True, null=True)
@@ -29,7 +30,7 @@ class PR_item(models.Model):
     
 class GRN(models.Model):
     GRN_no = models.TextField(primary_key=True)
-    # PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no', null=True, blank=True)
+    PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no', null=True, blank=True)
     date = models.DateField(blank=True, null=True)
     recieved_from = models.TextField(blank=True, null=True)
     transporter_name = models.TextField(blank=True, null=True)
@@ -116,6 +117,17 @@ class inventory_GRN_items(models.Model):
 
     def __str__(self):
      return self.item_name
+    
+class Supplier(models.Model):
+    supplier_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    contact_person = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    company = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
     
 

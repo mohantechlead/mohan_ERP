@@ -13,6 +13,9 @@ class FGRN(models.Model):
     total_crt = models.FloatField(blank=True, null=True)
     total_Pkg = models.FloatField(blank=True, null=True)
 
+    def __str__(self):
+        return str(self.FGRN_no)
+
 class FGRN_item(models.Model):
     FGRN_no = models.ForeignKey('FGRN', on_delete=models.CASCADE,db_column = 'FGRN_no')
     item_id = models.AutoField(primary_key= True)
@@ -24,6 +27,9 @@ class FGRN_item(models.Model):
     no_of_unit = models.FloatField(blank=True, null=True)
     per_unit_kg = models.FloatField(blank=True, null=True)
     unit_type = models.TextField(blank=True, null= True)
+
+    def __str__(self):
+        return f'{str(self.FGRN_no)} - {self.item_name}'
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)

@@ -176,4 +176,31 @@ class InventoryItemForm(forms.ModelForm):
         model = inventory
         fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
 
+class SupplierForm(forms.ModelForm):
+
+    company = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Company'})
+    )
+    
+    contact_person = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Name'})
+    )
+    
+    phone_number = forms.IntegerField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Company'})
+    )
+    
+    email = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Email'})
+    )
+
+    address = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Address'})
+    )
+    
+    
+    class Meta:
+        model = Supplier
+        fields = ['company','contact_person', 'phone_number', 'email', 'address']
+
 
