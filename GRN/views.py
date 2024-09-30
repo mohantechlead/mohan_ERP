@@ -168,7 +168,7 @@ def create_grn_items(request):
                 'pr_form': pr_form,
                 'formset': formset,
             }
-            return render(request, 'create_GRN.html', context)
+            return render(request, 'create_grn.html', context)
 
     else:
         formset = formset_factory(GRNItemForm, extra=1)
@@ -177,7 +177,7 @@ def create_grn_items(request):
     context = {
         'formset': formset,
     }
-    return render(request, 'create_GRN.html', context)
+    return render(request, 'create_grn.html', context)
 
 @login_required(login_url="login_user")
 def display_items(request,pr_no):
@@ -423,6 +423,33 @@ def print_pr(request):
     return render(request, 'print_pr.html', context)
 
 @login_required(login_url="login_user")
+def display_single_grn(request):
+    if request.method == 'GET':
+        grn_no = request.GET.get('GRN_no')  # Use .get() to avoid KeyError if GRN_no is missing
+        
+        try:
+            fgrns = GRN.objects.get(GRN_no=grn_no)
+            fgrn_items = GRN_item.objects.filter(GRN_no=grn_no)  # Filter directly on GRN_no
+            print('fgrns:', fgrns)
+            print('fgrn items:', fgrn_items)
+
+            context = {
+                'fgrn_item': fgrn_items,
+                'my_fgrn': fgrns,
+            }
+
+            return render(request, 'display_single_grn.html', context)
+
+        except GRN.DoesNotExist:
+            print("GRN not found")
+            context = {
+                'my_fgrn': None,
+            }
+
+    return render(request, 'display_single_grn.html', context)
+
+
+@login_required(login_url="login_user")
 def search_grns(request):
     if request.method == 'GET':
         PR_no = request.GET['PR_no']
@@ -472,6 +499,9 @@ def create_import_grn(request):
         'formset': formset,
     }
     return render(request, 'create_import_grn.html', context)
+
+
+
 
 @login_required(login_url="login_user")
 def create_import_grn_items(request):

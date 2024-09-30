@@ -50,7 +50,7 @@
     {% for order in my_order %}
     <tr>
       <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
-       --><td><a href="#" class="grn-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</a></td>
+       --><td><a href="#" class="order-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</a></td>
       {% comment %} <td><a href="#" class="order-link" data-order-id="{{ order.PR_no.PR_no }}">{{ order.PR_no.PR_no }}</a></td> {% endcomment %}
       <td>{{ order.date }}</td>
       <td>{{ order.transporter_name }}</td>
@@ -81,7 +81,7 @@
     {% for order in my_imports %}
     <tr>
       <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
-       --><td>{{ order.GRN_no }}</td>
+       --><td><a href="#" class="order-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</td>
       <td>{{ order.PR_no.PR_no }}</td>
       <td>{{ order.date }}</td>
       <td>{{ order.transporter_name }}</td>
@@ -99,27 +99,17 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-      const orderLinks = document.querySelectorAll('.order-link');
-      console.log("p1")
-      orderLinks.forEach(function (link) {
-          link.addEventListener('click', function (event) {
-              event.preventDefault();
-              console.log("p2")
-              const orderID = this.getAttribute('data-order-id');
-              window.location.href = `/GRN/print_pr?PR_no=${orderID}`;
-          });
-      });
-      const orderLinks2 = document.querySelectorAll('.grn-link');
-      console.log("p1")
-      orderLinks2.forEach(function (link) {
-          link.addEventListener('click', function (event) {
-              event.preventDefault();
-              console.log("p2")
-              const orderID = this.getAttribute('data-order-id');
-              window.location.href = `/GRN/display_grns?GRN_no=${orderID}`;
-          });
-      });
-  });
+    const orderLinks = document.querySelectorAll('.order-link');
+    console.log("p1")
+    orderLinks.forEach(function (link) {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+            console.log("p2")
+            const fgrnID = this.getAttribute('data-order-id');
+            window.location.href = `/GRN/display_single_grn?GRN_no=${fgrnID}`;
+        });
+    });
+});
 </script>
 
 {% endblock %}

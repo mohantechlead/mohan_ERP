@@ -293,33 +293,33 @@ def display_orders(request):
     return render(request,'display_orders.html', context)
 
 @login_required(login_url="login_user")
-def display_single_order(request):
+def display_single_fgrn(request):
     if request.method == 'GET':
         serial_no = request.GET['serial_no']
         
         try:
-            order = orders.objects.get(serial_no=serial_no)
-            order_items = order_items.objects.all()
-            order_items = order_items.filter(serial_no=serial_no)
-            print(order_items)
+            fgrns = orders.objects.get(serial_no=serial_no)
+            fgrn_items = orders_items.objects.all()
+            fgrn_items = fgrn_items.filter(serial_no=serial_no)
+            print(fgrn_items)
 
-            if order_items.exists():
-                print(order_items,"yes")
+            if fgrn_items.exists():
+                print(fgrn_items,"yes")
                 context = {
-                            'order_items': order_items,
-                            'order': order,
+                            'fgrn_item': fgrn_items,
+                            'my_fgrn': fgrns,
                         }
-                return render(request, 'display_single_order.html', context)
+                return render(request, 'display_single_fgrn.html', context)
         
         except orders.DoesNotExist:
-                order = None 
+                fgrns = None 
        
         print("no")
         
         context = {
-                        'order': order,
+                        'my_fgrn': fgrns,
                     }
-    return render(request, 'display_single_order.html')
+    return render(request, 'display_single_fgrn.html')
 
 @login_required(login_url="login_user")
 def display_remaining(request):
@@ -327,11 +327,63 @@ def display_remaining(request):
     return render(request, 'display_remaining.html', {'my_orders': my_orders})
 
 @login_required(login_url="login_user")  
-def display_single_order(request, serial_no):
-    my_order = get_object_or_404(orders, serial_no=serial_no)
-    
-    #deliveries = orders.delivery_set.prefetch_related('delivery_date')
-    return render(request, 'single_order.html', {'my_order': my_order})
+def display_single_order(request):
+    if request.method == 'GET':
+        serial_no = request.GET['serial_no']
+        
+        try:
+            fgrns = orders.objects.get(serial_no=serial_no)
+            fgrn_items = orders_items.objects.all()
+            fgrn_items = fgrn_items.filter(serial_no=serial_no)
+            print(fgrn_items)
+
+            if fgrn_items.exists():
+                print(fgrn_items,"yes")
+                context = {
+                            'fgrn_item': fgrn_items,
+                            'my_fgrn': fgrns,
+                        }
+                return render(request, 'display_single_order.html', context)
+        
+        except orders.DoesNotExist:
+                fgrns = None 
+       
+        print("no")
+        
+        context = {
+                        'my_fgrn': fgrns,
+                    }
+    return render(request, 'display_single_order.html')
+
+@login_required(login_url="login_user")  
+def display_single_delivery(request):
+    if request.method == 'GET':
+        delivery_no = request.GET['delivery_number']
+        
+        try:
+            fgrns = delivery.objects.get(delivery_number=delivery_no)
+            fgrn_items = delivery_items.objects.all()
+            fgrn_items = fgrn_items.filter(delivery_number=delivery_no)
+            print(fgrns)
+            print(fgrn_items)
+
+            if fgrn_items.exists():
+                print(fgrn_items,"yes")
+                context = {
+                            'fgrn_item': fgrn_items,
+                            'my_fgrn': fgrns,
+                        }
+                return render(request, 'display_single_delivery.html', context)
+        
+        except orders.DoesNotExist:
+                fgrns = None 
+       
+        print("no")
+        
+        context = {
+                        'my_fgrn': fgrns,
+                    }
+    return render(request, 'display_single_delivery.html')
 
 @login_required(login_url="login_user")
 def display_delivery(request):
