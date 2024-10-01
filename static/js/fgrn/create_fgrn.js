@@ -100,21 +100,26 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmationModal.style.display = "none";
     };
 
-    function add_new_form(args) {
+    function add_new_form() {
         const currentForms = document.getElementsByClassName('item-list');
-        let currentFormsCount = currentForms.length + 1;
+        let currentFormsCount = currentForms.length;
         const copyFormTarget = document.getElementById('form-lists');
         const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
+    
         copyEmptyForm.setAttribute('class', 'item-list form-group col-md-3 text-dark');
         copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`);
+        
         const regex = new RegExp('__prefix__', 'g');
-        copyEmptyForm.querySelectorAll('input').forEach(function (input) {
+        copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount);
+        
+        // Reset the values of the newly cloned form fields
+        copyEmptyForm.querySelectorAll('input').forEach(function(input) {
             input.value = '';
         });
-        copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount);
-        totalNewForms.value = currentFormsCount;
+        
+        totalNewForms.value = currentFormsCount + 1;
         copyFormTarget.appendChild(copyEmptyForm);
-    } 
+    }
 
      function updateTotalPrice(form) {
         var per_unit_kg = parseFloat(form.find('#per_unit_kg').val());
