@@ -41,6 +41,10 @@ class finished_goods(models.Model):
     def __str__(self):
         return self.item_name
     
+    class Meta:
+        ordering = ['item_name'] 
+
+    
 class items_list(models.Model):
     id = models.AutoField(primary_key=True)
     item_name = models.TextField(null=False, blank=False)
