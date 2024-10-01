@@ -14,7 +14,7 @@ class trial_delivery(models.Model):
     
 class orders(models.Model):
     customer_name = models.TextField()
-    tin_no = models.TextField()
+    tin_no = models.TextField(blank=True, null=True)
     serial_no = models.TextField(primary_key=True)
     date = models.DateField(blank=True, null=True)
     invoice = models.TextField(unique=True, blank=True, null=True)
