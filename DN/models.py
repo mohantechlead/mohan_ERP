@@ -28,6 +28,9 @@ class orders(models.Model):
 
     def __str__(self):
         return self.serial_no
+    
+    class Meta:
+        db_table = 'orders'
 
     class Meta:
         db_table = 'orders'
