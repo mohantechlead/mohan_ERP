@@ -33,18 +33,18 @@ def create_fgrn(request):
                     if form_item.instance.pk:
                         form_item.instance.delete()
                 else:
-                    item_name = form_item.cleaned_data.get('item_name')
+                    description = form_item.cleaned_data.get('description')
                     quantity = form_item.cleaned_data.get('quantity')
                     no_of_unit = form_item.cleaned_data.get('no_of_unit')
 
-                    if item_name:
+                    if description:
                         try:
-                            inventory_item = finished_goods.objects.get(item_name=item_name)
+                            inventory_item = finished_goods.objects.get(description=description)
                             inventory_item.quantity += quantity
                             inventory_item.no_of_unit += no_of_unit
                             inventory_item.save()
                         except finished_goods.DoesNotExist:
-                            inventory_item = finished_goods(item_name=item_name, quantity=quantity)
+                            inventory_item = finished_goods(description=description, quantity=quantity)
                             inventory_item.save()
 
                         # Save each MRItem form with the corresponding MR instance
