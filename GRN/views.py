@@ -638,10 +638,10 @@ def create_items(request):
                     form.instance.remaining = form.cleaned_data['quantity']
                     form.instance.PR_no = pr
                     items = form.cleaned_data['item_name']
-                    item = HS_code.objects.all()
-                    item = item.filter(item_name = items).first()
-                    code = item.hs_code
-                    form.instance.hs_code = code
+                    # item = HS_code.objects.all()
+                    # item = item.filter(item_name = items).first()
+                    # code = item.hs_code
+                    # form.instance.hs_code = code
                     before_vat_price += float(form.cleaned_data['before_vat'])
                     final_quantity += form.cleaned_data['quantity']
                     if form.cleaned_data['total_price']:
