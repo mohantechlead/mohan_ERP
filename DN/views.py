@@ -387,29 +387,48 @@ def display_single_delivery(request):
 
 @login_required(login_url="login_user")
 def display_delivery(request):
-    my_customers = orders.objects.all()
-    deliveries = delivery.objects.all()
-    my_order = orders.objects.all()
     my_delivery = delivery.objects.all()
-    # Join the two tables on the serial_no column
+    # Sort and filter based on user input
     sort_param = request.GET.get('sort')
-
-    # Sort the orders based on the selected parameter
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
-    # Filter orders within the specified date range
+    # Filter deliveries by date range
     if start_date and end_date:
         my_delivery = my_delivery.filter(delivery_date__range=[start_date, end_date])
         my_delivery = my_delivery.order_by('delivery_date')
     elif sort_param == 'date':
         my_delivery = my_delivery.order_by('delivery_date')
     elif sort_param == 'customer_name':
-        my_delivery = my_delivery.order_by('serial_no__customer_name')
-    elif sort_param == 'delivery number':
+        my_delivery = my_delivery.order_by('serial_no__customer_name')  # Sorting by related orders' customer_name
+    elif sort_param == 'delivery_number':
         my_delivery = my_delivery.order_by('delivery_number')
-    
-    return render(request, 'display_delivery.html', {'my_delivery': my_delivery,'my_order':my_order,'my_customers':my_customers})
+
+    # Prepare delivery data
+    deliveries_data = []
+
+    for deliveries in my_delivery:
+        # Fetch related delivery items
+        items = delivery_items.objects.filter(delivery_number=deliveries.delivery_number)
+        
+        delivery_data = {
+            'delivery_number': deliveries.delivery_number,
+            'serial_no': deliveries.serial_no,
+            'delivery_date': deliveries.delivery_date,
+            'total_quantity': deliveries.total_quantity,
+            'total_bags': deliveries.total_bags,
+            'truck_number': deliveries.truck_number,
+            'driver_name': deliveries.driver_name,
+            'recipient_name': deliveries.recipient_name,
+            'items': items,  # Add the related items to each delivery
+        }
+        deliveries_data.append(delivery_data)
+
+    # Render the deliveries and their items to the template
+    return render(request, 'display_delivery.html', {
+        'my_delivery': my_delivery,
+        'deliveries_data': deliveries_data,
+    })
 
 @login_required(login_url="login_user")
 def search_customer(request):

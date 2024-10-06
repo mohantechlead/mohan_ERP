@@ -2,22 +2,8 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
-# Load CSV data
-df = pd.read_csv('delivery.csv')
-
-# Clean up the date column by stripping leading/trailing whitespaces
-df['delivery_date'] = df['delivery_date'].str.strip()
-
-# Convert 'delivery_date' column to the format expected by PostgreSQL (YYYY-MM-DD)
-df['delivery_date'] = pd.to_datetime(df['delivery_date'], dayfirst=True).dt.strftime('%Y-%m-%d')
-
-# Convert 'serial_no_id' to integers in the CSV
-# First, handle any non-numeric or missing values by filling with a default or dropping rows
-df['serial_no_id'] = pd.to_numeric(df['serial_no_id'], errors='coerce').fillna(0).astype(int)
-
-# Print unique serial_no_id values after conversion
-print("Unique serial_no_id values in the CSV after integer conversion:")
-print(df['serial_no_id'].unique())
+# Load your delivery items CSV data
+df = pd.read_csv('delivery_item.csv')
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
@@ -31,39 +17,33 @@ conn = psycopg2.connect(
 # Create a cursor
 cur = conn.cursor()
 
-# Fetch existing serial_no_id values from the orders table and convert to integers
-cur.execute("SELECT serial_no FROM orders")
-existing_serial_nos = [int(row[0]) for row in cur.fetchall()]  # Convert to integers
+# Step 1: Get existing delivery numbers from the DN_delivery table
+cur.execute('SELECT delivery_number FROM "DN_delivery";')
+existing_delivery_numbers = set(row[0] for row in cur.fetchall())
 
-print("Existing serial_no_id values in the orders table (as integers):")
-print(existing_serial_nos)
+# Step 2: Filter DataFrame to include only valid delivery numbers
+df_filtered = df[df['delivery_number'].isin(existing_delivery_numbers)]
 
-# Filter the DataFrame to keep only valid serial_no_id values that exist in the orders table
-df = df[df['serial_no_id'].isin(existing_serial_nos)]
-print(f"Filtered DataFrame:\n{df}")
-
-# Check if there's any data to insert
-if df.empty:
-    print("No data to insert.")
+# Check if the filtered DataFrame is empty
+if df_filtered.empty:
+    print("No valid delivery numbers found for insertion.")
 else:
-    # Prepare data for insertion
+    print(f"Inserting {len(df_filtered)} records into DN_delivery_items.")
+
+    # Prepare your insert query
     insert_query = """
-        INSERT INTO "DN_delivery"(delivery_date, delivery_number, recipient_name, serial_no_id) 
+        INSERT INTO "DN_delivery_items"(delivery_number, no_of_unit, description, quantity, per_unit_kg, unit_type) 
         VALUES %s
     """
 
     # Convert DataFrame rows into a list of tuples
-    data = [tuple(row) for row in df.itertuples(index=False, name=None)]
+    data = [tuple(row) for row in df_filtered.itertuples(index=False, name=None)]
 
     # Use execute_values to insert data in bulk
-    try:
-        execute_values(cur, insert_query, data)
-        conn.commit()
-        print("Data inserted successfully!")
-    except Exception as e:
-        conn.rollback()
-        print(f"Error during insertion: {e}")
+    execute_values(cur, insert_query, data)
 
-# Always close the cursor and connection
+# Commit and close the connection
+conn.commit()
 cur.close()
 conn.close()
+

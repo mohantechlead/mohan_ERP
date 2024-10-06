@@ -85,18 +85,28 @@
                 <th>Serial No</th>
                 <th>delivery_number</th>
                 <th>delivery_date</th>
+                <th>Item Name</th>
                 <th>delivery_quantity</th>
-                <th>Truck_number</th>
                 <th>Customer Name</th>
             </tr>
-            {% for delivery in my_delivery %}
+            {% for delivery in deliveries_data %}
         <tr>
-            <td>{{ delivery.serial_no.serial_no}}</td>
-            <td><a href="#" class="order-link" data-order-id="{{ delivery.delivery_number }}">{{ delivery.delivery_number }}</a>{{ delivery.delivery_number }}</td>
+            <td>{{ delivery.serial_no}}</td>
+            <td><a href="#" class="order-link" data-order-id="{{ delivery.delivery_number }}">{{ delivery.delivery_number }}</a></td>
             <td>{{ delivery.delivery_date }}</td>
-            <td>{{ delivery.delivery_quantity }}</td>
-            <td>{{ delivery.truck_number }}</td>
-            <td>{{ delivery.serial_no.customer_name }}</td>
+            <td>
+              {% for item in delivery.items.all %}
+                  {{ item.description }}
+                  {% if not forloop.last %}<br>{% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              {% for item in delivery.items.all %}
+                  {{ item.quantity }}
+                  {% if not forloop.last %}<br>{% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ delivery.recipient_name }}</td>
         </tr>
         {% endfor %}
         </table>
