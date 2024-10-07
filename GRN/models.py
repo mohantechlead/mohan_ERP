@@ -19,7 +19,7 @@ class purchase_orders(models.Model):
     excise_tax = models.FloatField(blank=True, null=True)
 
 class PR_item(models.Model):
-    PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no',blank=True, null=True)
+    PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='pr_no',blank=True, null=True)
     id_numeric = models.AutoField(primary_key=True)
     item_name = models.TextField(blank=True, null=True)
     price = models.FloatField(blank=True, null=True)
