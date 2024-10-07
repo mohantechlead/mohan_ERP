@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 
 # Load your delivery items CSV data
-df = pd.read_csv('purchase order.csv')
+df = pd.read_csv('purchase order2.csv')
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(
@@ -17,30 +17,30 @@ conn = psycopg2.connect(
 # Create a cursor
 cur = conn.cursor()
 
-# # Step 1: Get existing delivery numbers from the DN_delivery table
-# cur.execute('SELECT delivery_number FROM "DN_delivery";')
-# existing_delivery_numbers = set(row[0] for row in cur.fetchall())
+# Step 1: Get existing delivery numbers from the DN_delivery table
+cur.execute('SELECT PR_no FROM "GRN_purchase_orders";')
+existing_delivery_numbers = set(row[0] for row in cur.fetchall())
 
-# # Step 2: Filter DataFrame to include only valid delivery numbers
-# df_filtered = df[df['delivery_number'].isin(existing_delivery_numbers)]
+# Step 2: Filter DataFrame to include only valid delivery numbers
+df_filtered = df[df['PR_no'].isin(existing_delivery_numbers)]
 
-# # Check if the filtered DataFrame is empty
-# if df_filtered.empty:
-#     print("No valid delivery numbers found for insertion.")
-# else:
-    # print(f"Inserting {len(df_filtered)} records into DN_delivery_items.")
+# Check if the filtered DataFrame is empty
+if df_filtered.empty:
+    print("No valid delivery numbers found for insertion.")
+else:
+    print(f"Inserting {len(df_filtered)} records into GRN_pr_items.")
 
     # Prepare your insert query
-insert_query = """
-        INSERT INTO "GRN_purchase_orders"(vendor_name,PR_no,date,site_name,requested_by,approved_by,PR_total_price,remaining,PR_before_vat,status,payment_type,total_quantity,excise_tax,measurement_type,freight) 
-        VALUES %s
-    """
+    insert_query = """
+            INSERT INTO "GRN_pr_item"(PR_no,item_name,tttt,price,before_vat,total_price,quantity,item_measurement,id_numeric,hs_code,remaining) 
+            VALUES %s
+        """
 
-    # Convert DataFrame rows into a list of tuples
-data = [tuple(row) for row in df.itertuples(index=False, name=None)]
+        # Convert DataFrame rows into a list of tuples
+    data = [tuple(row) for row in df_filtered.itertuples(index=False, name=None)]
 
-    # Use execute_values to insert data in bulk
-execute_values(cur, insert_query, data)
+        # Use execute_values to insert data in bulk
+    execute_values(cur, insert_query, data)
 
 # Commit and close the connection
 conn.commit()
