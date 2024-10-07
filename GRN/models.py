@@ -16,6 +16,7 @@ class purchase_orders(models.Model):
     measurement_type = models.TextField(blank=True, null=True)
     remaining = models.FloatField(blank=True, null=True)
     vat = models.FloatField(blank=True, null=True)
+    excise_tax = models.FloatField(blank=True, null=True)
 
 class PR_item(models.Model):
     PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='PR_no',blank=True, null=True)
