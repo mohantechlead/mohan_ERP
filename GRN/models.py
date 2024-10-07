@@ -3,14 +3,14 @@ import uuid
 # Create your models here.
 class purchase_orders(models.Model):
     vendor_name = models.TextField(blank=True, null=True)
-    PR_no = models.TextField(primary_key=True)
+    PR_no = models.TextField(primary_key=True, db_column='pr_no')
     date = models.DateField(blank=True, null=True)
     site_name = models.TextField( )
     payment_type = models.TextField(blank=True, null=True)
     requested_by = models.TextField(blank=True, null=True)
     approved_by = models.TextField(blank=True, null=True)
-    PR_total_price = models.FloatField(blank=True, null=True)
-    PR_before_vat = models.FloatField(blank=True, null=True)
+    PR_total_price = models.FloatField(blank=True, null=True, db_column='pr_total_price')
+    PR_before_vat = models.FloatField(blank=True, null=True, db_column="pr_before_vat")
     status = models.TextField(blank=True, null=True, default="Pending")
     total_quantity = models.FloatField(blank=True, null=True)
     measurement_type = models.TextField(blank=True, null=True)
