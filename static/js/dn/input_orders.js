@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
              
         var total = per_unit_kg * no_of_unit  || 0;
-        var final_price = unit_price * quantity || 0;   
+        var final_price = unit_price * per_unit_kg * no_of_unit || 0;   
         
 
         form.find('#quantity').val(total.toFixed(2));
