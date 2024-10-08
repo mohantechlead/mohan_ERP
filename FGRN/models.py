@@ -29,7 +29,7 @@ class FGRN_item(models.Model):
     unit_type = models.TextField(blank=True, null= True)
 
     def __str__(self):
-        return f'{str(self.FGRN_no)} - {self.item_name}'
+        return f'{str(self.FGRN_no)} - {self.description}'
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)
