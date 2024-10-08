@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var quantity = parseFloat(form.find('#quantity').val());
 
              
-        var total = per_unit_kg * no_of_unit * unit_price  || 0;
+        var total = per_unit_kg * no_of_unit  || 0;
         var final_price = unit_price * quantity || 0;   
         
 
