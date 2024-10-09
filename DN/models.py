@@ -32,8 +32,6 @@ class orders(models.Model):
     class Meta:
         db_table = 'orders'
 
-    class Meta:
-        db_table = 'orders'
 
 class orders_items(models.Model):
     serial_no = models.ForeignKey('orders', on_delete=models.CASCADE,db_column = 'serial_no', related_name="orders")
