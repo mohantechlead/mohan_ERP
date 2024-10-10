@@ -54,7 +54,6 @@ def delivery_list(request):
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
 @login_required(login_url="login_user")
-
 def input_delivery(request):
     # Fetch all orders for the dropdown in the form
     my_orders = orders.objects.all()
@@ -89,50 +88,66 @@ def input_delivery(request):
                 return redirect('input_delivery')
 
             # Assign the fetched order instance directly to the delivery_instance's serial_no field
-            delivery_instance.serial_no = order_instance  # Correct assignment
+            delivery_instance.serial_no = order_instance
 
             # Save the delivery instance
             delivery_instance.save()
 
-            # Process each item in the formset
-            for item_form in formset:
-                if item_form.cleaned_data.get('description'):
-                    description = item_form.cleaned_data['description']
-                    quantity = item_form.cleaned_data['quantity']
-                    no_of_unit = item_form.cleaned_data['no_of_unit']
+            try:
+                with transaction.atomic():
+                    # Process each item in the formset
+                    for item_form in formset:
+                        if item_form.cleaned_data.get('description'):
+                            description = item_form.cleaned_data['description']
+                            quantity = item_form.cleaned_data['quantity']
+                            no_of_unit = item_form.cleaned_data['no_of_unit']
 
-                    # Try to find the order item corresponding to the form data
-                    try:
-                        order_item = orders_items.objects.get(serial_no=serial_no, description=description)
-                    except orders_items.DoesNotExist:
-                        messages.error(request, f'Item {description} not found in order {serial_no}')
-                        continue
+                            # Try to find the order item corresponding to the form data
+                            try:
+                                order_item = orders_items.objects.get(serial_no=serial_no, description=description)
+                            except orders_items.DoesNotExist:
+                                messages.error(request, f'Item {description} not found in order {serial_no}')
+                                continue
 
-                    # Check and update the remaining quantity and unit
-                    order_item.remaining_quantity -= quantity
-                    order_item.remaining_unit -= no_of_unit
+                            # Debug: Check current values before subtraction
+                            print(f"Before update - Item: {description}, Remaining Quantity: {order_item.remaining_quantity}, Remaining Unit: {order_item.remaining_unit}")
 
-                    if order_item.remaining_quantity < 0 or order_item.remaining_unit < 0:
-                        messages.error(request, f'Over Delivery for item {description}')
-                        return render(request, 'input_delivery.html', {
-                            'form': form,
-                            'my_orders': my_orders,
-                            'formset': formset,
-                        })
+                            # Subtract the quantity and units from the order item
+                            order_item.remaining_quantity -= quantity
+                            order_item.remaining_unit -= no_of_unit
 
-                    # Save the changes
-                    order_item.save()
+                            # Debug: Check values after subtraction
+                            print(f"After update - Item: {description}, Remaining Quantity: {order_item.remaining_quantity}, Remaining Unit: {order_item.remaining_unit}")
 
-                    # Create delivery item instance
-                    delivery_item = delivery_items(
-                        delivery_number=delivery_instance,  # Use the delivery instance directly here
-                        description=description,
-                        quantity=quantity,
-                        no_of_unit=no_of_unit,
-                        # Assign other fields from item_form if needed
-                    )
-                    delivery_item.save()
+                            # Check for over-delivery
+                            if order_item.remaining_quantity < 0 or order_item.remaining_unit < 0:
+                                messages.error(request, f'Over Delivery for item {description}')
+                                return render(request, 'input_delivery.html', {
+                                    'form': form,
+                                    'my_orders': my_orders,
+                                    'formset': formset,
+                                })
 
+                            # Save the updated order item
+                            order_item.save()
+
+                            # Create delivery item instance
+                            delivery_item = delivery_items(
+                                delivery_number=delivery_instance,  # Use the delivery instance directly here
+                                description=description,
+                                quantity=quantity,
+                                no_of_unit=no_of_unit,
+                                # Assign other fields from item_form if needed
+                            )
+                            delivery_item.save()
+
+            except Exception as e:
+                # If something goes wrong, rollback the transaction and show an error message
+                messages.error(request, f'Error processing delivery: {e}')
+                return redirect('input_delivery')
+
+            # If everything is successful, redirect to the delivery page or show success message
+            messages.success(request, 'Delivery submitted successfully')
             return redirect('input_delivery')
 
         else:
@@ -160,6 +175,8 @@ def input_delivery(request):
         'formset': formset,
     }
     return render(request, 'input_delivery.html', context)
+
+
 
 
 @login_required(login_url="login_user")

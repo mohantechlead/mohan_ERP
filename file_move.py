@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 
 # Load CSV data
-df = pd.read_excel('driver.xlsx')
+df = pd.read_excel('delivery_item2.xlsx')
 
 # Connect to the Heroku PostgreSQL database
 conn = psycopg2.connect(
@@ -14,21 +14,36 @@ conn = psycopg2.connect(
     port="5432"
 )
 
-# Create a cursor
 cur = conn.cursor()
 
 insert_query = """
-    INSERT INTO "DN_delivery"(delivery_number,	serial_no,	delivery_date,	total_quantity	,truck_number,	driver_name	,recipent_name) 
+    INSERT INTO "DN_delivery_items"(delivery_number, no_of_unit, description, quantity, per_unit_kg, unit_type) 
     VALUES %s
 """
 
+# Fetch existing delivery numbers
+cur.execute('SELECT delivery_number FROM "DN_delivery"')
+existing_numbers = {row[0] for row in cur.fetchall()}
+
+# Filter DataFrame to ensure all delivery numbers exist
+valid_data = df[df['delivery_number'].isin(existing_numbers)]
+
+# Log the filtered DataFrame
+print("Filtered DataFrame:")
+print(valid_data)
+
 # Prepare data for insertion
-# Convert DataFrame rows into a list of tuples
-data = [tuple(row) for row in df.itertuples(index=False, name=None)]
+data = [tuple(row) for row in valid_data.itertuples(index=False, name=None)]
 
-# Use execute_values to insert data in bulk
-execute_values(cur, insert_query, data)
-
+# Insert only if valid data exists
+try:
+    if data:
+        execute_values(cur, insert_query, data)
+        print(f"Inserted {len(data)} rows into DN_delivery_items.")
+    else:
+        print("No valid data to insert.")
+except Exception as e:
+    print(f"An error occurred: {e}")
 
 # Commit and close the connection
 conn.commit()
