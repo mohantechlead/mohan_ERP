@@ -4,6 +4,10 @@
     <h1>Input Delivery Information</h1>
     <div>
       <div  class="col-md-6">
+        {% comment %} <form action="{% url 'search_orders' %}">
+          <input type="text" name="serial_no">
+          <input style="color: #6d7fcc;"  type="submit" value="Search Order">
+      </form> {% endcomment %}
       </div>
       
     </div>
@@ -26,21 +30,6 @@
       {{ error_message }}
     </div>
     {% endif %}
-
-    <div id="confirmationModal" class="modal">
-      <div class="modal-content">
-          <span class="close">&times;</span>
-          <h2>Confirm Submission</h2>
-          <p id="fgrnDisplay"></p>
-          <ul id="itemListDisplay"></ul>
-          <div class="align-right">
-              <button id="confirmSubmit" class="btn btn-primary">Confirm</button>
-              <button id="cancelSubmit" class="btn btn-secondary">Cancel</button>
-          </div>
-          
-      </div>
-  </div>
-
     <form action="{% url 'input_delivery' %}" method="post" id="form1">
         {% csrf_token %}
 
@@ -51,7 +40,7 @@
           <div class="col-sm-8">
             <!-- <input type="text" class="form-control" value="{{ next_order_number }}" readonly> -->
             <input type="text" list="my_orders" placeholder="Order No" name="serial_no" class="form-control "
-                  style="width: 100%;" id="serial_no">
+                  style="width: 100%;">
                 <datalist id="my_orders">
                   {% for order in my_orders %}
                   <option value="{{order.serial_no}}"></option>
@@ -73,7 +62,7 @@
               <label class="control-label col-sm-4" > Delivery Number</label>
               <div class="col-sm-8">
                 <!-- <input type="text" class="form-control" value="{{ next_order_number }}" readonly> -->
-                <input type="text" class="form-control" name="delivery_number" id="delivery_number">
+                <input type="text" class="form-control" name="delivery_number">
               </div>
             </div> 
         
@@ -117,8 +106,14 @@
           </div>
         </div>
       </div>
-
-      {{ formset.management_form }}
+      
+    </form>
+      
+    <div class="col-sm-12" style="margin-top: 10px;">
+  <form method="post" action="{% url 'input_delivery_items' %}" id="form2">
+        {% csrf_token %}
+  
+        {{ formset.management_form }}
   
         <div id="form-lists">
             {% for form in formset %}
@@ -133,15 +128,10 @@
         </div>
   
         <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
-        
         <button id="add-more" class="btn btn-primary" type="button"
             style="background-image:url('../static/back1.PNG');color: aliceblue;">Add
             Item</button>
-      
-    </form>
-      
-    <div class="col-sm-12" style="margin-top: 10px;">
- 
+  </form>
 
   </div>
  

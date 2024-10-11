@@ -11,96 +11,66 @@ document.addEventListener('DOMContentLoaded', function () {
     const itemListDisplay = document.getElementById('itemListDisplay');
     const serial_no = document.getElementById('serial_no')
 
-    addMoreBtn.addEventListener('click', add_new_form);
-    const calculateTotalButton = document.querySelector('#calculate_total');
-
-    calculateTotalButton.addEventListener('click', function (event) {
-        event.preventDefault();
-        calculateTotalPrice();
-    });
-
-    function calculateTotalPrice() {
-        let total = 0;
-        const formsets = document.querySelectorAll('.item-list');
-        const quantityFields = document.getElementById('total_quantity');
-
-        formsets.forEach(function(formset) {
-            const total_quantity_fields = formset.querySelectorAll('#quantity');
-            total_quantity_fields.forEach(function(quantityField) {
-                const quantity = parseFloat(quantityField.value) || 0;
-                total += quantity;
-            });
-        });
-
-        quantityFields.value = total.toFixed(2);
-        quantityFields.textContent = total.toFixed(2);
-    }
-    
-    calculateTotalPrice();
-    console.log(delivery_number.value)
     submitButton.addEventListener('click', function(event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        // Populate the confirmation modal with FGRN number and item list
-        fgrnDisplay.textContent = "Delivery Number: " + delivery_number.value;
-        
+    // Populate the confirmation modal with delivery number and item list
+    fgrnDisplay.textContent = "Delivery Number: " + delivery_number.value;
 
-        // Clear previous items
-        itemListDisplay.innerHTML = '';
-        document.querySelectorAll('.item-list').forEach(function(form) {
-            const itemName = form.querySelector('#description').value;
-            const quantity = form.querySelector('#quantity').value;
-            const listItem = document.createElement('li');
-            listItem.textContent = `Item: ${itemName}, Quantity: ${quantity}`;
-            itemListDisplay.appendChild(listItem);
-        });
-
-        // Show the confirmation modal
-        confirmationModal.style.display = "block";
+    // Clear previous items
+    itemListDisplay.innerHTML = '';
+    document.querySelectorAll('.item-list').forEach(function(form) {
+        const itemName = form.querySelector('[name$=description]').value; // Select by name attribute
+        const quantity = form.querySelector('[name$=quantity]').value; // Select by name attribute
+        const listItem = document.createElement('li');
+        listItem.textContent = `Item: ${itemName}, Quantity: ${quantity}`;
+        itemListDisplay.appendChild(listItem);
     });
 
-    confirmSubmitButton.addEventListener('click', function() {
-        confirmationModal.style.display = "none";
+    // Show the confirmation modal
+    confirmationModal.style.display = "block";
+});
 
-        const form1 = document.getElementById('form1');
-        const formData = new FormData(form1);
+confirmSubmitButton.addEventListener('click', function() {
+    confirmationModal.style.display = "none";
 
-        fetch(form1.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    const errorContainer = document.getElementById('error-container');
-                    errorContainer.innerHTML = ''; // Clear previous errors
-                    if (data.form_errors) {
-                        const errorList = document.createElement('ul');
-                        for (const key in data.form_errors) {
-                            if (Object.prototype.hasOwnProperty.call(data.form_errors, key)) {
-                                const errorItem = document.createElement('li');
-                                errorItem.textContent = `${key}: ${data.form_errors[key]}`;
-                                errorList.appendChild(errorItem);
-                            }
+    const form1 = document.getElementById('form1');
+    const formData = new FormData(form1);
+
+    fetch(form1.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                const errorContainer = document.getElementById('error-container');
+                errorContainer.innerHTML = ''; // Clear previous errors
+                if (data.form_errors) {
+                    const errorList = document.createElement('ul');
+                    for (const key in data.form_errors) {
+                        if (Object.prototype.hasOwnProperty.call(data.form_errors, key)) {
+                            const errorItem = document.createElement('li');
+                            errorItem.textContent = `${key}: ${data.form_errors[key].join(', ')}`; // Show all error messages
+                            errorList.appendChild(errorItem);
                         }
-                        errorContainer.appendChild(errorList);
                     }
-                    throw new Error('Form submission failed');
-                });
-            } else {
-                document.getElementById('form1').reset();
-                window.location.reload();
-            }
-        });
+                    errorContainer.appendChild(errorList);
+                }
+                throw new Error('Form submission failed');
+            });
+        } else {
+            // Clear form and reload page only if submission is successful
+            document.getElementById('form1').reset();
+            window.location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle the error message display
+        alert("An error occurred. Please check the form and try again.");
     });
-
-    cancelSubmitButton.addEventListener('click', function() {
-        confirmationModal.style.display = "none";
-    });
-
-    document.querySelector('.close').onclick = function() {
-        confirmationModal.style.display = "none";
-    };
+});
 
     function add_new_form(args) {
         const currentForms = document.getElementsByClassName('item-list');
