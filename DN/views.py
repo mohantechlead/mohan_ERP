@@ -112,10 +112,14 @@ def input_delivery_items(request):
                     print(Order_instance)
                 except orders.DoesNotExist:
                     return JsonResponse({'error': 'Order not found'}, status=404)
+                
 
                 for form in non_empty_forms:
                     # Assign the actual delivery number, not the delivery instance
-                    form.instance.delivery_number = Delivery_instance.delivery_number
+                    form.instance.delivery_number = Delivery_instance
+
+                    selected_item = form.cleaned_data['description']
+
                     
                     for order in Order_instance:
                         print("here")
@@ -123,7 +127,7 @@ def input_delivery_items(request):
                         print(order.description)
                         print(form.cleaned_data['description'])
                         
-                        if form.cleaned_data['description'] == order.description:
+                        if order.description and order.description.strip().lower() == selected_item.lower():
                             print("I am here")
                             form.instance.serial_no = order.serial_no  # Correctly assign the serial_no
 
