@@ -81,96 +81,153 @@ def input_delivery(request):
 
 @login_required(login_url="login_user")
 def input_delivery_items(request):
+    # if request.method == 'POST':
+    #     print(request.POST)
+
+    #     formset_class = formset_factory(DeliverItemForm, extra=1, min_num=1)
+    #     formset = formset_class(request.POST, prefix="items")
+
+    #     if formset.is_valid():  # Check if the formset is valid
+    #         delivery_no = request.POST.get('delivery_number')
+    #         order_no = request.POST.get('serial_no')  # Assuming this comes from a different part of your form
+
+    #         try:
+    #             Delivery_instance = delivery.objects.get(delivery_number=delivery_no)
+    #             print(Delivery_instance)
+    #         except delivery.DoesNotExist:
+    #             return JsonResponse({'error': 'Delivery not found'}, status=404)
+
+    #         try:
+    #             orders_instance = orders.objects.get(serial_no=order_no)
+    #             Order_instance = orders_items.objects.filter(serial_no=order_no)
+    #             print(Order_instance)
+    #         except orders.DoesNotExist:
+    #             return JsonResponse({'error': 'Order not found'}, status=404)
+
+    #         # Iterate through each form in the formset
+    #         for form in formset:
+    #             if form.is_valid() and form.cleaned_data.get('description'):
+    #                 selected_item = form.cleaned_data['description']
+    #                 selected_item_description = selected_item.item_name  # Assuming item_name is the field
+
+    #                 item_found = False  # To check if the item was found in the order
+    #                 for order in Order_instance:
+    #                     print("Checking order:", order.serial_no)
+    #                     print("Order description:", order.description)
+    #                     print("Selected item description:", selected_item_description)
+
+    #                     if order.description == selected_item_description:
+    #                         print("Match found for:", selected_item_description)
+    #                         # No need to set form.instance.serial_no; instead, set the delivery_number
+    #                         form.instance.delivery_number = Delivery_instance
+
+    #                         # Adjust quantities
+    #                         order.remaining_quantity -= form.cleaned_data['quantity']
+    #                         order.remaining_unit -= form.cleaned_data['no_of_unit']
+
+    #                         # Prevent over-delivery
+    #                         if order.remaining_quantity < 0 or order.remaining_unit < 0:
+    #                             error_message = 'Over Delivery'
+    #                             return render(request, 'input_delivery.html', {
+    #                                 'formset': formset, 'error_message': error_message
+    #                             })
+
+    #                         # Save the order and the form
+    #                         order.save()
+    #                         form.save()  # Save the individual form
+    #                         Delivery_instance.save()  # Save the delivery instance
+    #                         item_found = True  # Mark item as found
+    #                         break  # Exit the loop once found
+
+    #                 if not item_found:
+    #                     print("Item not found:", selected_item_description)
+
+    #         return redirect('input_delivery')  # Redirect after processing all forms
+    #     else:
+    #         # Print out formset errors
+    #         print(formset.errors)
+    #         return JsonResponse({'form_errors': dict(formset.errors.items())}, status=400)
+
+    # # GET request handling
+    # formset_class = formset_factory(DeliverItemForm, extra=1)
+    # formset = formset_class(prefix="items")
+
+    # context = {
+    #     'formset': formset,
+    # }
+    # return render(request, 'input_delivery.html', context)
+
     if request.method == 'POST':
         print(request.POST)
-        
-        formset_class = formset_factory(DeliverItemForm, extra=1, min_num=1)
-        formset = formset_class(request.POST or None, prefix="items")
+        formset = formset_factory(DeliverItemForm, extra=1 , min_num= 1)
+        formset = formset(request.POST or None, prefix="items")
 
         if formset.errors:
             print(formset.errors)
 
         non_empty_forms = [form for form in formset if form.cleaned_data.get('description')]
         delivery_no = request.POST.get('delivery_number')
-        order_no = request.POST.get('serial_no')
-        description = request.POST.get('description')
-
-        print(delivery_no, "delivery number")
-        print(order_no, "order_no number")
-
+        print(delivery_no,"delivery_no")
         if non_empty_forms:
             if formset.is_valid():
-                try:
-                    Delivery_instance = delivery.objects.get(delivery_number=delivery_no)
-                    print(Delivery_instance)
-                except delivery.DoesNotExist:
-                    return JsonResponse({'error': 'Delivery not found'}, status=404)
-
-                try:
-                    order_ins = orders.objects.get(serial_no=order_no)
-                    Order_instance = orders_items.objects.filter(serial_no=order_no)
-                    print(Order_instance)
-                except orders.DoesNotExist:
-                    return JsonResponse({'error': 'Order not found'}, status=404)
-                
-
+                Delivery_instance = delivery.objects.get(delivery_number = delivery_no)
+                final_quantity = 0.0
+                vat_amount = 0.0
+                final_price  = 0.0
+                before_vat = 0.0
+                final_unit = 0.0
                 for form in non_empty_forms:
-                    # Assign the actual delivery number, not the delivery instance
                     form.instance.delivery_number = Delivery_instance
 
                     selected_item = form.cleaned_data['description']
-
+                    selected_item_description = selected_item.item_name  # Assuming item_name is the field
+                
+                    # quantity = form.cleaned_data['quantity']
+                    # no_of_unit = form.cleaned_data['no_of_unit']
+                    # total_price = form.cleaned_data['total_price']
+            
+                    # # final_quantity += quantity
+                    # final_unit += no_of_unit
+                    # vat_amount += quantity * 0.15
+                    # Order_instance.vat_amount = vat_amount
+                    # final_price += quantity + (quantity * 0.15)
+                    # Order_instance.final_price = final_price
+                    # before_vat += total_price  
+                    # Order_instance.before_vat = before_vat
                     
-                    for order in Order_instance:
-                        print("here")
-                        print(order.serial_no)
-                        print(order.description)
-                        print(form.cleaned_data['description'])
-                        
-                        if order.description and order.description.strip().lower() == selected_item.lower():
-                            print("I am here")
-                            form.instance.serial_no = order.serial_no  # Correctly assign the serial_no
-
-                            # Adjust quantities
-                            order.remaining_quantity -= form.cleaned_data['quantity']
-                            order.remaining_unit -= form.cleaned_data['no_of_unit']
-                            
-                            # Prevent over-delivery
-                            if order.remaining_quantity < 0 or order.remaining_unit < 0:
-                                error_message = 'Over Delivery'
-                                return render(request, 'input_delivery.html', {
-                                    'form': form, 'error_message': error_message
-                                })
-
-                            order.save()
-                            form.save()
-                            Delivery_instance.save()
-                        else:
-                            print("item not found")
-
-                return redirect('input_delivery')
+                    # form.instance.remaining_quantity = quantity
+                    # form.instance.remaining_unit = no_of_unit
+                    form.save()
+         
+                    Delivery_instance.save()
+                    
+                    
             else:
-                print(formset.data, "nval")
+                print(formset.data,"nval")
                 errors = dict(formset.errors.items())
                 return JsonResponse({'form_errors': errors}, status=400)
+        
+            order_form = DeliveryForm(prefix="orders")
+            formset = formset_factory(DeliverItemForm, extra=1)
+            formset = formset(prefix="items")
 
-        order_form = DeliveryForm(prefix="orders")
-        formset = formset_class(prefix="items")
-
-        context = {
-            'order_form': order_form,
-            'formset': formset,
-        }
-        return render(request, 'input_delivery.html', context)
-    
+            context = {
+                'order_form': order_form,
+                'formset': formset,
+                # 'message':success_message,
+            }
+            return render(request, 'input_delivery.html', context)
     else:
-        formset_class = formset_factory(DeliverItemForm, extra=1)
-        formset = formset_class(prefix="items")
+       
+        formset = formset_factory(DeliverItemForm, extra=1)
+        formset = formset(prefix="items")
 
     context = {
         'formset': formset,
     }
     return render(request, 'input_delivery.html', context)
+
+
 
 @login_required(login_url="login_user")
 #To display the delivery notes for a specific order number
@@ -796,3 +853,28 @@ def order_chart(request):
         'finished_items': finished_items,
         'chart_div': chart_div,
     })
+
+@login_required(login_url="login_user")
+def display_DN_items(request):
+
+    item_quantities = delivery_items.objects.values('description').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+  
+    for item in item_quantities:
+        inventory_DN_items.objects.update_or_create(
+            item_name=item['description'],
+            defaults={'total_quantity': item['total_quantity'],
+                      'total_no_of_unit': item['total_no_of_unit']}
+            
+        )
+        print(f"Name: {item['description']}, Total Quantity: {item['total_quantity']}, Total No of Unit: {item['total_no_of_unit']}")
+    
+
+    items = inventory_DN_items.objects.all().order_by('item_name')    
+    print(items)
+    context = {
+        # 'total_quantity':item_quantities,
+        'items':items,
+        
+    }
+
+    return render(request,'display_DN_items.html',context)

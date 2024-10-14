@@ -56,7 +56,7 @@ class DeliveryForm(forms.ModelForm):
         
 class DeliverItemForm(forms.ModelForm):
     description = forms.ModelChoiceField(
-        queryset=orders_items.objects.all(),
+        queryset=finished_goods.objects.all(),
         widget=forms.Select(attrs={
             'class': 'form-control select2',
             'data-minimum-input-length': '0',  # Start filtering from the first character
