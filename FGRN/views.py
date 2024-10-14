@@ -196,3 +196,28 @@ def fgrn_opening_balances(request):
     }
 
     return render(request,'fgrn_opening_balance.html',context)
+
+@login_required(login_url="login_user")
+def display_FGRN_items(request):
+
+    item_quantities = FGRN_item.objects.values('description').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+  
+    for item in item_quantities:
+        inventory_FGRN_items.objects.update_or_create(
+            item_name=item['description'],
+            defaults={'total_quantity': item['total_quantity'],
+                      'total_no_of_unit': item['total_no_of_unit']}
+            
+        )
+        print(f"Name: {item['description']}, Total Quantity: {item['total_quantity']}, Total No of Unit: {item['total_no_of_unit']}")
+    
+
+    items = inventory_FGRN_items.objects.all().order_by('item_name')    
+    print(items)
+    context = {
+        # 'total_quantity':item_quantities,
+        'items':items,
+        
+    }
+
+    return render(request,'display_FGRN_items.html',context)

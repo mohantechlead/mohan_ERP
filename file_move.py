@@ -2,10 +2,10 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
-# Load your delivery items CSV data
-df = pd.read_csv('purchase order2.csv')
+# Load CSV data
+df = pd.read_excel('delivery_item2.xlsx')
 
-# Connect to the PostgreSQL database
+# Connect to the Heroku PostgreSQL database
 conn = psycopg2.connect(
     dbname="danu52bd6b47kp",
     user="ub3o0thg8i7u2n",
@@ -14,36 +14,38 @@ conn = psycopg2.connect(
     port="5432"
 )
 
-# Create a cursor
 cur = conn.cursor()
 
-# Step 1: Get existing delivery numbers from the DN_delivery table
-cur.execute('SELECT PR_no FROM "GRN_purchase_orders";')
-existing_delivery_numbers = set(row[0] for row in cur.fetchall())
+insert_query = """
+    INSERT INTO "DN_delivery_items"(delivery_number, no_of_unit, description, quantity, per_unit_kg, unit_type) 
+    VALUES %s
+"""
 
-# Step 2: Filter DataFrame to include only valid delivery numbers
-df_filtered = df[df['PR_no'].isin(existing_delivery_numbers)]
+# Fetch existing delivery numbers
+cur.execute('SELECT delivery_number FROM "DN_delivery"')
+existing_numbers = {row[0] for row in cur.fetchall()}
 
-# Check if the filtered DataFrame is empty
-if df_filtered.empty:
-    print("No valid delivery numbers found for insertion.")
-else:
-    print(f"Inserting {len(df_filtered)} records into GRN_pr_items.")
+# Filter DataFrame to ensure all delivery numbers exist
+valid_data = df[df['delivery_number'].isin(existing_numbers)]
 
-    # Prepare your insert query
-    insert_query = """
-            INSERT INTO "GRN_pr_item"(PR_no,item_name,tttt,price,before_vat,total_price,quantity,item_measurement,id_numeric,hs_code,remaining) 
-            VALUES %s
-        """
+# Log the filtered DataFrame
+print("Filtered DataFrame:")
+print(valid_data)
 
-        # Convert DataFrame rows into a list of tuples
-    data = [tuple(row) for row in df_filtered.itertuples(index=False, name=None)]
+# Prepare data for insertion
+data = [tuple(row) for row in valid_data.itertuples(index=False, name=None)]
 
-        # Use execute_values to insert data in bulk
-    execute_values(cur, insert_query, data)
+# Insert only if valid data exists
+try:
+    if data:
+        execute_values(cur, insert_query, data)
+        print(f"Inserted {len(data)} rows into DN_delivery_items.")
+    else:
+        print("No valid data to insert.")
+except Exception as e:
+    print(f"An error occurred: {e}")
 
 # Commit and close the connection
 conn.commit()
 cur.close()
 conn.close()
-

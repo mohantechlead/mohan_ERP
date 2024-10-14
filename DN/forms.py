@@ -15,12 +15,6 @@ class DeliveryForm(forms.ModelForm):
                                         'placeholder': 'Add a Truck Number', 
                                         'id':'delivery_number'}))
     
-    # serial_no = forms.IntegerField(required=True,
-    #                                     widget = forms.TextInput(attrs={'class': 'form-control', 
-    #                                     # 'type':'select',
-    #                                     # 'placeholder': 'Add a Truck Number', 
-    #                                     'id':'serial_no'}))
-    
     delivery_date = forms.DateField(
         widget=forms.DateInput(
             attrs={
@@ -110,7 +104,7 @@ class DeliverItemForm(forms.ModelForm):
     )
     
     class Meta:
-        model = delivery
+        model = delivery_items
         fields = ['description', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit']
 
 

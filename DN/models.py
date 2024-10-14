@@ -32,8 +32,6 @@ class orders(models.Model):
     class Meta:
         db_table = 'orders'
 
-    class Meta:
-        db_table = 'orders'
 
 class orders_items(models.Model):
     serial_no = models.ForeignKey('orders', on_delete=models.CASCADE,db_column = 'serial_no', related_name="orders")
@@ -66,6 +64,9 @@ class delivery(models.Model):
     def __str__(self):
         return str(self.delivery_number)
     
+    class Meta:
+        ordering = ['delivery_number'] 
+    
 class delivery_items(models.Model):
     # serial_no = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'serial_no', related_name='orders')
     delivery_number = models.ForeignKey('delivery', on_delete=models.CASCADE,db_column = 'delivery_number', related_name='delivery')
@@ -78,6 +79,9 @@ class delivery_items(models.Model):
 
     def __str__(self):
         return f'{str(self.delivery_number)} - {self.description}'
+    
+    class Meta:
+        ordering = ['delivery_number'] 
 
 class Customer(models.Model):
     customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -90,5 +94,18 @@ class Customer(models.Model):
     def __str__(self):
         return self.name
 
+class inventory_DN_items(models.Model):
+    item_name = models.TextField(blank=True)
+    total_no_of_unit = models.FloatField(blank=True, null=True)
+    total_quantity = models.FloatField(blank=True)
+    balance_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    branch = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name'] 
+
+    def __str__(self):
+        return self.item_name
+    
 
 
