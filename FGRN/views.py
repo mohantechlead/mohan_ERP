@@ -12,7 +12,7 @@ from django.db.models import Sum
 from django.http import JsonResponse
 from MR.models import *
 from .decorators import allowed_users
-from DN.models import delivery_items
+from DN.models import delivery_items, inventory_DN_items
 
 @login_required(login_url="login_user")
 def create_fgrn(request):
@@ -135,25 +135,25 @@ def display_goods(request):
     
     form = InventoryItemForm()
 
-    names_a = set(FGRN_item.objects.values_list('description', flat=True))
-    names_b = set(delivery_items.objects.values_list('description', flat=True))
+    names_a = set(inventory_FGRN_items.objects.values_list('item_name', flat=True))
+    names_b = set(inventory_DN_items.objects.values_list('item_name', flat=True))
     names_c = set(FGRNopening_balance.objects.values_list('item_name', flat=True))
 
     all_names = names_a.union(names_b).union(names_c)
 
     for name in all_names:
         # Get the quantity from each model
-        quantity_a = FGRN_item.objects.filter(description=name).first()
-        quantity_b = delivery_items.objects.filter(description=name).first()
+        quantity_a = inventory_FGRN_items.objects.filter(item_name=name).first()
+        quantity_b = inventory_DN_items.objects.filter(item_name=name).first()
         quantity_c = FGRNopening_balance.objects.filter(item_name=name).first()
         
         # Initialize the quantities or set to 0 if not found
-        quantity_a_value = quantity_a.quantity if quantity_a else 0
-        quantity_b_value = quantity_b.quantity if quantity_b else 0
+        quantity_a_value = quantity_a.total_quantity if quantity_a else 0
+        quantity_b_value = quantity_b.total_quantity if quantity_b else 0
         quantity_c_value = quantity_c.quantity if quantity_c else 0
 
-        units_a_value = quantity_a.no_of_unit if quantity_a else 0
-        units_b_value = quantity_b.no_of_unit if quantity_b else 0
+        units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
+        units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
         units_c_value = quantity_c.no_of_unit if quantity_c else 0
         
         # Calculate the result: Subtract ModelA and ModelC, and add ModelB
