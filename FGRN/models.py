@@ -32,10 +32,13 @@ class FGRN_item(models.Model):
     unit_type = models.TextField(blank=True, null= True)
 
     def __str__(self):
-        return f'{str(self.FGRN_no)} - {self.item_name}'
-    
+      return f'{str(self.FGRN_no)} - {self.description}'
+ 
     class Meta:
         ordering = ['FGRN_no'] 
+
+        
+
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)
@@ -85,3 +88,4 @@ class inventory_FGRN_items(models.Model):
 
     def __str__(self):
         return self.item_name
+
