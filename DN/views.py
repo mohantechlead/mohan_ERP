@@ -182,21 +182,6 @@ def input_delivery_items(request):
                     selected_item = form.cleaned_data['description']
                     selected_item_description = selected_item.item_name  # Assuming item_name is the field
                 
-                    # quantity = form.cleaned_data['quantity']
-                    # no_of_unit = form.cleaned_data['no_of_unit']
-                    # total_price = form.cleaned_data['total_price']
-            
-                    # # final_quantity += quantity
-                    # final_unit += no_of_unit
-                    # vat_amount += quantity * 0.15
-                    # Order_instance.vat_amount = vat_amount
-                    # final_price += quantity + (quantity * 0.15)
-                    # Order_instance.final_price = final_price
-                    # before_vat += total_price  
-                    # Order_instance.before_vat = before_vat
-                    
-                    # form.instance.remaining_quantity = quantity
-                    # form.instance.remaining_unit = no_of_unit
                     form.save()
          
                     Delivery_instance.save()
@@ -277,7 +262,6 @@ def input_orders_items(request):
         if non_empty_forms:
             if formset.is_valid():
                 Order_instance = orders.objects.get(serial_no = order_number)
-                final_quantity = 0.0
                 vat_amount = 0.0
                 final_price  = 0.0
                 before_vat = 0.0
@@ -289,7 +273,6 @@ def input_orders_items(request):
                     no_of_unit = form.cleaned_data['no_of_unit']
                     total_price = form.cleaned_data['total_price']
             
-                    # final_quantity += quantity
                     final_unit += no_of_unit
                     vat_amount += quantity * 0.15
                     Order_instance.vat_amount = vat_amount
@@ -335,14 +318,31 @@ def input_orders_items(request):
 def display_orders(request):
  
     the_order = orders.objects.all().order_by('serial_no')
+    the_delivery = delivery.objects.all().order_by('delivery_number')
+
     orders_data = []
 
     for order in the_order:
         items = orders_items.objects.filter(serial_no=order.serial_no)
+        dn = delivery.objects.filter(serial_no=order.serial_no)
+        delivery_items_list = delivery_items.objects.filter(
+                delivery_number__in=dn
+            )
+        
+        for item in items:
+            ordered_quantity = item.quantity
+       
+            delivered_quantity = delivery_items_list.filter(
+                    description=item.description
+                ).aggregate(total_delivered=Sum('quantity'))['total_delivered'] or 0
+            
+            remaining_quantity = ordered_quantity - delivered_quantity
+            
         order_data = {
                 'serial_no': order.serial_no,
                 'before_vat': order.before_vat,
                 'invoice':order.invoice,
+                'remaining_quantity': remaining_quantity,
                 'date': order.date,
                 'final_price': order.final_price,
                 'order_item': items,
@@ -350,7 +350,7 @@ def display_orders(request):
             }
         orders_data.append(order_data)
 
-    print(items)
+    print(the_delivery)
 
     context = {
         'my_order': the_order,
