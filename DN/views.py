@@ -337,6 +337,10 @@ def display_orders(request):
                 ).aggregate(total_delivered=Sum('quantity'))['total_delivered'] or 0
             
             remaining_quantity = ordered_quantity - delivered_quantity
+            item.remaining_quantity = remaining_quantity
+
+            print(item.remaining_quantity)
+            item.save()
             
         order_data = {
                 'serial_no': order.serial_no,
