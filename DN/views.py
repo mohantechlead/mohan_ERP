@@ -92,7 +92,7 @@ def input_delivery_items(request):
                     form.instance.delivery_number = Delivery_instance
 
                     selected_item = form.cleaned_data['description']
-                    selected_item_description = selected_item.item_name  # Assuming item_name is the field
+                    # selected_item_description = selected_item.item_name  # Assuming item_name is the field
                 
                     form.save()
          
