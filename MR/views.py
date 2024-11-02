@@ -19,6 +19,7 @@ import openpyxl
 from itertools import chain
 import plotly.graph_objs as go
 from plotly.offline import plot
+from DN.models import inventory_DN_items
 
 @login_required(login_url="login_user")
 def create_MR(request):
@@ -134,39 +135,46 @@ def display_inventory(request):
             form.save()
             return redirect('display_inventory')
     
+    mr_names = set(inventory.objects.values_list('item_name', flat=True))
+    
     form = InventoryItemForm()
 
     names_a = set(inventory_GRN_items.objects.values_list('item_name', flat=True))
     names_b = set(inventory_MR_items.objects.values_list('item_name', flat=True))
     names_c = set(opening_balance.objects.values_list('item_name', flat=True))
+    names_d = set(inventory_DN_items.objects.values_list('item_name', flat=True))
 
-    all_names = names_a.union(names_b).union(names_c)
+    all_names = names_a.union(names_b).union(names_c).union(names_d)
 
     for name in all_names:
         # Get the quantity from each model
-        quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
-        quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
-        quantity_c = opening_balance.objects.filter(item_name=name).first()
-        
-        # Initialize the quantities or set to 0 if not found
-        quantity_a_value = quantity_a.total_quantity if quantity_a else 0
-        quantity_b_value = quantity_b.total_quantity if quantity_b else 0
-        quantity_c_value = quantity_c.quantity if quantity_c else 0
+        if name in mr_names:
+            quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
+            quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
+            quantity_c = opening_balance.objects.filter(item_name=name).first()
+            quantity_d = inventory_DN_items.objects.filter(item_name = name).first()
 
-        units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
-        units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
-        units_c_value = quantity_c.no_of_unit if quantity_c else 0
-        
-        # Calculate the result: Subtract ModelA and ModelC, and add ModelB
-        result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value 
-        result_units = units_c_value - units_b_value + units_a_value
-        
-        # Save or update the result in ModelD
-        inventory.objects.update_or_create(
-            item_name=name,
-            defaults={'quantity': result_quantity,
-                      'no_of_unit': result_units}
-        )
+            # Initialize the quantities or set to 0 if not found
+            quantity_a_value = quantity_a.total_quantity if quantity_a else 0
+            quantity_b_value = quantity_b.total_quantity if quantity_b else 0
+            quantity_c_value = quantity_c.quantity if quantity_c else 0
+            quantity_d_value = quantity_d.total_quantity if quantity_d else 0
+
+            units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
+            units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
+            units_c_value = quantity_c.no_of_unit if quantity_c else 0
+            units_d_value = quantity_d.total_no_of_unit if quantity_d else 0
+            
+            # Calculate the result: Subtract ModelA and ModelC, and add ModelB
+            result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value - quantity_d_value
+            result_units = units_c_value - units_b_value + units_a_value - units_d_value
+            
+            # Save or update the result in ModelD
+            inventory.objects.update_or_create(
+                item_name=name,
+                defaults={'quantity': result_quantity,
+                        'no_of_unit': result_units}
+            )
 
     items = inventory.objects.all().order_by('item_name')
     print(items)

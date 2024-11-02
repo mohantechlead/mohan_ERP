@@ -1,6 +1,9 @@
 from django import forms
 from .models import *
 from FGRN.models import finished_goods
+from itertools import chain
+from MR.models import inventory
+import operator
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -53,10 +56,16 @@ class DeliveryForm(forms.ModelForm):
     class Meta:
         model = delivery
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
-        
+
 class DeliverItemForm(forms.ModelForm):
-    description = forms.ModelChoiceField(
-        queryset=finished_goods.objects.all(),
+    description = forms.ChoiceField(
+        choices=[
+            (f"{item._meta.model_name}_{item.item_name}", f"{item.item_name}")
+            for item in sorted(
+                chain(finished_goods.objects.all(), inventory.objects.all()),
+                key=operator.attrgetter('item_name')
+            )
+        ],
         widget=forms.Select(attrs={
             'class': 'form-control select2',
             'data-minimum-input-length': '0',  # Start filtering from the first character
