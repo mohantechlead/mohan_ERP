@@ -1,11 +1,4 @@
-from django.forms import ValidationError
 from django.shortcuts import get_object_or_404, render, redirect
-from .models import orders, delivery, orders_items
-from .forms import DeliveryForm, OrderForm, OrderItemForm, DeliverItemForm
-from django.core.mail import EmailMessage, get_connection
-from django.conf import settings
-from django.db.models import Q
-from django.core.mail import send_mail
 from datetime import datetime
 from django.core import serializers
 from django.db.models import Sum, Case, When, F, Value, IntegerField
@@ -17,14 +10,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
 from django.contrib import messages
-from .models import *
 from .forms import *
 from FGRN.models import finished_goods
+from MR.models import inventory
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 import plotly.graph_objs as go
 from plotly.offline import plot
-from django.db import transaction
 
 @api_view(['GET','POST'])
 def order_list(request):
@@ -81,82 +73,7 @@ def input_delivery(request):
 
 @login_required(login_url="login_user")
 def input_delivery_items(request):
-    # if request.method == 'POST':
-    #     print(request.POST)
-
-    #     formset_class = formset_factory(DeliverItemForm, extra=1, min_num=1)
-    #     formset = formset_class(request.POST, prefix="items")
-
-    #     if formset.is_valid():  # Check if the formset is valid
-    #         delivery_no = request.POST.get('delivery_number')
-    #         order_no = request.POST.get('serial_no')  # Assuming this comes from a different part of your form
-
-    #         try:
-    #             Delivery_instance = delivery.objects.get(delivery_number=delivery_no)
-    #             print(Delivery_instance)
-    #         except delivery.DoesNotExist:
-    #             return JsonResponse({'error': 'Delivery not found'}, status=404)
-
-    #         try:
-    #             orders_instance = orders.objects.get(serial_no=order_no)
-    #             Order_instance = orders_items.objects.filter(serial_no=order_no)
-    #             print(Order_instance)
-    #         except orders.DoesNotExist:
-    #             return JsonResponse({'error': 'Order not found'}, status=404)
-
-    #         # Iterate through each form in the formset
-    #         for form in formset:
-    #             if form.is_valid() and form.cleaned_data.get('description'):
-    #                 selected_item = form.cleaned_data['description']
-    #                 selected_item_description = selected_item.item_name  # Assuming item_name is the field
-
-    #                 item_found = False  # To check if the item was found in the order
-    #                 for order in Order_instance:
-    #                     print("Checking order:", order.serial_no)
-    #                     print("Order description:", order.description)
-    #                     print("Selected item description:", selected_item_description)
-
-    #                     if order.description == selected_item_description:
-    #                         print("Match found for:", selected_item_description)
-    #                         # No need to set form.instance.serial_no; instead, set the delivery_number
-    #                         form.instance.delivery_number = Delivery_instance
-
-    #                         # Adjust quantities
-    #                         order.remaining_quantity -= form.cleaned_data['quantity']
-    #                         order.remaining_unit -= form.cleaned_data['no_of_unit']
-
-    #                         # Prevent over-delivery
-    #                         if order.remaining_quantity < 0 or order.remaining_unit < 0:
-    #                             error_message = 'Over Delivery'
-    #                             return render(request, 'input_delivery.html', {
-    #                                 'formset': formset, 'error_message': error_message
-    #                             })
-
-    #                         # Save the order and the form
-    #                         order.save()
-    #                         form.save()  # Save the individual form
-    #                         Delivery_instance.save()  # Save the delivery instance
-    #                         item_found = True  # Mark item as found
-    #                         break  # Exit the loop once found
-
-    #                 if not item_found:
-    #                     print("Item not found:", selected_item_description)
-
-    #         return redirect('input_delivery')  # Redirect after processing all forms
-    #     else:
-    #         # Print out formset errors
-    #         print(formset.errors)
-    #         return JsonResponse({'form_errors': dict(formset.errors.items())}, status=400)
-
-    # # GET request handling
-    # formset_class = formset_factory(DeliverItemForm, extra=1)
-    # formset = formset_class(prefix="items")
-
-    # context = {
-    #     'formset': formset,
-    # }
-    # return render(request, 'input_delivery.html', context)
-
+    
     if request.method == 'POST':
         print(request.POST)
         formset = formset_factory(DeliverItemForm, extra=1 , min_num= 1)
@@ -171,11 +88,6 @@ def input_delivery_items(request):
         if non_empty_forms:
             if formset.is_valid():
                 Delivery_instance = delivery.objects.get(delivery_number = delivery_no)
-                final_quantity = 0.0
-                vat_amount = 0.0
-                final_price  = 0.0
-                before_vat = 0.0
-                final_unit = 0.0
                 for form in non_empty_forms:
                     form.instance.delivery_number = Delivery_instance
 
@@ -199,7 +111,6 @@ def input_delivery_items(request):
             context = {
                 'order_form': order_form,
                 'formset': formset,
-                # 'message':success_message,
             }
             return render(request, 'input_delivery.html', context)
     else:

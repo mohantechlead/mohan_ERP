@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from MR.models import *
 from .decorators import allowed_users
 from DN.models import delivery_items, inventory_DN_items
+from GRN.models import inventory_GRN_items
 
 @login_required(login_url="login_user")
 def create_fgrn(request):
@@ -135,37 +136,43 @@ def display_goods(request):
     
     form = InventoryItemForm()
 
+    finished_goods_names = set(finished_goods.objects.values_list('item_name', flat=True))
+    mr_names = set(inventory.objects.values_list('item_name', flat=True))
+
     names_a = set(inventory_FGRN_items.objects.values_list('item_name', flat=True))
     names_b = set(inventory_DN_items.objects.values_list('item_name', flat=True))
     names_c = set(FGRNopening_balance.objects.values_list('item_name', flat=True))
+
+    
 
     all_names = names_a.union(names_b).union(names_c)
 
     for name in all_names:
         # Get the quantity from each model
-        quantity_a = inventory_FGRN_items.objects.filter(item_name=name).first()
-        quantity_b = inventory_DN_items.objects.filter(item_name=name).first()
-        quantity_c = FGRNopening_balance.objects.filter(item_name=name).first()
-        
-        # Initialize the quantities or set to 0 if not found
-        quantity_a_value = quantity_a.total_quantity if quantity_a else 0
-        quantity_b_value = quantity_b.total_quantity if quantity_b else 0
-        quantity_c_value = quantity_c.quantity if quantity_c else 0
+        if name in finished_goods_names:
+            quantity_a = inventory_FGRN_items.objects.filter(item_name=name).first()
+            quantity_b = inventory_DN_items.objects.filter(item_name=name).first()
+            quantity_c = FGRNopening_balance.objects.filter(item_name=name).first()
+            
+            # Initialize the quantities or set to 0 if not found
+            quantity_a_value = quantity_a.total_quantity if quantity_a else 0
+            quantity_b_value = quantity_b.total_quantity if quantity_b else 0
+            quantity_c_value = quantity_c.quantity if quantity_c else 0
 
-        units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
-        units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
-        units_c_value = quantity_c.no_of_unit if quantity_c else 0
+            units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
+            units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
+            units_c_value = quantity_c.no_of_unit if quantity_c else 0
+            
+            # Calculate the result: Subtract ModelA and ModelC, and add ModelB
+            result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value 
+            result_units = units_c_value - units_b_value + units_a_value
         
-        # Calculate the result: Subtract ModelA and ModelC, and add ModelB
-        result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value 
-        result_units = units_c_value - units_b_value + units_a_value
-        
-        # Save or update the result in ModelD
-        finished_goods.objects.update_or_create(
-            item_name=name,
-            defaults={'quantity': result_quantity,
-                      'no_of_unit': result_units}
-        )
+            # Save or update the result in ModelD
+            finished_goods.objects.update_or_create(
+                item_name=name,
+                defaults={'quantity': result_quantity,
+                        'no_of_unit': result_units}
+            )
 
     items = finished_goods.objects.all().order_by('item_name')
     print(items)
