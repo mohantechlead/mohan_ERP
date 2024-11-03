@@ -59,6 +59,7 @@ class DeliveryForm(forms.ModelForm):
 
 class DeliverItemForm(forms.ModelForm):
     description = forms.ChoiceField(
+        choices=[],  # Set initial choices as an empty list
         widget=forms.Select(attrs={
             'class': 'form-control select2',
             'data-minimum-input-length': '0',  # Start filtering from the first character
@@ -67,21 +68,26 @@ class DeliverItemForm(forms.ModelForm):
         })
     )
 
-    @property
-    def description_choices(self):
-        # Fetch choices directly from the database
+    @classmethod
+    def get_description_choices(cls):
+        # Fetch and sort items from both models
         items = sorted(
             chain(finished_goods.objects.all(), inventory.objects.all()),
             key=operator.attrgetter('item_name')
         )
+        # Generate choices as tuples of (item_name, item_name)
         return [(item.item_name, item.item_name) for item in items]
+
+    # Override the `description` field choices property to use the dynamic choices
+    @property
+    def description_choices(self):
+        return self.get_description_choices()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Set the dynamic choices here
-        self.fields['description'].choices = self.description_choices
+        # Set the dynamic choices from the method
+        self.fields['description'].choices = self.get_description_choices()
 
-    
     no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
