@@ -56,37 +56,32 @@ class DeliveryForm(forms.ModelForm):
     class Meta:
         model = delivery
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
-
+            
 class DeliverItemForm(forms.ModelForm):
     description = forms.ChoiceField(
-        choices=[],  # Set initial choices as an empty list
+        choices=[],  # Placeholder; choices will be dynamically fetched
         widget=forms.Select(attrs={
             'class': 'form-control select2',
-            'data-minimum-input-length': '0',  # Start filtering from the first character
+            'data-minimum-input-length': '0',
             'data-placeholder': 'Select or type an item',
             'id': 'description'
         })
     )
 
-    @classmethod
-    def get_description_choices(cls):
-        # Fetch and sort items from both models
+    @staticmethod
+    def get_dynamic_choices():
+        # Combine and sort items from both models
         items = sorted(
             chain(finished_goods.objects.all(), inventory.objects.all()),
             key=operator.attrgetter('item_name')
         )
-        # Generate choices as tuples of (item_name, item_name)
+        # Return a list of tuples for ChoiceField
         return [(item.item_name, item.item_name) for item in items]
-
-    # Override the `description` field choices property to use the dynamic choices
-    @property
-    def description_choices(self):
-        return self.get_description_choices()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Set the dynamic choices from the method
-        self.fields['description'].choices = self.get_description_choices()
+        # Set the dynamic choices each time the form is initialized
+        self.fields['description'].choices = self.get_dynamic_choices()
 
     no_of_unit = forms.FloatField(
         required = False,
