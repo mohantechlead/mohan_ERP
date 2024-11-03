@@ -58,7 +58,7 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
-       description = forms.ModelChoiceField(
+    description = forms.ModelChoiceField(
         queryset=sorted(
             chain(finished_goods.objects.all(), inventory.objects.all()),
             key=operator.attrgetter('item_name')
