@@ -59,20 +59,27 @@ class DeliveryForm(forms.ModelForm):
 
 class DeliverItemForm(forms.ModelForm):
     description = forms.ChoiceField(
-    choices=[
-        (item.item_name, item.item_name)  # Only include item_name without the model name prefix
-        for item in sorted(
+        widget=forms.Select(attrs={
+            'class': 'form-control select2',
+            'data-minimum-input-length': '0',  # Start filtering from the first character
+            'data-placeholder': 'Select or type an item',
+            'id': 'description'
+        })
+    )
+
+    @property
+    def description_choices(self):
+        # Fetch choices directly from the database
+        items = sorted(
             chain(finished_goods.objects.all(), inventory.objects.all()),
             key=operator.attrgetter('item_name')
         )
-    ],
-    widget=forms.Select(attrs={
-        'class': 'form-control select2',
-        'data-minimum-input-length': '0',  # Start filtering from the first character
-        'data-placeholder': 'Select or type an item',
-        'id': 'description'
-    }),
-)
+        return [(item.item_name, item.item_name) for item in items]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set the dynamic choices here
+        self.fields['description'].choices = self.description_choices
 
     
     no_of_unit = forms.FloatField(
