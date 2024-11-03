@@ -56,33 +56,24 @@ class DeliveryForm(forms.ModelForm):
     class Meta:
         model = delivery
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
-            
+
 class DeliverItemForm(forms.ModelForm):
     description = forms.ChoiceField(
-        choices=[],  # Placeholder; choices will be dynamically fetched
+        choices=[
+            (f"{item._meta.model_name}_{item.item_name}", f"{item.item_name}")
+            for item in sorted(
+                chain(finished_goods.objects.all(), inventory.objects.all()),
+                key=operator.attrgetter('item_name')
+            )
+        ],
         widget=forms.Select(attrs={
             'class': 'form-control select2',
-            'data-minimum-input-length': '0',
+            'data-minimum-input-length': '0',  # Start filtering from the first character
             'data-placeholder': 'Select or type an item',
             'id': 'description'
-        })
+        }),
     )
-
-    @staticmethod
-    def get_dynamic_choices():
-        # Combine and sort items from both models
-        items = sorted(
-            chain(finished_goods.objects.all(), inventory.objects.all()),
-            key=operator.attrgetter('item_name')
-        )
-        # Return a list of tuples for ChoiceField
-        return [(item.item_name, item.item_name) for item in items]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Set the dynamic choices each time the form is initialized
-        self.fields['description'].choices = self.get_dynamic_choices()
-
+    
     no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
