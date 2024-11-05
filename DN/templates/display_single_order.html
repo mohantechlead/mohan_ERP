@@ -123,6 +123,21 @@
                                                         
                                                     </tr>
                                                     {% endfor %}
+
+                                                    <tr>
+                                                        <th scope="row" colspan="4" class="text-end">Before VAT</th>
+                                                        <td class="text-end" id="total_price">{{my_fgrn.before_vat}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row" colspan="4" class="text-end">VAT</th>
+                                                        <td class="text-end" id="total_price">{{my_fgrn.vat_amount}}</td>
+                                                    </tr>
+                                                   
+                                                    <!-- end tr -->
+                                                     <tr>
+                                                        <th scope="row" colspan="4" class="text-end">Total</th>
+                                                        <td class="text-end" id="total_price">{{my_fgrn.final_price}}</td>
+                                                    </tr>
                                                    
             
                                                     {% comment %} <tr>
