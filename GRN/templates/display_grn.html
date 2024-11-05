@@ -6,7 +6,7 @@
     <h3>GRN Details</h3>
   </strong>
   
-  <form action="{% url 'search_grns' %}">
+  <!-- <form action="{% url 'search_grns' %}">
     <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
       <input type="text" name="PR_no" placeholder="PR No" class="form-control" style=" margin-top: 10px; ">
       <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search PR</button></div>
@@ -17,7 +17,7 @@
       <input type="text" name="GRN_no" placeholder="GRN No" class="form-control" style=" margin-top: 10px; ">
       <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search GRN</button></div>
     </div>
-  </form>
+  </form> -->
   <br>
   <br>
 
@@ -34,7 +34,8 @@
       </div>
     </div>
   </section>
-  <table class="table table-striped table-bordered">
+  <table class="table table-striped table-bordered" id="example">
+    <thead>
     <tr>
       <th>GRN Number</th>
       {% comment %} <th>PR Number</th> {% endcomment %}
@@ -47,6 +48,9 @@
       <th>Store Keeper</th>
      {% endcomment %}
     </tr>
+  </thead>
+
+  <tbody>
     {% for order in my_order %}
     <tr>
       <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
@@ -62,39 +66,10 @@
       {% endcomment %}
     </tr>
     {% endfor %}
+  </tbody>
   </table>
+    
 
-  <div><h4>Imports</h4></div>
-  <table class="table table-striped table-bordered">
-    <tr>
-      <th>GRN Number</th>
-      <th>PR Number</th>
-      <th>GRN Date</th>
-      <th>Transporter Name</th>
-      <th>Plate Number</th>
-      <th>Recieved From</th>
-      <th>Remaining</th>
-      <th>Store Name</th>
-      <th>Store Keeper</th>
-    
-    </tr>
-    {% for order in my_imports %}
-    <tr>
-      <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
-       --><td><a href="#" class="order-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</td>
-      <td>{{ order.PR_no.PR_no }}</td>
-      <td>{{ order.date }}</td>
-      <td>{{ order.transporter_name }}</td>
-      <td>{{ order.truck_no }}</td>
-      <td>{{ order.recieved_from }}</td>
-      <td>{{ order.PR_no.remaining }}</td>
-      <td>{{ order.store_name }}</td>
-      <td>{{ order.store_keeper }}</td>
-     
-    </tr>
-    {% endfor %}
-    
-  </table>
 </div>
 
 <script>
