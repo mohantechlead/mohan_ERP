@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 
 # Load CSV data
-df = pd.read_csv('order_items.csv')
+df = pd.read_csv('orders2.csv')
 
 # Connect to the Heroku PostgreSQL database
 conn = psycopg2.connect(
@@ -18,7 +18,7 @@ conn = psycopg2.connect(
 cur = conn.cursor()
 
 insert_query = """
-    INSERT INTO "DN_orders_items"(serial_no,description,unit_price,quantity,total_price) 
+    INSERT INTO "DN_orders_items"(serial_no,unit_price,quantity,total_price,description) 
     VALUES %s
 """
 

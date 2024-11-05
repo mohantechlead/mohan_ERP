@@ -98,9 +98,9 @@
                                                     <tr>
                                                         <th style="width: 70px;">No.</th>
                                                         <th>Item</th>
-                                                        <th>No of Unit</th>
-                                                        <th>Per unit KG</th>
                                                         <th>Quantity</th>
+                                                        <th>Unit Price</th>
+                                                        <th>Total Price</th>
                                                     </tr>
                                                 </thead><!-- end thead -->
                                                 <tbody>
@@ -117,9 +117,10 @@
                                                         </td>
                                 
                                                         
-                                                        <td> {{item.no_of_unit}} {{item.unit_type}}</td>
-                                                        <td>{{item.per_unit_kg}}</td>
                                                         <td> {{item.quantity}} {{item.measurement_unit}}</td>
+                                                        <td>{{item.unit_price}}</td>
+                                                        <td>{{item.total_price}}</td>
+                                                        
                                                         
                                                     </tr>
                                                     {% endfor %}

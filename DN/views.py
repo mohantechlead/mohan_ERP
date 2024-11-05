@@ -151,10 +151,11 @@ def input_orders(request):
             form.save()
             return redirect('input_orders')
     my_goods = finished_goods.objects.all()
+    my_customer = Customer.objects.all()
     form = OrderForm()
     formset = formset_factory(OrderItemForm, extra= 1)
     formset = formset(prefix="items")
-    context = {'form': form ,'my_goods': my_goods, 'formset': formset}
+    context = {'form': form ,'my_goods': my_goods, 'formset': formset, 'my_customer':my_customer}
     return render(request, 'input_orders.html', context)
 
 @login_required(login_url="login_user")
