@@ -12,6 +12,7 @@ class FGRN(models.Model):
     total_bags = models.FloatField(blank=True, null=True)
     total_crt = models.FloatField(blank=True, null=True)
     total_Pkg = models.FloatField(blank=True, null=True)
+    branch = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return str(self.FGRN_no)

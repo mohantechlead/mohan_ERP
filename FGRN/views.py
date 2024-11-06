@@ -18,6 +18,7 @@ from GRN.models import inventory_GRN_items
 @login_required(login_url="login_user")
 def create_fgrn(request):
     FGRNFormSet = formset_factory(FGRNItemForm, extra=1)
+    recieved_by = FGRN.objects.values_list('recieved_by', flat=True)
 
     if request.method == 'POST':
         form = FGRNForm(request.POST)
@@ -65,7 +66,9 @@ def create_fgrn(request):
         form = FGRNForm()
         formset = FGRNFormSet(prefix="items")
 
-    return render(request, 'create_fgrn.html', {'form': form, 'formset': formset})
+    print(recieved_by)
+
+    return render(request, 'create_fgrn.html', {'form': form, 'formset': formset, 'recieved_by': recieved_by})
 
 @login_required(login_url="login_user")
 def display_FGRN(request):

@@ -1,7 +1,5 @@
 {% extends "grn_base.html" %}
-
-
-
+{% load custom_filters %}
 {% block content %}
 <div style=" height: 50px;">
     {% if grn_form.errors %}
@@ -80,24 +78,25 @@
             <div class="col-sm-8" style="margin-top: 10px;">
                 <input list="transporter_name" type="text" class="form-control" name="transporter_name">
                 <datalist id="transporter_name">
-                    <option value="TADESSE KEBEDE">
-                    <option value="DEMEKE ABATE">
-                    <option value="ABERA LEMMA">
+                    {% for name in transporter_name|unique %}
+                    <option value="{{ name }}">
+                    {% endfor %}
                 </datalist>
+              
             </div>
         </div>
         <span class="form-group">
             <label class="control-label col-sm-4"> Plate No</label>
             <div class="col-sm-8">
 
-                <input id="plate_no" type="text" class="form-control" name="truck_no">
-                <datalist id="plate_no">
-                    <option value="3-A47325">
-                    <option value="3-B40589">
-                    <option value="3-A17781">
-                    <option vlaue="3-A70179">
-                    <option value="3-20580">
+                <input id="plate_no" type="text" class="form-control" name="truck_no" list="truck_no">
+
+                <datalist id="truck_no">
+                    {% for name in plate_no|unique %}
+                    <option value="{{ name }}">
+                    {% endfor %}
                 </datalist>
+               
             </div>
         </span>
     </div>
@@ -109,30 +108,27 @@
             <label class="control-label col-sm-4" style="margin-top: 10px;">Store Name</label>
             <div class="col-sm-8" style="margin-top: 10px;">
                 <input type="text" list="store_name" placeholder="store" name="store_name" class="form-control "  style="width: 100%;">
-                <datalist id="store_name"> 
-                    {% for order in grns %}
-                    <option value="{{order.store_name}}"></option>
+
+                <datalist id="store_name">
+                    {% for name in store_name|unique %}
+                    <option value="{{ name }}">
                     {% endfor %}
-                  </datalist>
+                </datalist>
+               
             </div>
             <label class="control-label col-sm-4" style="margin-top: 10px;">Store Keeper</label>
             <div class="col-sm-8" style="margin-top: 10px;">
-                <input type="text" list="store_keeper" placeholder="keeper" name="store_keeper" class="form-control "
+                <input type="text" list="store_keeper" placeholder="keeper" name="store_keeper" class="form-control " style="width: 100%;">
 
-                style="width: 100%;">
+                <datalist id="store_keeper">
+                    {% for name in store_keeper|unique %}
+                    <option value="{{ name }}">
+                    {% endfor %}
+                </datalist>
   
-              <datalist id="store_keeper">
-                {% for order in grns %}
-                <option value="{{order.store_keeper}}"></option>
-                {% endfor %}
-              </datalist>
-
+             
             </div>
-            <!-- <label class="control-label col-sm-4" style="margin-top: 10px;">Invoice Type</label>
-          <div class="col-sm-8" style="margin-top: 10px;">
-            <input type="text" class="form-control" name="invoice_type">
-            
-          </div> -->
+          
         </div>
     </div>
     
@@ -140,18 +136,6 @@
 
 </form>
 </div></div></div>
-<!-- <div style=""><table>
-    <tr>
-        <th >Item Name</th> 
-        <th>Remaining</th>
-    </tr>
-    {% for item in pr_items%}
-    <tr>
-        <td>{{item.item_name}}</td>
-        <td>{{item.remaining}}</td>
-    </tr>
-    {% endfor %}
-</table></div> -->
 <div class="container mt-2">
     <div class="row">
         <div class="col-md-12">
@@ -193,7 +177,7 @@
         </div></div></div>
 
         <button id="submits" class="col-sm-3 btn-lg " style="color: #6d7fcc; background-color: white; margin-left: 100px;">
-            Submits
+            Submit
         </button>
         <script src="../../static/js/grn/create_grn.js"></script>
             

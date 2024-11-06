@@ -10,15 +10,15 @@ class FGRNForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'id': 'date'})
     )
     recieved_from = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received From', 'id': 'recieved_from'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received From', 'id': 'recieved_from', 'list': 'received_options'})
     )
     recieved_by = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received By', 'id': 'recieved_by'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received By', 'id': 'recieved_by', 'list':'recieved_by_option'})
     )
     
     class Meta:
         model = FGRN
-        fields = ['FGRN_no', 'date', 'recieved_from', 'recieved_by']
+        fields = ['FGRN_no', 'date', 'recieved_from', 'recieved_by', 'branch']
    
 class FGRNItemForm(forms.ModelForm):
     

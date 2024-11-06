@@ -93,6 +93,11 @@ def create_trial_grn(request):
 
 @login_required(login_url="login_user")
 def create_grn(request):
+    transporter_name = GRN.objects.values_list('transporter_name', flat=True)
+    plate_no = GRN.objects.values_list('truck_no', flat=True)
+    store_name = GRN.objects.values_list('store_name', flat=True)
+    store_keeper = GRN.objects.values_list('store_keeper', flat=True)
+
     if request.method == 'POST':
         form = GRNForm(request.POST)
         
@@ -114,7 +119,14 @@ def create_grn(request):
     formset = formset_factory(GRNItemForm, extra= 1)
     formset = formset(prefix="GRN_items")
     print(formset)
-    return render(request,'create_grn.html',{'form': form, 'formset': formset})
+    context = {'form': form, 
+               'formset': formset,
+               'transporter_name': transporter_name, 
+               'plate_no' : plate_no,
+               'store_name' : store_name,
+               'store_keeper' : store_keeper,
+               }
+    return render(request,'create_grn.html',context)
 
 @login_required(login_url="login_user")
 def create_grn_items(request):
