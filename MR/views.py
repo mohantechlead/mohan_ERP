@@ -24,6 +24,9 @@ from DN.models import inventory_DN_items
 @login_required(login_url="login_user")
 def create_MR(request):
     MRFormSet = formset_factory(MRItemForm, extra=1)
+    
+    recieved_from = MR.objects.values_list('MR_store', flat=True)
+    recieved_to = MR.objects.values_list('desc', flat=True)
 
     if request.method == 'POST':
         form = MRForm(request.POST)
@@ -71,7 +74,7 @@ def create_MR(request):
         form = MRForm()
         formset = MRFormSet(prefix="items")
 
-    return render(request, 'create_mr.html', {'form': form, 'formset': formset})
+    return render(request, 'create_mr.html', {'form': form, 'formset': formset, 'recieved_from': recieved_from, 'recieved_to': recieved_to})
 
 @login_required(login_url="login_user")
 def edit_parent_and_children(request, MR_no):

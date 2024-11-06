@@ -49,7 +49,7 @@ def delivery_list(request):
 @login_required(login_url="login_user")
 def input_delivery(request):
     my_orders = orders.objects.all()
-    
+    truck_number = delivery.objects.values_list('truck_number', flat=True)
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
         delivery_number = request.POST['delivery_number']
@@ -69,7 +69,7 @@ def input_delivery(request):
     form = DeliveryForm()
     formset = formset_factory(DeliverItemForm, extra= 1)
     formset = formset(prefix="items")
-    return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 'formset':formset})
+    return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 'formset':formset, 'truck_number': truck_number})
 
 @login_required(login_url="login_user")
 def input_delivery_items(request):
@@ -144,6 +144,7 @@ def deliveries(request):
 @login_required(login_url="login_user")
 #for creating Orders
 def input_orders(request):
+    customer = Customer.objects.values_list('company', flat=True)
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -154,7 +155,7 @@ def input_orders(request):
     form = OrderForm()
     formset = formset_factory(OrderItemForm, extra= 1)
     formset = formset(prefix="items")
-    context = {'form': form ,'my_goods': my_goods, 'formset': formset}
+    context = {'form': form ,'my_goods': my_goods, 'formset': formset, 'my_customer':customer}
     return render(request, 'input_orders.html', context)
 
 @login_required(login_url="login_user")

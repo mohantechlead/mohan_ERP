@@ -19,6 +19,11 @@ def filter_by_month(items, month):
 def filter_by_branch(items, branch):
      return items.filter(MR_no__branch=branch)
 
+
+@register.filter
+def unique(values):
+    return list(set(values))
+
 @register.filter
 def classname(obj):
     return obj.__class__.__name__

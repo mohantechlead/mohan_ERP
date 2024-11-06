@@ -21,8 +21,8 @@
           <div class="col-sm-8" style="margin-top: 10px;">
             <input type="text" list="orders" placeholder="name" name="customer_name" class="form-control" >
             <datalist id="orders">
-              {% for order in orders %}
-                  <option value="{{order.customer_name}}"></option>
+              {% for name in my_customer|unique %}
+                  <option value="{{ name }}"></option>
               {% endfor %}
             </datalist>
           </div>
