@@ -80,7 +80,7 @@
                                 <div class="col-sm-11">
                                 {{ form.recieved_by }}
                                 <datalist id="recieved_by_option">
-                                    {% for name in recieved_by|unique %}
+                                    {% for name in recieved_by %}
                                     <option value="{{ name }}">
                                     {% endfor %}
                                 </datalist>

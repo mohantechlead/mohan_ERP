@@ -78,7 +78,7 @@
             <div class="col-sm-8" style="margin-top: 10px;">
                 <input list="transporter_name" type="text" class="form-control" name="transporter_name">
                 <datalist id="transporter_name">
-                    {% for name in transporter_name|unique %}
+                    {% for name in transporter_name %}
                     <option value="{{ name }}">
                     {% endfor %}
                 </datalist>
@@ -92,7 +92,7 @@
                 <input id="plate_no" type="text" class="form-control" name="truck_no" list="truck_no">
 
                 <datalist id="truck_no">
-                    {% for name in plate_no|unique %}
+                    {% for name in plate_no %}
                     <option value="{{ name }}">
                     {% endfor %}
                 </datalist>
@@ -110,7 +110,7 @@
                 <input type="text" list="store_name" placeholder="store" name="store_name" class="form-control "  style="width: 100%;">
 
                 <datalist id="store_name">
-                    {% for name in store_name|unique %}
+                    {% for name in store_name %}
                     <option value="{{ name }}">
                     {% endfor %}
                 </datalist>
@@ -121,7 +121,7 @@
                 <input type="text" list="store_keeper" placeholder="keeper" name="store_keeper" class="form-control " style="width: 100%;">
 
                 <datalist id="store_keeper">
-                    {% for name in store_keeper|unique %}
+                    {% for name in store_keeper %}
                     <option value="{{ name }}">
                     {% endfor %}
                 </datalist>

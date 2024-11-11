@@ -30,7 +30,7 @@
                                         <input type="text" list="recieved_from_option" class="form-control" name="MR_store" autocomplete="off" placeholder="Received From">
                                         
                                         <datalist id="recieved_from_option">
-                                            {% for name in recieved_from|unique %}
+                                            {% for name in recieved_from %}
                                                 <option value="{{ name }}">
                                             {% endfor %}
                                         </datalist>
@@ -43,7 +43,7 @@
                                 <input type="text" list="recieved_to_option" class="form-control" name="desc" autocomplete="off">
 
                                 <datalist id="recieved_to_option">
-                                    {% for name in recieved_to|unique %}
+                                    {% for name in recieved_to %}
                                     <option value="{{ name }}">
                                     {% endfor %}
                                 </datalist>
