@@ -123,8 +123,6 @@ def input_delivery_items(request):
     }
     return render(request, 'input_delivery.html', context)
 
-
-
 @login_required(login_url="login_user")
 #To display the delivery notes for a specific order number
 def deliveries(request):

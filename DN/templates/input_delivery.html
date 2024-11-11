@@ -1,5 +1,5 @@
 {% extends 'deliveries_base.html' %}
-{% load custom_filters %}
+
 {% block content %}
     <h1>Input Delivery Information</h1>
     <div>
@@ -42,7 +42,7 @@
             <input type="text" list="my_orders" placeholder="Order No" name="serial_no" class="form-control "
                   style="width: 100%;">
                 <datalist id="my_orders">
-                  {% for order in my_orders|unique %}
+                  {% for order in my_orders %}
                   <option value="{{order.serial_no}}"></option>
                   {% endfor %}
                 </datalist>
@@ -95,12 +95,7 @@
         <div class="form-group" >
           <label class="control-label col-sm-6">Truck Number</label>
           <div class="col-sm-8" style="margin-top: 10px;">
-            <input type="text" class="form-control" name="truck_number" list="truck_number">
-            <datalist id="truck_number">
-              {% for name in truck_number|unique %}
-              <option value="{{ name }}">
-              {% endfor %}
-            </datalist>
+            <input type="text" class="form-control" name="truck_number">
           </div>
         </div>
      
