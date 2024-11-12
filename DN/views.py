@@ -176,6 +176,7 @@ def input_orders_items(request):
                 final_price  = 0.0
                 before_vat = 0.0
                 final_unit = 0.0
+                vat = 0.0
                 for form in non_empty_forms:
                     form.instance.serial_no = Order_instance
                    
