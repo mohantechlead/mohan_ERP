@@ -188,14 +188,14 @@ def input_orders_items(request):
                     Order_instance.vat_amount = vat_amount
                     final_price += total_price + vat_amount
                     Order_instance.final_price = final_price
-                    before_vat += total_price  
-                    Order_instance.before_vat = before_vat
+                before_vat += total_price  
+                Order_instance.before_vat = before_vat
                     
-                    form.instance.remaining_quantity = quantity
-                    form.instance.remaining_unit = no_of_unit
-                    form.save()
+                form.instance.remaining_quantity = quantity
+                form.instance.remaining_unit = no_of_unit
+                form.save()
          
-                    Order_instance.save()
+                Order_instance.save()
                     
                     
             else:
