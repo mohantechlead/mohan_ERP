@@ -184,18 +184,19 @@ def input_orders_items(request):
                     total_price = form.cleaned_data['total_price']
             
                     final_unit += no_of_unit
-                    vat_amount += total_price * 0.15
-                    Order_instance.vat_amount = vat_amount
+                    vat_amount = total_price * 0.15
+                    vat += vat_amount
+                    Order_instance.vat_amount = vat
                     final_price += total_price + vat_amount
                     Order_instance.final_price = final_price
-                before_vat += total_price  
-                Order_instance.before_vat = before_vat
+                    before_vat += total_price  
+                    Order_instance.before_vat = before_vat
                     
-                form.instance.remaining_quantity = quantity
-                form.instance.remaining_unit = no_of_unit
-                form.save()
+                    form.instance.remaining_quantity = quantity
+                    form.instance.remaining_unit = no_of_unit
+                    form.save()
          
-                Order_instance.save()
+                    Order_instance.save()
                     
                     
             else:
