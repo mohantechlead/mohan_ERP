@@ -603,7 +603,6 @@ def create_pr(request):
             #instance.PR_before_vat = 0.00
             #instance.PR_total_price = 0.00
             instance.excise_tax = excise
-            instance.vat = instance.total_price - instance.before_vat
 
             instance.save()
             
