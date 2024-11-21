@@ -2,6 +2,41 @@ from django import forms
 from .models import *
 
 
+class FinishedGoodsGroupForm(forms.ModelForm):
+    class Meta:
+        model = FinishedGoodsGroup
+        fields = ['finished_good', 'order_items']
+        widgets = {
+            'order_items': forms.CheckboxSelectMultiple(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        finished_good = kwargs.get('instance', None)
+        
+        # If the form is being initialized with data (POST request), try to capture finished_good
+        if 'data' in kwargs:
+            data = kwargs['data']
+            finished_good_id = data.get('finished_good', None)
+            if finished_good_id:
+                finished_good = finished_good_id
+        
+        # Check if finished_good is provided and filter the order_items
+        if finished_good:
+            # Find all existing FinishedGoodsGroup entries with the given finished_good
+            existing_order_items = FinishedGoodsGroup.objects.filter(finished_good=finished_good)
+            
+            # Collect all order_items that are already assigned to this finished_good
+            existing_items = [item for group in existing_order_items for item in group.order_items.all()]
+            queryset = inventory_order_items.objects.exclude(id__in=[item.id for item in existing_items])
+        else:
+            queryset = inventory_order_items.objects.all()
+
+        super().__init__(*args, **kwargs)
+        
+        # Apply the filtered queryset to the order_items field
+        self.fields['order_items'].queryset = queryset
+
+
 class FGRNForm(forms.ModelForm):
     FGRN_no = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'FGRN Number', 'id': 'FGRN_no'})

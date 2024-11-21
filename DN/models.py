@@ -107,5 +107,17 @@ class inventory_DN_items(models.Model):
     def __str__(self):
         return self.item_name
     
+class inventory_order_items(models.Model):
+    item_name = models.TextField(blank=True, primary_key=True)
+    total_no_of_unit = models.FloatField(blank=True, null=True)
+    total_quantity = models.FloatField(blank=True)
+    branch = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name'] 
+
+    def __str__(self):
+        return self.item_name
+    
 
 
