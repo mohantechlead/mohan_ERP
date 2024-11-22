@@ -62,7 +62,7 @@ class DeliverItemForm(forms.ModelForm):
     choices=[
         (item.item_name, item.item_name)  # Only include item_name without the model name prefix
         for item in sorted(
-            chain(finished_goods.objects.all(), inventory.objects.all()),
+            chain(inventory_order_items.objects.all(), inventory.objects.all()),
             key=operator.attrgetter('item_name')
         )
     ],
@@ -73,6 +73,7 @@ class DeliverItemForm(forms.ModelForm):
         'id': 'description'
     }),
 )
+
 
     
     no_of_unit = forms.FloatField(
@@ -133,7 +134,7 @@ class OrderItemForm(forms.ModelForm):
     choices=[
         (item.item_name, item.item_name)  # Only include item_name without the model name prefix
         for item in sorted(
-            chain(finished_goods.objects.all(), inventory.objects.all()),
+            chain(inventory_order_items.objects.all(), inventory.objects.all()),
             key=operator.attrgetter('item_name')
         )
     ],

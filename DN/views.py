@@ -139,6 +139,30 @@ def deliveries(request):
   }
 
   return render(request, 'deliveries.html', context)
+
+@login_required(login_url="login_user")
+def display_orders_items(request):
+    item_quantities = orders_items.objects.values('description').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+  
+    for item in item_quantities:
+        inventory_order_items.objects.update_or_create(
+            item_name=item['description'],
+            defaults={'total_quantity': item['total_quantity'],
+                      'total_no_of_unit': item['total_no_of_unit']}
+            
+        )
+        print(f"Name: {item['description']}, Total Quantity: {item['total_quantity']}, Total No of Unit: {item['total_no_of_unit']}")
+    
+
+    items = inventory_order_items.objects.all().order_by('item_name')    
+    print(items)
+    context = {
+        # 'total_quantity':item_quantities,
+        'items':items,
+        
+    }
+
+    return render(request, 'display_orders_items.html', context)
 @login_required(login_url="login_user")
 #for creating Orders
 def input_orders(request):

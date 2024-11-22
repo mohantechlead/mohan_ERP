@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import django_heroku
 from pathlib import Path
 import dj_database_url
+from dotenv import load_dotenv
+import os
 
 import os
 
@@ -165,5 +167,13 @@ EMAIL_HOST_USER = 'tech@mohanplc.com'
 EMAIL_HOST_PASSWORD = 'ieqlewrifhfvhesd'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+
+
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+# GEMINI_SECRET_KEY = os.getenv("GEMINI_SECRET_KEY")
+
 
 
