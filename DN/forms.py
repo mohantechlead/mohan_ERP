@@ -101,9 +101,7 @@ class DeliverItemForm(forms.ModelForm):
     
     Measurement_unit_choices =( 
         ("", ""),
-    ("kgs", "kgs"), 
-    ("Pair", "Pair"),
-    ("Pcs", "Pcs")) 
+    ("kgs", "kgs")) 
 
     measurement_unit = forms.ChoiceField(
         choices = Measurement_unit_choices,
@@ -118,14 +116,6 @@ class DeliverItemForm(forms.ModelForm):
     class Meta:
         model = delivery_items
         fields = ['description', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Refresh queryset to capture new items from finished_goods and inventory
-        self.fields['description'].queryset = sorted(
-            chain(finished_goods.objects.all(), inventory.objects.all()),
-            key=operator.attrgetter('item_name')
-        )
 
 
 class OrderItemForm(forms.ModelForm):
@@ -179,9 +169,7 @@ class OrderItemForm(forms.ModelForm):
     
     Measurement_unit_choices =( 
         ("", ""),
-    ("kgs", "kgs"), 
-    ("Pair", "Pair"),
-    ("Pcs", "Pcs")) 
+    ("kgs", "kgs")) 
 
     measurement_unit = forms.ChoiceField(
         choices = Measurement_unit_choices,

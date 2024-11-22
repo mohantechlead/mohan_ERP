@@ -176,7 +176,6 @@ def input_orders_items(request):
                 final_price  = 0.0
                 before_vat = 0.0
                 final_unit = 0.0
-                vat = 0.0
                 for form in non_empty_forms:
                     form.instance.serial_no = Order_instance
                    
@@ -185,9 +184,8 @@ def input_orders_items(request):
                     total_price = form.cleaned_data['total_price']
             
                     final_unit += no_of_unit
-                    vat_amount = total_price * 0.15
-                    vat += vat_amount
-                    Order_instance.vat_amount = vat
+                    vat_amount += total_price * 0.15
+                    Order_instance.vat_amount = vat_amount
                     final_price += total_price + vat_amount
                     Order_instance.final_price = final_price
                     before_vat += total_price  

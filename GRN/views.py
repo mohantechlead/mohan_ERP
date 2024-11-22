@@ -602,7 +602,7 @@ def create_pr(request):
             instance.status = "Approved"
             #instance.PR_before_vat = 0.00
             #instance.PR_total_price = 0.00
-            instance.excise_tax = excise
+            
 
             instance.save()
             
