@@ -9,5 +9,4 @@ urlpatterns = [
     path('fgrn_opening_balance', views.fgrn_opening_balances, name='fgrn_opening_balance'),
     path('display_single_fgrn', views.display_single_fgrn, name='display_single_fgrn'),
     path('display_FGRN_items', views.display_FGRN_items, name='display_FGRN_items'),
-    path('create_group/', views.create_group, name='create_group'),
 ]

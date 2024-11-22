@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-from DN.models import inventory_order_items 
 
 # Create your models here.
 class FGRN(models.Model):
@@ -38,6 +37,9 @@ class FGRN_item(models.Model):
  
     class Meta:
         ordering = ['FGRN_no'] 
+
+        
+
 
 class finished_goods(models.Model):
     item_name = models.TextField(primary_key=True)
@@ -87,21 +89,4 @@ class inventory_FGRN_items(models.Model):
 
     def __str__(self):
         return self.item_name
-    
-class FinishedGoodsGroup(models.Model):
-    group_name = models.CharField(max_length=255, editable=False)  # Prevent editing directly
-    finished_good = models.ForeignKey('finished_goods', on_delete=models.CASCADE, related_name='groups')
-    order_items = models.ManyToManyField('DN.inventory_order_items')  # Change to ManyToManyField
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        # Automatically set group_name to the finished_good's item_name before saving
-        if self.finished_good:
-            self.group_name = str(self.finished_good)  # Ensure group_name reflects finished_good's item_name
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.group_name
-
 

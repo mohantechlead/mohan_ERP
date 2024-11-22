@@ -14,7 +14,6 @@ from MR.models import *
 from .decorators import allowed_users
 from DN.models import delivery_items, inventory_DN_items
 from GRN.models import inventory_GRN_items
-import uuid
 
 @login_required(login_url="login_user")
 def create_fgrn(request):
@@ -151,43 +150,6 @@ def display_goods(request):
 
     all_names = names_a.union(names_b).union(names_c)
 
-    for name in names_b:
-    # Check if this name exists as an order_items in FinishedGoodsGroup
-        finished_goods_group = FinishedGoodsGroup.objects.filter(order_items__item_name=name).first()
-
-        # If a FinishedGoodsGroup with this item_name exists, proceed with the calculation
-        if finished_goods_group:
-            print(finished_goods_group.group_name)
-            # Now we can safely check the quantities from the other models
-            quantity_a = inventory_FGRN_items.objects.filter(item_name=name).first()
-            quantity_b = inventory_DN_items.objects.filter(item_name=name).first()
-            quantity_c = FGRNopening_balance.objects.filter(item_name=finished_goods_group.group_name).first()
-
-            # Initialize the quantities or set to 0 if not found
-            quantity_a_value = quantity_a.total_quantity if quantity_a else 0
-            quantity_b_value = quantity_b.total_quantity if quantity_b else 0
-            quantity_c_value = quantity_c.quantity if quantity_c else 0
-
-            units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
-            units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
-            units_c_value = quantity_c.no_of_unit if quantity_c else 0
-
-            # Calculate the result: Subtract ModelA and ModelC, and add ModelB
-            result_quantity = quantity_c_value - quantity_b_value + quantity_a_value
-            result_units = units_c_value - units_b_value + units_a_value
-
-            # Here you can decide what to do with the result_quantity and result_units, 
-            # such as saving it in a model or printing it.
-            print(f"Item: {name} | Group: {finished_goods_group.group_name} | Result Quantity: {result_quantity} | Result Units: {result_units}")
-
-            finished_goods.objects.update_or_create(
-            item_name=finished_goods_group.group_name,  # Match based on group_name
-            defaults={
-                'quantity': result_quantity,  # Update the quantity
-                'no_of_unit': result_units  # Update the number of units
-            }
-        )
-            
     for name in all_names:
         # Get the quantity from each model
         if name in finished_goods_names:
@@ -269,32 +231,3 @@ def display_FGRN_items(request):
     }
 
     return render(request,'display_FGRN_items.html',context)
-
-def create_group(request):
-    if request.method == 'POST':
-        form = FinishedGoodsGroupForm(request.POST)
-        if form.is_valid():
-            finished_good = form.cleaned_data['finished_good']
-            group_name = str(finished_good)  # Get the group name based on the selected finished_good
-
-            # Check if the group already exists based on the finished_good's group_name
-            existing_group = FinishedGoodsGroup.objects.filter(group_name=group_name).first()
-
-            if existing_group:
-                # If the group already exists, update the existing group with new order_items
-                existing_group.order_items.set(form.cleaned_data['order_items'])
-                messages.success(request, f"Group '{group_name}' has been updated with the selected items.")
-                return redirect('create_group')  # Redirect after successful update
-            else:
-                # If no existing group, create a new group
-                group = form.save(commit=False)  # Don't save yet
-                group.group_name = group_name  # Set the group name from finished_good
-                group.save()  # Save the new group
-                group.order_items.set(form.cleaned_data['order_items'])  # Associate the selected order_items
-
-                messages.success(request, f"New group '{group_name}' has been created with the selected items.")
-                return redirect('create_group')  # Redirect after successful creation
-    else:
-        form = FinishedGoodsGroupForm()
-
-    return render(request, 'create_group.html', {'form': form})

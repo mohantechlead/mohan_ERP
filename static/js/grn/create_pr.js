@@ -239,7 +239,7 @@ radioButtons.forEach(button => {
                 document.getElementById('form2').reset();
 
                 // Reload the page
-                // window.location.reload();
+                window.location.reload();
                
             })
             .catch(error => {
