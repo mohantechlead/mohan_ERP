@@ -90,7 +90,9 @@ class FGRNItemForm(forms.ModelForm):
 
     Measurement_unit_choices =( 
         ("", ""),
-    ("kgs", "kgs")) 
+    ("kgs", "kgs"), 
+    ("Pair", "Pair"),
+    ("Pcs", "Pcs" )) 
 
     # measurement_unit = forms.CharField(
     #     widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add measurement units'})
