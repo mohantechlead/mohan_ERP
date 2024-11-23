@@ -792,3 +792,27 @@ def display_DN_items(request):
     }
 
     return render(request,'display_DN_items.html',context)
+
+@login_required(login_url="login_user")
+def display_order_items(request):
+    if request.method == 'POST':
+        form = OrderInventoryForm(request.POST)
+
+        if form.errors:
+            print(form.errors)
+
+        if form.is_valid():
+            form.save()
+            return redirect('display_order_items')
+    
+    form = OrderInventoryForm()
+
+    
+    items = inventory_order_items.objects.all().order_by('item_name')
+    print(items)
+    context = {
+        'items':items,
+        'form':form,
+    }
+
+    return render(request,'display_order_items.html',context)

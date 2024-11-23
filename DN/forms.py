@@ -210,3 +210,10 @@ class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = [ 'company','contact_person', 'phone_number', 'email','address']
+
+class OrderInventoryForm(forms.ModelForm):
+    
+    class Meta:
+   
+        model = inventory_order_items
+        fields = ['item_name','total_quantity','total_no_of_unit','branch']
