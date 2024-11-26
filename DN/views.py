@@ -809,8 +809,10 @@ def display_order_items(request):
 
     
     items = inventory_order_items.objects.all().order_by('item_name')
+    group_name = finished_goods.objects.all().order_by('item_name')
     print(items)
     context = {
+        'group':group_name,
         'items':items,
         'form':form,
     }

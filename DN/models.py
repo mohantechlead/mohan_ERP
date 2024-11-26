@@ -112,7 +112,7 @@ class inventory_order_items(models.Model):
     total_no_of_unit = models.FloatField(blank=True, null=True)
     total_quantity = models.FloatField(blank=True)
     branch = models.TextField(blank=True, null=True)
-
+    group = models.TextField(blank=True, null=True)
     class Meta:
         ordering = ['item_name'] 
 
