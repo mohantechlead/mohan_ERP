@@ -34,9 +34,9 @@ class PRItemForm(forms.ModelForm):
     quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
     price = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'price form-control'}))
     item_measurement = forms.CharField(widget=forms.TextInput(attrs={'class': 'item_measurement form-control'}), required=False)
-    item_name= forms.ModelChoiceField(
-        queryset=inventory.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control'}),
+     item_name = forms.CharField(
+        required = False,
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
     )
     hs_code = forms.CharField(label='HS CODE', required=False, widget=forms.TextInput(attrs={'class': 'hs_codes form-control'}))
     
