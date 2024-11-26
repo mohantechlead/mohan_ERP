@@ -807,7 +807,7 @@ def display_order_items(request):
     
     form = OrderInventoryForm()
 
-    item_quantities = order_items.objects.values('description').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+    item_quantities = orders_items.objects.values('description').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
   
     for item in item_quantities:
         inventory_order_items.objects.update_or_create(
