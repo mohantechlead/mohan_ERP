@@ -12,7 +12,7 @@ from django.db.models import Sum
 from django.http import JsonResponse
 from MR.models import *
 from .decorators import allowed_users
-from DN.models import delivery_items, inventory_DN_items
+from DN.models import delivery_items, inventory_DN_items, inventory_order_items
 from GRN.models import inventory_GRN_items
 
 @login_required(login_url="login_user")
@@ -127,64 +127,97 @@ def display_single_fgrn(request):
 
 @login_required(login_url="login_user")
 def display_goods(request):
-    if request.method == 'POST':
-        form = InventoryItemForm(request.POST)
+    # Fetch all DN items
+    dn_items = inventory_DN_items.objects.all().order_by('item_name')
 
-        if form.errors:
-            print(form.errors)
+    # Get all groups from inventory_order_items
+    order_items_with_groups = inventory_order_items.objects.values('item_name', 'group')
 
-        if form.is_valid():
-            form.save()
-            return redirect('display_goods')
-    
-    form = InventoryItemForm()
+    # Create a mapping of groups to item names
+    group_to_items = {}
+    for item in order_items_with_groups:
+        group = item['group']
+        item_name = item['item_name']
+        if group:  # Ensure group is not empty or null
+            if group not in group_to_items:
+                group_to_items[group] = []
+            group_to_items[group].append(item_name)
 
-    finished_goods_names = set(finished_goods.objects.values_list('item_name', flat=True))
-    mr_names = set(inventory.objects.values_list('item_name', flat=True))
+    # Iterate through DN items to calculate
+    for dn_item in dn_items:
+        item_name = dn_item.item_name
 
-    names_a = set(inventory_FGRN_items.objects.values_list('item_name', flat=True))
-    names_b = set(inventory_DN_items.objects.values_list('item_name', flat=True))
-    names_c = set(FGRNopening_balance.objects.values_list('item_name', flat=True))
-
-    
-
-    all_names = names_a.union(names_b).union(names_c)
-
-    for name in all_names:
-        # Get the quantity from each model
-        if name in finished_goods_names:
-            quantity_a = inventory_FGRN_items.objects.filter(item_name=name).first()
-            quantity_b = inventory_DN_items.objects.filter(item_name=name).first()
-            quantity_c = FGRNopening_balance.objects.filter(item_name=name).first()
-            
-            # Initialize the quantities or set to 0 if not found
-            quantity_a_value = quantity_a.total_quantity if quantity_a else 0
-            quantity_b_value = quantity_b.total_quantity if quantity_b else 0
-            quantity_c_value = quantity_c.quantity if quantity_c else 0
-
-            units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
-            units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
-            units_c_value = quantity_c.no_of_unit if quantity_c else 0
-            
-            # Calculate the result: Subtract ModelA and ModelC, and add ModelB
-            result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value 
-            result_units = units_c_value - units_b_value + units_a_value
+        # Check if item has a group name, else use item_name itself
+        group_name = None
+        for group, item_names in group_to_items.items():
+            if item_name in item_names:
+                group_name = group
+                break
         
-            # Save or update the result in ModelD
-            finished_goods.objects.update_or_create(
-                item_name=name,
-                defaults={'quantity': result_quantity,
-                        'no_of_unit': result_units}
-            )
+        # If no group is found, use the item_name itself
+        if not group_name:
+            group_name = item_name
 
+        # Initialize totals for the group/item
+        total_quantity_a = 0
+        total_quantity_b = 0
+        total_quantity_c = 0
+
+        total_units_a = 0
+        total_units_b = 0
+        total_units_c = 0
+
+        # Aggregate values for all items in the group or for the item itself
+        if group_name == item_name:
+            # Item does not belong to a group, calculate based on the item itself
+            quantity_a = inventory_FGRN_items.objects.filter(item_name=item_name).first()
+            quantity_b = inventory_DN_items.objects.filter(item_name=item_name).first()
+            quantity_c = FGRNopening_balance.objects.filter(item_name=item_name).first()
+
+            total_quantity_a = quantity_a.total_quantity if quantity_a else 0
+            total_quantity_b = quantity_b.total_quantity if quantity_b else 0
+            total_quantity_c = quantity_c.quantity if quantity_c else 0
+
+            total_units_a = quantity_a.total_no_of_unit if quantity_a else 0
+            total_units_b = quantity_b.total_no_of_unit if quantity_b else 0
+            total_units_c = quantity_c.no_of_unit if quantity_c else 0
+        else:
+            # If group exists, calculate for the group
+            for item_name_in_group in group_to_items[group_name]:
+                quantity_a = inventory_FGRN_items.objects.filter(item_name=item_name_in_group).first()
+                quantity_b = inventory_DN_items.objects.filter(item_name=item_name_in_group).first()
+                quantity_c = FGRNopening_balance.objects.filter(item_name=group_name).first()
+
+                # Accumulate quantities
+                total_quantity_a += quantity_a.total_quantity if quantity_a else 0
+                total_quantity_b += quantity_b.total_quantity if quantity_b else 0
+                total_quantity_c += quantity_c.quantity if quantity_c else 0
+
+                # Accumulate units
+                total_units_a += quantity_a.total_no_of_unit if quantity_a else 0
+                total_units_b += quantity_b.total_no_of_unit if quantity_b else 0
+                total_units_c += quantity_c.no_of_unit if quantity_c else 0
+
+        # Calculate the final result for the group or item
+        result_quantity = total_quantity_c - total_quantity_b + total_quantity_a
+        result_units = total_units_c - total_units_b + total_units_a
+
+        # Log the group or item being updated for debugging
+        print(f"Updating or creating: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
+
+        # Update or create in finished_goods using the group name or item_name
+        finished_goods.objects.update_or_create(
+            item_name=group_name,  # Use group name if available, else item_name
+            defaults={'quantity': result_quantity, 'no_of_unit': result_units}
+        )
+
+    # Render the context
     items = finished_goods.objects.all().order_by('item_name')
-    print(items)
     context = {
-        'items':items,
-        'form':form,
+        'items': items,
     }
 
-    return render(request,'display_goods.html',context)
+    return render(request, 'display_goods.html', context)
 
 @login_required(login_url="login_user")
 def fgrn_opening_balances(request):

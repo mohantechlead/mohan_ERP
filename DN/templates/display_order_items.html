@@ -4,7 +4,7 @@
 <div class="form-group pull-left">
   <div style="margin-left: 200px;">
     <strong>
-        <h2>FGRN Inventory Details</h2>
+        <h2>Order Inventory Details</h2>
       </strong>
   </div>
  
@@ -23,9 +23,8 @@
                     <tr>
                       <th>Item Name </th>
                       <th>Quantity</th>
-                      <th>Measurement Type</th>
                       <th>No of Unit</th>
-                      <th>Unit Type</th>
+                      <th>Inventory Group</th>                     
                     </tr>
                   </thead>
 
@@ -33,10 +32,9 @@
                     {% for item in items %}
                     <tr>
                     <td>{{ item.item_name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>{{ item.measurement_type }}</td>
-                    <td>{{ item.no_of_unit }}</td>
-                    <td>{{ item.unit_type }}</td>
+                    <td>{{ item.total_no_of_unit }}</td>
+                    <td>{{ item.total_no_of_unit }}</td>
+                    <td>{{ item.group }}</td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -59,22 +57,23 @@
         </div>
 
         <div class="col-sm-2">
-          <input type="text" class="form-control col-sm-2" name = "quantity" placeholder="Quantity">
+          <input type="text" class="form-control col-sm-2" name = "total_quantity" placeholder="Quantity">
         </div>
-        
-        <div class="col-sm-1">
-          <input type="text" class="form-control col-sm-2" name = "measurement_type" placeholder="Type">
-        </div>
-        
+            
         <div class="col-sm-2">
-          <input type="text" class="form-control col-sm-2" name = "no_of_unit" placeholder="no_of_unit">
+          <input type="text" class="form-control col-sm-2" name = "total_no_of_unit" placeholder="no_of_unit">
         </div>
 
-        <div class="col-sm-1">
-          <input type="text" class="form-control col-sm-2" name = "unit_type" placeholder="unit type">
+        <div class="col-sm-2">
+          <select name="group" id="group" class="form-control">
+            <option value="" disabled selected>Select an item</option>
+            {% for item in group %}
+            <option value="{{ item.item_name }}">{{ item.item_name }}</option>
+            {% endfor %}
+        </select>
         </div>
-       
-           </div>
+
+        </div>
       <button  class="col-sm-1 btn-sm " 
     style="background-image:url('../static/back1.PNG');color: aliceblue; margin-left: 100px;font-size: 12px; height: 40px; font-weight: bold;">
         Add Item
