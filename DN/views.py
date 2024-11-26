@@ -807,8 +807,20 @@ def display_order_items(request):
     
     form = OrderInventoryForm()
 
+    item_quantities = order_items.objects.values('description').annotate(total_quantity=Sum('quantity'), total_no_of_unit=Sum('no_of_unit'))
+  
+    for item in item_quantities:
+        inventory_order_items.objects.update_or_create(
+            item_name=item['description'],
+            defaults={'total_quantity': item['total_quantity'],
+                      'total_no_of_unit': item['total_no_of_unit']}
+            
+        )
+        print(f"Name: {item['description']}, Total Quantity: {item['total_quantity']}, Total No of Unit: {item['total_no_of_unit']}")
     
-    items = inventory_order_items.objects.all().order_by('item_name')
+
+    items = inventory_order_items.objects.all().order_by('item_name')    
+
     group_name = finished_goods.objects.all().order_by('item_name')
     print(items)
     context = {
