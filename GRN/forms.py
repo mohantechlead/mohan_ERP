@@ -34,7 +34,7 @@ class PRItemForm(forms.ModelForm):
     quantity = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'quantity form-control' }))
     price = forms.DecimalField(widget=forms.TextInput(attrs={'class': 'price form-control'}))
     item_measurement = forms.CharField(widget=forms.TextInput(attrs={'class': 'item_measurement form-control'}), required=False)
-     item_name = forms.CharField(
+    item_name = forms.CharField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Description'})
     )
