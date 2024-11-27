@@ -26,9 +26,25 @@ class FGRNItemForm(forms.ModelForm):
         queryset=items_list.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control', 'id':'item_name'}),
     )
-    description = forms.ModelChoiceField(
-        queryset=finished_goods.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control', 'id':'description'}),)
+    # description = forms.ModelChoiceField(
+    #     queryset=finished_goods.objects.all(),
+    #     widget=forms.Select(attrs={'class': 'form-control', 'id':'description'}),)
+
+    description = forms.ChoiceField(
+    choices=[
+        (item.item_name, item.item_name)  # Only include item_name without the model name prefix
+        for item in sorted(
+            chain(inventory_order_items.objects.all(), finished_goods.objects.all()),
+            key=operator.attrgetter('item_name')
+        )
+    ],
+    widget=forms.Select(attrs={
+        'class': 'form-control select2',
+        'data-minimum-input-length': '0',  # Start filtering from the first character
+        'data-placeholder': 'Select or type an item',
+        'id': 'description'
+    }),
+)
     
     no_of_unit = forms.FloatField(
         required = False,
