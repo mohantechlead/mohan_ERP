@@ -101,7 +101,8 @@ class DeliverItemForm(forms.ModelForm):
     
     Measurement_unit_choices =( 
         ("", ""),
-    ("kgs", "kgs")) 
+    ("kgs", "kgs"),
+    ("pairs", "pairs")) 
 
     measurement_unit = forms.ChoiceField(
         choices = Measurement_unit_choices,
@@ -169,7 +170,8 @@ class OrderItemForm(forms.ModelForm):
     
     Measurement_unit_choices =( 
         ("", ""),
-    ("kgs", "kgs")) 
+    ("kgs", "kgs"), 
+    ("pairs", "pairs")) 
 
     measurement_unit = forms.ChoiceField(
         choices = Measurement_unit_choices,
