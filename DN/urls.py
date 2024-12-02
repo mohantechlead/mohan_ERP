@@ -21,6 +21,8 @@ from DN import views
 
 urlpatterns = [
     path('input_delivery/', views.input_delivery, name='input_delivery'), 
+    path('generate-excel/', views.generate_excel, name='generate_excel'),
+    path('deliveries_excel/', views.deliveries_excel, name='deliveries_excel'),
     path('display_DN_items', views.display_DN_items, name='display_DN_items'),
     path('display_orders/', views.display_orders, name='display_orders'),
     path('input_orders_items/',views.input_orders_items, name='input_orders_items'),

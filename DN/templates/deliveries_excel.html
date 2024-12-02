@@ -1,0 +1,87 @@
+{% extends 'deliveries_base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <form method="get" action="{% url 'generate_excel' %}">
+        <button type="submit" class="btn btn-primary">Download Excel</button>
+    </form>
+    <ul class="nav nav-tabs" id="companyTabs" role="tablist">
+        {% for company, data in company_data.items %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if forloop.first %}active{% endif %}" id="tab-{{ forloop.counter }}" data-toggle="tab" href="#content-{{ forloop.counter }}" role="tab">
+                    {{ company }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content mt-3">
+        {% for company, data in company_data.items %}
+            <div class="tab-pane {% if forloop.first %}active{% endif %}" id="content-{{ forloop.counter }}" role="tabpanel">
+                <h3>{{ company }}</h3>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Serial No</th>
+                            <th>Date</th>
+                            <th>DN No</th>
+                            <th>Cash Sales Invoice</th>
+                            <th>Price</th>
+                            <th>TOTAL</th>
+                            <th>Balance</th>
+                            <th>Debit</th>
+                            <th>Credit</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <!-- Initial Order Row -->
+                            <tr>
+                                <td>{{ row.order.serial_no }}</td>
+                                <td>{{ row.order.date }}</td>
+                                <td></td>
+                                <td>{{ row.order.item_name }}</td>
+                                <td></td>
+                                <td></td>
+                                <td>{{ row.order.total_price }}</td>
+                                <td>{{ row.order.quantity }}</td>
+                                <td></td>
+                                <!-- <td>{{ row.order.quantity }}</td> -->
+                                <td>{{ row.updated_balance }}</td>
+                            </tr>
+
+                            <!-- Delivery Rows -->
+                            {% with row.order.quantity as current_balance %}
+                                {% for delivery in row.deliveries %}
+                                    {% with current_balance|default:0 as balance %}
+                                    <tr>
+                                        <!-- <td>{{ row.order.serial_no }}</td> -->
+                                        <td></td>
+                                        <td>{{ delivery.delivery_date }}</td>
+                                        <td>{{ delivery.delivery_no }}</td>
+                                        <td>{{ row.order.invoice }}</td>
+                                        <td>{{ delivery.unit_price }}</td>
+                                        <td>{{ delivery.total_price }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{{ delivery.del_quantity }}</td>
+                                       
+                                    </tr>
+                                    {% endwith %}
+                                {% endfor %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+{% endblock %}

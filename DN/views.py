@@ -17,6 +17,9 @@ from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 import plotly.graph_objs as go
 from plotly.offline import plot
+import openpyxl
+from django.http import HttpResponse
+from openpyxl.styles import Alignment
 
 @api_view(['GET','POST'])
 def order_list(request):
@@ -830,3 +833,152 @@ def display_order_items(request):
     }
 
     return render(request,'display_order_items.html',context)
+
+def deliveries_excel(request):
+    # Fetch all unique company names
+    companies = orders.objects.values_list('customer_name', flat=True).distinct()
+
+   # Prepare data grouped by company
+    company_data = {}
+    for company in companies:
+        # Fetch orders for the company
+        orders_queryset = orders.objects.filter(customer_name=company)
+
+        data = []
+        for o in orders_queryset:
+            items = orders_items.objects.filter(serial_no=o.serial_no)
+            deliveries = delivery.objects.filter(serial_no=o.serial_no)
+
+            # Initialize data for each order item
+            for item in items:
+                # Start with the initial quantity for each item
+                initial_balance = item.quantity
+
+                order_data = {
+                    'order': {
+                        'serial_no': o.serial_no,
+                        'invoice_no': o.invoice,
+                        'unit_price': item.unit_price,
+                        'total_price': item.total_price,
+                        'item_name': item.description,
+                        'date': o.date,
+                        'quantity': item.quantity,
+                    },
+                    'deliveries': [],
+                    'updated_balance': initial_balance,  # Start with the initial quantity
+                }
+
+                # Loop through each delivery and update the balance for the matching item
+                for delivry in deliveries:
+                    # Get the items for this delivery from the delivery_item model
+                    delivery_items_set = delivery_items.objects.filter(delivery_number=delivry.delivery_number)
+
+                    for del_item in delivery_items_set:
+                        if del_item.description == item.description:  # Match by item name
+                            order_data['deliveries'].append({
+                                'delivery_no': delivry.delivery_number,
+                                'delivery_date': delivry.delivery_date,
+                                'item_name': del_item.description,
+                                'unit_price':item.unit_price,
+                                'total_price':item.total_price,
+                                'del_quantity': del_item.quantity,
+                            })
+
+                            # Update the balance by subtracting the delivered quantity
+                            order_data['updated_balance'] -= del_item.quantity
+
+                # Append the order data to the company's list
+                data.append(order_data)
+
+        # Assign collected data to the company
+        company_data[company] = data
+
+
+        
+    return render(request, 'deliveries_excel.html', {'company_data': company_data})
+
+
+def generate_excel(request):
+    # Fetch all unique company names
+    companies = orders.objects.values_list('customer_name', flat=True).distinct()
+
+    # Create a workbook
+    wb = openpyxl.Workbook()
+
+    # Loop through each company and create a new sheet for each one
+    for company in companies:
+        # Create a sheet for each company, named after the company
+        ws = wb.create_sheet(title=company)
+
+        # Fetch orders for the company
+        orders_queryset = orders.objects.filter(customer_name=company)
+
+        # Create the header row
+        ws.append([
+            "Serial No", "Date", "DN No", "Cash Sales Invoice", "Price", 
+            "TOTAL", "Balance", "Debit", "Credit", "Balance"
+        ])
+
+        # Loop through the orders and add rows to the sheet
+        for o in orders_queryset:
+            items = orders_items.objects.filter(serial_no=o.serial_no)
+            deliveries = delivery.objects.filter(serial_no=o.serial_no)
+
+            # Loop through each item in the order
+            for item in items:
+                initial_balance = item.quantity  # Start with the initial quantity for the item
+
+                # Create the order row for the item (Initial row with initial balance)
+                row = [
+                    o.serial_no, o.date, "", item.description, "", 
+                    "", item.total_price, "", item.quantity, initial_balance
+                ]
+                ws.append(row)
+                order_row_index = len(list(ws.rows))  # Track the row index of the order row
+
+                # Keep track of the delivery numbers we've processed for this item
+                processed_delivery_numbers = set()
+
+                # Add delivery rows only for unique delivery numbers
+                for delivry in deliveries:
+                    delivery_items_set = delivery_items.objects.filter(delivery_number=delivry.delivery_number)
+
+                    # Process the deliveries only if the item description matches and the delivery hasn't been processed yet
+                    for del_item in delivery_items_set:
+                        if del_item.description == item.description:  # Match by item name
+                            # Skip this delivery if it has already been processed
+                            if delivry.delivery_number not in processed_delivery_numbers:
+                                # Update the initial balance (subtract the delivered quantity)
+                                initial_balance -= del_item.quantity
+                                
+                                # Create the delivery row
+                                delivery_row = [
+                                    "", delivry.delivery_date, delivry.delivery_number, 
+                                    o.invoice, item.unit_price, item.total_price, "", "", 
+                                    del_item.quantity,  # Delivered quantity
+                                ]
+                                ws.append(delivery_row)
+
+                                # Update the order row with the updated balance (same row index)
+                                ws.cell(row=order_row_index, column=10, value=initial_balance)  # Update the Balance cell
+
+                                # Mark this delivery number as processed
+                                processed_delivery_numbers.add(delivry.delivery_number)
+
+        # Remove the default sheet created by openpyxl
+        wb.remove(wb['Sheet'])
+
+    # Create a response to serve the Excel file
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=company_data.xlsx'
+
+    # Save the workbook to the response
+    wb.save(response)
+
+    return response
+
+
+
+
+
+
