@@ -965,7 +965,8 @@ def generate_excel(request):
                                 # Mark this delivery number as processed
                                 processed_delivery_numbers.add(delivry.delivery_number)
 
-        # Remove the default sheet created by openpyxl
+    # Remove the default sheet created by openpyxl if it exists
+    if 'Sheet' in wb.sheetnames:
         wb.remove(wb['Sheet'])
 
     # Create a response to serve the Excel file
