@@ -45,7 +45,8 @@
   <tbody>
     {% for order in my_order %}
     <tr>
-      <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
+      <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td> -->
+       <td><a href="/GRN/print_pr/{{ order.PR_no }}" >{{ order.PR_no }}</a></td>
       <td>{{ order.date }}</td>
       <td>{{ order.site_name }}</td>
       <td>{{ order.PR_before_vat }}</td>

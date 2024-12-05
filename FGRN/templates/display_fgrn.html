@@ -37,7 +37,8 @@
                     <tbody>
                     {% for order in my_order %}
                     <tr>
-                      <td><a href="#" class="order-link" data-order-id="{{ order.FGRN_no }}">{{ order.FGRN_no }}</a></td>
+                      <!-- <td><a href="#" class="order-link" data-order-id="{{ order.FGRN_no }}">{{ order.FGRN_no }}</a></td> -->
+                       <td><a href="display_single_fgrn/{{ order.FGRN_no }}">{{ order.FGRN_no }}</a></td>
                       <td>{{ order.date }}</td>
                       <td>
                         {% for item in order.FGRN_items.all %}

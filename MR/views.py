@@ -236,33 +236,28 @@ def display_MR_items(request):
     return render(request,'display_MR_items.html',context)
 
 @login_required(login_url="login_user")
-def display_single_mr(request):
+def display_single_mr(request, MR_no):
     if request.method == 'GET':
-        mr_no = request.GET['MR_no']
-        
         try:
-            mr = MR.objects.get(MR_no=mr_no)
-            mr_items = MR_item.objects.all()
-            mr_items = mr_items.filter(MR_no=mr_no)
-            print(mr_items)
-
-            if mr_items.exists():
-                print(mr_items,"yes")
-                context = {
-                            'mr_item': mr_items,
-                            'my_mr': mr,
-                        }
-                return render(request, 'display_single_mr.html', context)
+            # Fetch the MR object using the URL parameter
+            mr = get_object_or_404(MR, MR_no=MR_no)
+            
+            # Fetch related MR_items for the MR
+            mr_items = MR_item.objects.filter(MR_no=MR_no)
+            
+            context = {
+                'mr_item': mr_items,
+                'my_mr': mr,
+            }
+        except Exception as e:
+            # Handle any unexpected exceptions gracefully
+            context = {
+                'mr_item': [],
+                'my_mr': None,
+                'error_message': f"An error occurred: {str(e)}",
+            }
         
-        except MR.DoesNotExist:
-                mr = None 
-       
-        print("no")
-        
-        context = {
-                        'my_mr': mr,
-                    }
-    return render(request, 'display_single_mr.html')
+        return render(request, 'display_single_mr.html', context)
 
 @login_required(login_url="login_user")
 def export_mr(request):

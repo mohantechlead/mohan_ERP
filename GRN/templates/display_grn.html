@@ -6,18 +6,7 @@
     <h3>GRN Details</h3>
   </strong>
   
-  <!-- <form action="{% url 'search_grns' %}">
-    <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
-      <input type="text" name="PR_no" placeholder="PR No" class="form-control" style=" margin-top: 10px; ">
-      <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search PR</button></div>
-    </div>
-  </form>
-  <form action="/GRN/display_grns">
-    <div class="form-group col-sm-4" style="display: flex; margin-top: 20px; ">
-      <input type="text" name="GRN_no" placeholder="GRN No" class="form-control" style=" margin-top: 10px; ">
-      <div style="width: 20%;"><button type="submit" class="btn btn-primary">Search GRN</button></div>
-    </div>
-  </form> -->
+
   <br>
   <br>
 
@@ -54,7 +43,9 @@
     {% for order in my_order %}
     <tr>
       <!-- <td><a href="#" class="order-link" data-order-id="{{ order.PR_no }}">{{ order.PR_no }}</a></td>
-       --><td><a href="#" class="order-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</a></td>
+       -->
+      <!-- <td><a href="#" class="order-link" data-order-id="{{ order.GRN_no }}">{{ order.GRN_no }}</a></td> -->
+       <td><a href="/GRN/display_single_grn/{{order.GRN_no}}" >{{ order.GRN_no }}</a></td>
       {% comment %} <td><a href="#" class="order-link" data-order-id="{{ order.PR_no.PR_no }}">{{ order.PR_no.PR_no }}</a></td> {% endcomment %}
       <td>{{ order.date }}</td>
       <td>{{ order.transporter_name }}</td>
