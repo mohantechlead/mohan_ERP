@@ -406,36 +406,35 @@ def print_format(request):
     return render(request, 'print_format.html', context)
 
 @login_required(login_url="login_user")
-def print_pr(request):
+def print_pr(request, PR_no):
     if request.method == 'GET':
-        pr_no = request.GET['PR_no']
+        # Get the PR_no from GET parameters if it is not provided in the function argument
+        pr_no = request.GET.get('PR_no', PR_no)
         
         try:
+            # Fetch the order corresponding to the PR_no
             orders = purchase_orders.objects.get(PR_no=pr_no)
-            pr_items = PR_item.objects.all()
-            pr_items = pr_items.filter(PR_no=pr_no)
-            print(pr_items)
-        except purchase_orders.DoesNotExist:
-            # If it's not found in purchase_orders, try searching in import_PR
+            # Fetch the items related to this specific PR_no
+            pr_items = PR_item.objects.filter(PR_no=pr_no)
             
-            order = None 
-       
-        print("no")
-        if pr_items.exists():
-            print(pr_items,"yes")
+            # Prepare the context with order and PR items
             context = {
                         'pr_items': pr_items,
                         'my_order': orders,
                     }
             return render(request, 'print_pr.html', context)
-        context = {
-                        
-                        'my_order': orders,
+        
+        except purchase_orders.DoesNotExist:
+            # If the purchase order is not found, handle the case by providing None for my_order
+            context = {
+                        'my_order': None,
+                        'pr_items': [],  # Assuming you want an empty list for pr_items in this case
                     }
-    return render(request, 'print_pr.html', context)
+            return render(request, 'print_pr.html', context)
+
 
 @login_required(login_url="login_user")
-def display_single_grn(request):
+def display_single_grn(request, GRN_no):
     if request.method == 'GET':
         grn_no = request.GET.get('GRN_no')  # Use .get() to avoid KeyError if GRN_no is missing
         

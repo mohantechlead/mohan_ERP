@@ -59,15 +59,14 @@ def input_delivery(request):
         if delivery.objects.filter(delivery_number__icontains = delivery_number).exists():
             messages.error(request, 'Delivery Number already exists')
             return redirect('input_delivery')
-        else: 
-            if form.is_valid():
+        elif form.is_valid():
                 serial_no = form.cleaned_data['serial_no']
                 order = orders.objects.get(serial_no = serial_no.serial_no)       
                 form.save()
                 return redirect('input_delivery')
             
-            if form.errors:
-                print(form.errors)
+        elif form.errors:
+            print(form.errors)
    
     form = DeliveryForm()
     formset = formset_factory(DeliverItemForm, extra= 1)

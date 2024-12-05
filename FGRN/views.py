@@ -97,33 +97,30 @@ def display_FGRN(request):
     return render(request,'display_fgrn.html', context)
 
 @login_required(login_url="login_user")
-def display_single_fgrn(request):
+def display_single_fgrn(request, FGRN_no):
     if request.method == 'GET':
-        fgrn_no = request.GET['FGRN_no']
-        
         try:
-            fgrns = FGRN.objects.get(FGRN_no=fgrn_no)
-            fgrn_items = FGRN_item.objects.all()
-            fgrn_items = fgrn_items.filter(FGRN_no=fgrn_no)
-            print(fgrn_items)
+            # Fetch the MR object using the URL parameter
+            fgrn_no = get_object_or_404(FGRN, FGRN_no=FGRN_no)
 
-            if fgrn_items.exists():
-                print(fgrn_items,"yes")
-                context = {
+            fgrns = FGRN.objects.get(FGRN_no = fgrn_no)
+            
+            # Fetch related MR_items for the MR
+            fgrn_items = FGRN_item.objects.filter(FGRN_no=fgrn_no)
+            
+            context = {
                             'fgrn_item': fgrn_items,
                             'my_fgrn': fgrns,
                         }
-                return render(request, 'display_single_fgrn.html', context)
+        except Exception as e:
+            # Handle any unexpected exceptions gracefully
+            context = {
+                'fgrn_items': [],
+                'fgrns': None,
+                'error_message': f"An error occurred: {str(e)}",
+            }
         
-        except FGRN.DoesNotExist:
-                fgrns = None 
-       
-        print("no")
-        
-        context = {
-                        'my_fgrn': fgrns,
-                    }
-    return render(request, 'display_single_fgrn.html')
+        return render(request, 'display_single_fgrn.html', context)
 
 @login_required(login_url="login_user")
 def display_goods(request):
