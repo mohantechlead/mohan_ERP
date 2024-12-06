@@ -241,23 +241,23 @@ def display_grn(request):
 @login_required(login_url="login_user")   
 def display_grns(request):
     if request.method == 'GET':
-        grn_no = request.GET['GRN_no']
-        orders = GRN.objects.get(GRN_no=grn_no)
-        # pr_no = orders.PR_no.PR_no
-        # pr_items = PR_item.objects.all()
-        grn_items = GRN_item.objects.all()
-        grn_items = grn_items.filter(GRN_no=grn_no)
-        if grn_items.exists():
-            context = {
-                        'grn_items': grn_items,
-                        'my_order': orders,
-                    }
-            return render(request, 'display_grns.html', context)
+        grn_no = request.GET.get('GRN_no')  # Safely get 'GRN_no'
+        if not grn_no:
+            return render(request, 'display_grns.html', {'error': 'GRN number is required.'})
+
+        # Retrieve the GRN object or return a 404 page if not found
+        orders = get_object_or_404(GRN, GRN_no=grn_no)
+
+        # Filter GRN items directly
+        grn_items = GRN_item.objects.filter(GRN_no=grn_no)
+
+        # Prepare the context
         context = {
-                        
-                        'my_order': orders,
-                    }
-    return render(request, 'display_grns.html', context)
+            'my_order': orders,
+            'grn_items': grn_items if grn_items.exists() else None,
+        }
+
+        return render(request, 'display_grns.html', context)
 
 @login_required(login_url="login_user")
 def display_pr(request):
@@ -416,11 +416,15 @@ def print_pr(request, PR_no):
             orders = purchase_orders.objects.get(PR_no=pr_no)
             # Fetch the items related to this specific PR_no
             pr_items = PR_item.objects.filter(PR_no=pr_no)
-            
+            vat = orders.PR_total_price - orders.PR_before_vat
+            vat = round(vat,2)
+            orders.vat = vat
+            orders.save()
             # Prepare the context with order and PR items
             context = {
                         'pr_items': pr_items,
                         'my_order': orders,
+                        'vat': vat,
                     }
             return render(request, 'print_pr.html', context)
         
@@ -435,29 +439,37 @@ def print_pr(request, PR_no):
 
 @login_required(login_url="login_user")
 def display_single_grn(request, GRN_no):
+   
     if request.method == 'GET':
-        grn_no = request.GET.get('GRN_no')  # Use .get() to avoid KeyError if GRN_no is missing
+        grn_no = request.GET.get('GRN_no', GRN_no)  # Use .get() to avoid KeyError if GRN_no is missing
         
-        try:
-            fgrns = GRN.objects.get(GRN_no=grn_no)
-            fgrn_items = GRN_item.objects.filter(GRN_no=grn_no)  # Filter directly on GRN_no
-            print('fgrns:', fgrns)
-            print('fgrn items:', fgrn_items)
+        if grn_no:
+            try:
+                # Fetch the GRN object
+                fgrns = GRN.objects.get(GRN_no=grn_no)
+                # Fetch the related GRN items
+                fgrn_items = GRN_item.objects.filter(GRN_no=grn_no)
+                print('fgrns:', fgrns)
+                print('fgrn items:', fgrn_items)
 
-            context = {
-                'fgrn_item': fgrn_items,
-                'my_fgrn': fgrns,
-            }
+                # Update context if GRN is found
+                context = {
+                    'fgrn_item': fgrn_items,
+                    'my_fgrn': fgrns,
+                }
 
-            return render(request, 'display_single_grn.html', context)
+                return render(request, 'display_single_grn.html', context)
 
-        except GRN.DoesNotExist:
-            print("GRN not found")
-            context = {
-                'my_fgrn': None,
-            }
+            except GRN.DoesNotExist:
+                # Handle case where GRN is not found
+                print("GRN not found")
+                context = {
+                    'my_fgrn': None,
+                    'fgrn_item': None,  # No items to show if GRN doesn't exist
+                }
 
-    return render(request, 'display_single_grn.html', context)
+    # Render the response with the context
+                return render(request, 'display_single_grn.html', context)
 
 
 @login_required(login_url="login_user")
@@ -598,15 +610,10 @@ def create_pr(request):
         print(request.POST) 
         if pr_form.is_valid():
             instance = pr_form.save(commit=False)
-            instance.status = "Approved"
-            #instance.PR_before_vat = 0.00
-            #instance.PR_total_price = 0.00
-            
+            instance.status = "Approved"            
 
             instance.save()
             
-            
-    
     pr_form = PRForm(prefix="purchases")
     formset = formset_factory(PRItemForm, extra=1)
     formset = formset(prefix="items")

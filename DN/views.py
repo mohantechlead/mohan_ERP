@@ -338,63 +338,72 @@ def display_remaining(request):
     return render(request, 'display_remaining.html', {'my_orders': my_orders})
 
 @login_required(login_url="login_user")  
-def display_single_order(request):
+def display_single_order(request, serial_no):
     if request.method == 'GET':
-        serial_no = request.GET['serial_no']
-        
         try:
+            # Fetch the order with the given serial number
             fgrns = orders.objects.get(serial_no=serial_no)
-            fgrn_items = orders_items.objects.all()
-            fgrn_items = fgrn_items.filter(serial_no=serial_no)
-            print(fgrn_items)
+
+            # Fetch the items for that order
+            fgrn_items = orders_items.objects.filter(serial_no=serial_no)
 
             if fgrn_items.exists():
-                print(fgrn_items,"yes")
                 context = {
-                            'fgrn_item': fgrn_items,
-                            'my_fgrn': fgrns,
-                        }
+                    'fgrn_item': fgrn_items,
+                    'my_fgrn': fgrns,
+                }
+                return render(request, 'display_single_order.html', context)
+            else:
+                # If no items are found, return an empty list in the context
+                context = {
+                    'fgrn_item': [],
+                    'my_fgrn': fgrns,
+                }
                 return render(request, 'display_single_order.html', context)
         
         except orders.DoesNotExist:
-                fgrns = None 
-       
-        print("no")
-        
-        context = {
-                        'my_fgrn': fgrns,
-                    }
-    return render(request, 'display_single_order.html')
+            # If the order does not exist, return None for 'my_fgrn' and an empty list for 'fgrn_item'
+            context = {
+                'fgrn_item': [],
+                'my_fgrn': None,
+            }
+            return render(request, 'display_single_order.html', context)
 
-@login_required(login_url="login_user")  
-def display_single_delivery(request):
-    if request.method == 'GET':
-        delivery_no = request.GET['delivery_number']
+       
         
+    
+@login_required(login_url="login_user")  
+def display_single_delivery(request, delivery_number):
+    if request.method == 'GET':
         try:
-            fgrns = delivery.objects.get(delivery_number=delivery_no)
-            fgrn_items = delivery_items.objects.all()
-            fgrn_items = fgrn_items.filter(delivery_number=delivery_no)
-            print(fgrns)
-            print(fgrn_items)
+            # Fetch the delivery record with the given delivery number
+            fgrns = delivery.objects.get(delivery_number=delivery_number)
+
+            # Fetch the items for that delivery
+            fgrn_items = delivery_items.objects.filter(delivery_number=delivery_number)
 
             if fgrn_items.exists():
-                print(fgrn_items,"yes")
+                print(fgrn_items, "yes")
                 context = {
-                            'fgrn_item': fgrn_items,
-                            'my_fgrn': fgrns,
-                        }
-                return render(request, 'display_single_delivery.html', context)
+                    'fgrn_item': fgrn_items,
+                    'my_fgrn': fgrns,
+                }
+            else:
+                # If no items are found, include an empty list in the context
+                context = {
+                    'fgrn_item': [],
+                    'my_fgrn': fgrns,
+                }
+            return render(request, 'display_single_delivery.html', context)
         
-        except orders.DoesNotExist:
-                fgrns = None 
-       
-        print("no")
-        
-        context = {
-                        'my_fgrn': fgrns,
-                    }
-    return render(request, 'display_single_delivery.html')
+        except delivery.DoesNotExist:
+            # If the delivery does not exist
+            print("Delivery not found")
+            context = {
+                'fgrn_item': [],
+                'my_fgrn': None,
+            }
+            return render(request, 'display_single_delivery.html', context)
 
 @login_required(login_url="login_user")
 def display_delivery(request):
