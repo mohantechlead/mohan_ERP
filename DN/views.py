@@ -56,21 +56,28 @@ def input_delivery(request):
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
         delivery_number = request.POST['delivery_number']
-        if delivery.objects.filter(delivery_number__icontains = delivery_number).exists():
-            messages.error(request, 'Delivery Number already exists')
-            return redirect('input_delivery')
-        elif form.is_valid():
+
+        if form.errors:
+            print(form.errors)
+        
+        if form.is_valid():
                 serial_no = form.cleaned_data['serial_no']
                 order = orders.objects.get(serial_no = serial_no.serial_no)       
                 form.save()
                 return redirect('input_delivery')
+        
+        else:
+            print(form.data,"nval")
+            errors = dict(form.errors.items())
+            print(errors,"errors")
+            return JsonResponse({'form_errors': errors}, status=400)
             
-        elif form.errors:
-            print(form.errors)
+        
    
     form = DeliveryForm()
     formset = formset_factory(DeliverItemForm, extra= 1)
     formset = formset(prefix="items")
+
     return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 'formset':formset, 'truck_number': truck_number})
 
 @login_required(login_url="login_user")
@@ -89,17 +96,21 @@ def input_delivery_items(request):
         print(delivery_no,"delivery_no")
         if non_empty_forms:
             if formset.is_valid():
-                Delivery_instance = delivery.objects.get(delivery_number = delivery_no)
-                for form in non_empty_forms:
-                    form.instance.delivery_number = Delivery_instance
+                try:
+                    Delivery_instance = delivery.objects.get(delivery_number = delivery_no)
+                    for form in non_empty_forms:
+                        form.instance.delivery_number = Delivery_instance
 
-                    selected_item = form.cleaned_data['description']
-                    # selected_item_description = selected_item.item_name  # Assuming item_name is the field
-                
-                    form.save()
-         
-                    Delivery_instance.save()
+                        selected_item = form.cleaned_data['description']
+                        # selected_item_description = selected_item.item_name  # Assuming item_name is the field
                     
+                        form.save()
+            
+                        Delivery_instance.save()
+                except delivery.DoesNotExist:
+                    print(f"Delivery with Delivery_no {delivery_no} does not exist.")
+                    return JsonResponse({'error': 'Invalid Delivery_no'}, status=400)
+                        
                     
             else:
                 print(formset.data,"nval")
@@ -147,10 +158,21 @@ def input_orders(request):
     customer = Customer.objects.values_list('company', flat=True)
     if request.method == 'POST':
         form = OrderForm(request.POST)
+
+        if form.errors:
+            print(form.errors)
+
         if form.is_valid():
             order_number = form.cleaned_data['serial_no']
             form.save()
             return redirect('input_orders')
+        
+        else:
+            print(form.data,"nval")
+            errors = dict(form.errors.items())
+            print(errors,"errors")
+            return JsonResponse({'form_errors': errors}, status=400)
+        
     my_goods = finished_goods.objects.all()
     form = OrderForm()
     formset = formset_factory(OrderItemForm, extra= 1)
@@ -173,31 +195,37 @@ def input_orders_items(request):
         print(order_number,"order_no")
         if non_empty_forms:
             if formset.is_valid():
-                Order_instance = orders.objects.get(serial_no = order_number)
-                vat_amount = 0.0
-                final_price  = 0.0
-                before_vat = 0.0
-                final_unit = 0.0
-                for form in non_empty_forms:
-                    form.instance.serial_no = Order_instance
-                   
-                    quantity = form.cleaned_data['quantity']
-                    no_of_unit = form.cleaned_data['no_of_unit']
-                    total_price = form.cleaned_data['total_price']
-            
-                    final_unit += no_of_unit
-                    vat_amount += total_price * 0.15
-                    Order_instance.vat_amount = vat_amount
-                    final_price += total_price + vat_amount
-                    Order_instance.final_price = final_price
-                    before_vat += total_price  
-                    Order_instance.before_vat = before_vat
+                try:
+                    Order_instance = orders.objects.get(serial_no = order_number)
+                    vat_amount = 0.0
+                    final_price  = 0.0
+                    before_vat = 0.0
+                    final_unit = 0.0
+                    for form in non_empty_forms:
+                        form.instance.serial_no = Order_instance
                     
-                    form.instance.remaining_quantity = quantity
-                    form.instance.remaining_unit = no_of_unit
-                    form.save()
-         
-                    Order_instance.save()
+                        quantity = form.cleaned_data['quantity']
+                        no_of_unit = form.cleaned_data['no_of_unit']
+                        total_price = form.cleaned_data['total_price']
+                
+                        final_unit += no_of_unit
+                        vat_amount += total_price * 0.15
+                        Order_instance.vat_amount = vat_amount
+                        final_price += total_price + vat_amount
+                        Order_instance.final_price = final_price
+                        before_vat += total_price  
+                        Order_instance.before_vat = before_vat
+                        
+                        form.instance.remaining_quantity = quantity
+                        form.instance.remaining_unit = no_of_unit
+                        form.save()
+            
+                        Order_instance.save()
+                except orders.DoesNotExist:
+                    print(f"Order with Order_no {order_number} does not exist.")
+                    return JsonResponse({'error': 'Invalid Order_no'}, status=400)
+                    
+
                     
                     
             else:
@@ -310,63 +338,72 @@ def display_remaining(request):
     return render(request, 'display_remaining.html', {'my_orders': my_orders})
 
 @login_required(login_url="login_user")  
-def display_single_order(request):
+def display_single_order(request, serial_no):
     if request.method == 'GET':
-        serial_no = request.GET['serial_no']
-        
         try:
+            # Fetch the order with the given serial number
             fgrns = orders.objects.get(serial_no=serial_no)
-            fgrn_items = orders_items.objects.all()
-            fgrn_items = fgrn_items.filter(serial_no=serial_no)
-            print(fgrn_items)
+
+            # Fetch the items for that order
+            fgrn_items = orders_items.objects.filter(serial_no=serial_no)
 
             if fgrn_items.exists():
-                print(fgrn_items,"yes")
                 context = {
-                            'fgrn_item': fgrn_items,
-                            'my_fgrn': fgrns,
-                        }
+                    'fgrn_item': fgrn_items,
+                    'my_fgrn': fgrns,
+                }
+                return render(request, 'display_single_order.html', context)
+            else:
+                # If no items are found, return an empty list in the context
+                context = {
+                    'fgrn_item': [],
+                    'my_fgrn': fgrns,
+                }
                 return render(request, 'display_single_order.html', context)
         
         except orders.DoesNotExist:
-                fgrns = None 
-       
-        print("no")
-        
-        context = {
-                        'my_fgrn': fgrns,
-                    }
-    return render(request, 'display_single_order.html')
+            # If the order does not exist, return None for 'my_fgrn' and an empty list for 'fgrn_item'
+            context = {
+                'fgrn_item': [],
+                'my_fgrn': None,
+            }
+            return render(request, 'display_single_order.html', context)
 
-@login_required(login_url="login_user")  
-def display_single_delivery(request):
-    if request.method == 'GET':
-        delivery_no = request.GET['delivery_number']
+       
         
+    
+@login_required(login_url="login_user")  
+def display_single_delivery(request, delivery_number):
+    if request.method == 'GET':
         try:
-            fgrns = delivery.objects.get(delivery_number=delivery_no)
-            fgrn_items = delivery_items.objects.all()
-            fgrn_items = fgrn_items.filter(delivery_number=delivery_no)
-            print(fgrns)
-            print(fgrn_items)
+            # Fetch the delivery record with the given delivery number
+            fgrns = delivery.objects.get(delivery_number=delivery_number)
+
+            # Fetch the items for that delivery
+            fgrn_items = delivery_items.objects.filter(delivery_number=delivery_number)
 
             if fgrn_items.exists():
-                print(fgrn_items,"yes")
+                print(fgrn_items, "yes")
                 context = {
-                            'fgrn_item': fgrn_items,
-                            'my_fgrn': fgrns,
-                        }
-                return render(request, 'display_single_delivery.html', context)
+                    'fgrn_item': fgrn_items,
+                    'my_fgrn': fgrns,
+                }
+            else:
+                # If no items are found, include an empty list in the context
+                context = {
+                    'fgrn_item': [],
+                    'my_fgrn': fgrns,
+                }
+            return render(request, 'display_single_delivery.html', context)
         
-        except orders.DoesNotExist:
-                fgrns = None 
-       
-        print("no")
-        
-        context = {
-                        'my_fgrn': fgrns,
-                    }
-    return render(request, 'display_single_delivery.html')
+        except delivery.DoesNotExist:
+            # If the delivery does not exist
+            print("Delivery not found")
+            context = {
+                'fgrn_item': [],
+                'my_fgrn': None,
+            }
+            return render(request, 'display_single_delivery.html', context)
 
 @login_required(login_url="login_user")
 def display_delivery(request):

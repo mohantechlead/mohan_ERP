@@ -72,14 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.reload();
             }
         })
-    });
-    
-      
-        
-    
-   
-   
-    
+    }); 
     
     function add_new_form(args) {
         // Your code to add a new form here

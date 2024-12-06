@@ -7,6 +7,10 @@
 <h2 class="text-center">Order Confirmation Form</h2>
 <br>
 
+<div id="error-container" style="height:50px;">
+  <!-- Errors will be displayed here -->
+</div> 
+
 <form action="{% url 'input_orders' %}"  method="post" id="form1">
     {% csrf_token %}
    

@@ -2,6 +2,10 @@
 
 {% block content %}
     <h1>Input Delivery Information</h1>
+    <div id="error-container" style="height:50px;">
+      <!-- Errors will be displayed here -->
+    </div> 
+  
     <div>
       <div  class="col-md-6">
         {% comment %} <form action="{% url 'search_orders' %}">
@@ -11,25 +15,9 @@
       </div>
       
     </div>
-    {% if messages %}
-    {% for message in messages %}
+   
 
-    {% if message.tags == "error" %}
-    <div class="alert alert-danger">{{message}}</div>
-    {% endif%}
 
-    {% if message.tags == "success" %}
-    <div class="alert alert-success">{{message}}</div>
-    {% endif %}
-
-    {% endfor %}
-    {% endif %}
-    
-    {% if error_message %}
-    <div class="alert alert-danger">
-      {{ error_message }}
-    </div>
-    {% endif %}
     <form action="{% url 'input_delivery' %}" method="post" id="form1">
         {% csrf_token %}
 
