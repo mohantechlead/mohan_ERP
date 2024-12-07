@@ -52,7 +52,10 @@ def delivery_list(request):
 @login_required(login_url="login_user")
 def input_delivery(request):
     my_orders = orders.objects.all()
-    truck_number = delivery.objects.values_list('truck_number', flat=True)
+    truck_number = sorted(set(delivery.objects.values_list('truck_number', flat=True)))
+    driver_name = sorted(set(delivery.objects.values_list('driver_name', flat=True)))
+    customer = sorted(set(Customer.objects.values_list('company', flat=True)))
+
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
         delivery_number = request.POST['delivery_number']
@@ -78,7 +81,11 @@ def input_delivery(request):
     formset = formset_factory(DeliverItemForm, extra= 1)
     formset = formset(prefix="items")
 
-    return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 'formset':formset, 'truck_number': truck_number})
+    return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 
+                                                   'formset':formset, 
+                                                   'truck_number': truck_number, 
+                                                   'my_customer': customer, 
+                                                   'driver_name': driver_name,})
 
 @login_required(login_url="login_user")
 def input_delivery_items(request):
@@ -491,7 +498,6 @@ def customer_date(request):
                 }
     if request.method == 'GET':
         customer_name = request.GET['customer_name']
-        #my_order = get_object_or_404(orders, customer_name=customer_name)
         my_order = orders.objects.filter(customer_name__icontains= customer_name)
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
@@ -516,7 +522,6 @@ def search_orders(request):
         serial_no = request.GET['serial_no']
 
         # Get the order by serial number
-        #my_order = orders.objects.filter(serial_no=serial_no)
         my_order = get_object_or_404(orders, serial_no=serial_no)
         # If the order exists,
         if my_order:

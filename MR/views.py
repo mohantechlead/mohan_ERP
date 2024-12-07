@@ -24,9 +24,8 @@ from DN.models import inventory_DN_items
 @login_required(login_url="login_user")
 def create_MR(request):
     MRFormSet = formset_factory(MRItemForm, extra=1)
-    
-    recieved_from = MR.objects.values_list('MR_store', flat=True)
-    recieved_to = MR.objects.values_list('desc', flat=True)
+    recieved_to = sorted(set(MR.objects.values_list('desc', flat=True)))
+    recieved_from = sorted(set(MR.objects.values_list('MR_store', flat=True)))
 
     if request.method == 'POST':
         form = MRForm(request.POST)

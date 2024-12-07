@@ -93,10 +93,11 @@ def create_trial_grn(request):
 
 @login_required(login_url="login_user")
 def create_grn(request):
-    transporter_name = GRN.objects.values_list('transporter_name', flat=True)
-    plate_no = GRN.objects.values_list('truck_no', flat=True)
-    store_name = GRN.objects.values_list('store_name', flat=True)
-    store_keeper = GRN.objects.values_list('store_keeper', flat=True)
+    transporter_name = sorted(set(GRN.objects.values_list('transporter_name', flat=True)))
+    plate_no = sorted(set(GRN.objects.values_list('truck_no', flat=True)))
+    store_name = sorted(set(GRN.objects.values_list('store_name', flat=True)))
+    store_keeper = sorted(set(GRN.objects.values_list('store_keeper', flat=True)))
+    recieved_from = sorted(set(GRN.objects.values_list('recieved_from', flat=True)))
 
     if request.method == 'POST':
         form = GRNForm(request.POST)
@@ -125,6 +126,7 @@ def create_grn(request):
                'plate_no' : plate_no,
                'store_name' : store_name,
                'store_keeper' : store_keeper,
+               'recieved_from' : recieved_from
                }
     return render(request,'create_grn.html',context)
 
@@ -297,32 +299,6 @@ def search_prs(request,pr_no):
                     }
         return render(request, 'display_pr.html')
     
-# def search_grn(request,grn_no):
-    
-#     if request.method == 'GET':
-#         grn_no = grn_no
-#         my_order = get_object_or_404(GRN, grn=grn_no)
-        
-   
-#         # If the order exists,
-#         if my_order:
-#             print(my_order)
-#             print('yes')
-#             context = {
-#                         'my_order': my_order,
-#                     }
-#             return render(request, 'single_pr.html', context)
-
-#         else:
-#             print("none")
-#             return render(request, 'single_pr.html', context)
-
-#     else:
-#         context = {
-#                         'my_order': my_order,
-#                     }
-#         return render(request, 'display_pr.html')
-
 @login_required(login_url="login_user")
 def search_customer(request):
     if request.method == 'GET':

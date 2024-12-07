@@ -10,10 +10,22 @@ class FGRNForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date', 'id': 'date'})
     )
     recieved_from = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received From', 'id': 'recieved_from', 'list': 'received_options'})
+    widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Received From',
+            'id': 'recieved_from',
+            'list': 'received_options',
+            'autocomplete': 'off'  # Disable autocomplete
+        }
     )
+)
     recieved_by = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Received By', 'id': 'recieved_by', 'list':'recieved_by_option'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 
+                                      'placeholder': 'Received By', 
+                                      'id': 'recieved_by',
+                                       'list':'recieved_by_option', 
+                                       'autocomplete': 'off'})
     )
     
     class Meta:
