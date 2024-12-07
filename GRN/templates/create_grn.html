@@ -37,8 +37,8 @@
             <input type="text" list="vendor_name" placeholder="Name" name="recieved_from" class="form-control "
               style="width: 100%;">
             <datalist id="vendor_name">
-              {% for order in names %}
-              <option value="{{order.vendor_name}}"></option>
+              {% for order in recieved_from %}
+              <option value="{{order}}"></option>
               {% endfor %}
             </datalist>
           </div>

@@ -40,7 +40,12 @@
         <div class="form-group">
           <label class="control-label col-sm-6"> Recipient Name</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="recipient_name">
+            <input type="text" class="form-control" name="recipient_name" autocomplete="off" list="orders">
+            <datalist id="orders">
+              {% for name in my_customer %}
+                  <option value="{{ name }}"></option>
+              {% endfor %}
+            </datalist>
           </div>
         </div> 
       </div>
@@ -68,7 +73,12 @@
         <div class="form-group" style="margin-bottom: 10px;">
           <label class="control-label col-sm-4"> Driver Name</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" name="driver_name">
+            <input type="text" class="form-control" name="driver_name" list="driver" autocomplete="off">
+            <datalist id="driver">
+              {% for name in driver_name %}
+                  <option value="{{ name }}"></option>
+              {% endfor %}
+            </datalist>
           </div>
         </div> 
       </div>
@@ -83,7 +93,12 @@
         <div class="form-group" >
           <label class="control-label col-sm-6">Truck Number</label>
           <div class="col-sm-8" style="margin-top: 10px;">
-            <input type="text" class="form-control" name="truck_number">
+            <input type="text" class="form-control" name="truck_number" list="truck" autocomplete="off">
+            <datalist id="truck">
+              {% for name in truck_number %}
+                  <option value="{{ name }}"></option>
+              {% endfor %}
+            </datalist>
           </div>
         </div>
      
