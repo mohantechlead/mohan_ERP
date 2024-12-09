@@ -20,6 +20,7 @@ from plotly.offline import plot
 import openpyxl
 from django.http import HttpResponse
 from openpyxl.styles import Alignment
+from django.core.mail import send_mail
 
 @api_view(['GET','POST'])
 def order_list(request):
@@ -81,7 +82,8 @@ def input_delivery(request):
     formset = formset_factory(DeliverItemForm, extra= 1)
     formset = formset(prefix="items")
 
-    return render(request, 'input_delivery.html', {'form': form,'my_orders':my_orders, 
+    return render(request, 'input_delivery.html', {'form': form,
+                                                   'my_orders':my_orders, 
                                                    'formset':formset, 
                                                    'truck_number': truck_number, 
                                                    'my_customer': customer, 
@@ -104,21 +106,64 @@ def input_delivery_items(request):
         if non_empty_forms:
             if formset.is_valid():
                 try:
-                    Delivery_instance = delivery.objects.get(delivery_number = delivery_no)
-                    for form in non_empty_forms:
-                        form.instance.delivery_number = Delivery_instance
+                    # Retrieve the delivery instance
+                    Delivery_instance = delivery.objects.get(delivery_number=delivery_no)
+                    related_delivery = Delivery_instance
 
-                        selected_item = form.cleaned_data['description']
-                        # selected_item_description = selected_item.item_name  # Assuming item_name is the field
-                    
-                        form.save()
-            
-                        Delivery_instance.save()
+                    # Retrieve the serial_no from the delivery instance
+                    delivery_serial_no = related_delivery.serial_no
+                    print(f"Serial No: {delivery_serial_no}")
+
+                    # Retrieve the delivery_items queryset filtered by the serial_no
+                    delivery_items_queryset = delivery_items.objects.filter(delivery_number__serial_no=delivery_serial_no)
+
+                    # Calculate the aggregated data grouped by serial_no and description
+                    aggregated_data = (
+                        delivery_items_queryset
+                        .values('delivery_number__serial_no', 'description')  # Group by serial_no and description
+                        .annotate(total_quantity=Sum('quantity'))  # Sum the quantities
+                    )
+
+                    # Display or process the aggregated results
+                    for data in aggregated_data:
+                        print(f"Serial No: {data['delivery_number__serial_no']}, Description: {data['description']}, Total Quantity: {data['total_quantity']}")
+
+                    # Example: Process each item for further logic
+                    for data in aggregated_data:
+                        serial_no = data['delivery_number__serial_no']
+                        description = data['description']
+                        total_quantity = data['total_quantity']
+
+                        # Find the matching order item in orders_items (if needed)
+                        order_item = orders_items.objects.filter(serial_no=serial_no, description=description).first()
+                        if order_item:
+                            print(f"Before Update: Order Item {order_item.description}, Quantity: {order_item.quantity}")
+                            
+                            # Subtract the total quantity from the order item
+                            order_item.quantity -= total_quantity
+                                                        
+                            print(f"After Update: Order Item {order_item.description}, Quantity: {order_item.quantity}")
+
+                            if order_item.quantity < 0:
+                                error_message = 'Over Delivery'
+                                subject = 'Over Delivery Notification'
+                                message = f'The order with Order ID {serial_no} has been over delivered by {order_item.quantity} on delivery number {delivery_no}'
+                                from_email = 'tech@mohanplc.com'
+                                recipient_list = ['tibarek90@gmail.com']
+
+                                send_mail(subject, message, from_email, recipient_list, fail_silently= False)
+
+                        else:
+                            print(f"No matching order item found for Serial No: {serial_no} and Description: {description}")
+
                 except delivery.DoesNotExist:
                     print(f"Delivery with Delivery_no {delivery_no} does not exist.")
                     return JsonResponse({'error': 'Invalid Delivery_no'}, status=400)
-                        
-                    
+                
+                except orders_items.DoesNotExist:
+                    print(f"Order item with Serial_no {delivery_serial_no} does not exist.")
+                    return JsonResponse({'error': 'Invalid Serial_no'}, status=400)
+                                               
             else:
                 print(formset.data,"nval")
                 errors = dict(formset.errors.items())
