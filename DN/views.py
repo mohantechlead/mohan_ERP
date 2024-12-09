@@ -108,6 +108,17 @@ def input_delivery_items(request):
                 try:
                     # Retrieve the delivery instance
                     Delivery_instance = delivery.objects.get(delivery_number=delivery_no)
+
+                    for form in non_empty_forms:
+                        form.instance.delivery_number = Delivery_instance
+
+                        selected_item = form.cleaned_data['description']
+                        # selected_item_description = selected_item.item_name  # Assuming item_name is the field
+                    
+                        form.save()
+            
+                        Delivery_instance.save()
+
                     related_delivery = Delivery_instance
 
                     # Retrieve the serial_no from the delivery instance
@@ -123,6 +134,7 @@ def input_delivery_items(request):
                         .values('delivery_number__serial_no', 'description')  # Group by serial_no and description
                         .annotate(total_quantity=Sum('quantity'))  # Sum the quantities
                     )
+
 
                     # Display or process the aggregated results
                     for data in aggregated_data:
