@@ -166,12 +166,9 @@ EMAIL_HOST_PASSWORD = 'llcbqsjcpgyzbqvc'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Change the broker URL as per your configuration
-# CELERY_BEAT_SCHEDULE = {
-#     'send_weekly_emails': {
-#         'task': 'your_app.tasks.send_weekly_email',
-#         'schedule': crontab(day_of_week=0, hour=8, minute=0),  # Every Monday at 8 AM
-#     },
-# }
+
+
 
