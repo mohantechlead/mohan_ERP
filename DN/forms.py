@@ -58,11 +58,7 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
-    # Combine both querysets into one iterable
-    combined_queryset = chain(inventory_order_items.objects.all(), inventory.objects.all())
-    
-    # Use a dictionary comprehension to ensure uniqueness based on item_name
-    unique_items = {item.item_name: item for item in combined_queryset}.values()
+    seen_item_names = set()   
     description = forms.ChoiceField(
         choices=[
             (item.item_name, item.item_name)  # Only include item_name without the model name prefix
