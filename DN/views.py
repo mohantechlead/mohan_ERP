@@ -161,7 +161,7 @@ def input_delivery_items(request):
                                 subject = 'Over Delivery Notification'
                                 message = f'The order with Order ID {serial_no} has been over delivered by {order_item.quantity} on delivery number {delivery_no}'
                                 from_email = 'tech@mohanplc.com'
-                                recipient_list = ['tibarek90@gmail.com']
+                                recipient_list = ['tibarek90@gmail.com', 'harsh@mohanplc.com']
 
                                 send_mail(subject, message, from_email, recipient_list, fail_silently= False)
 
