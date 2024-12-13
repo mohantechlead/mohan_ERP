@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import orders,delivery,orders_items,delivery_items, inventory_DN_items, inventory_order_items
+from .models import orders,delivery,orders_items,delivery_items, inventory_DN_items, inventory_order_items, Customer
 
 admin.site.register(orders)
 admin.site.register(delivery)
