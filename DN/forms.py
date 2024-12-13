@@ -58,11 +58,12 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
+    combined_queryset = set(inventory_order_items.objects.all()) | set(inventory.objects.all())
     description = forms.ChoiceField(
     choices=[
         (item.item_name, item.item_name)  # Only include item_name without the model name prefix
         for item in sorted(
-            chain(inventory_order_items.objects.all(), inventory.objects.all()),
+            combined_queryset,
             key=operator.attrgetter('item_name')
         )
     ],
