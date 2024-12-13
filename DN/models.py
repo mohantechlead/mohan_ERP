@@ -95,7 +95,7 @@ class Customer(models.Model):
         ordering = ['company'] 
 
     def __str__(self):
-        return self.name
+        return self.company
 
 class inventory_DN_items(models.Model):
     item_name = models.TextField(blank=True)
