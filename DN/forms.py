@@ -58,24 +58,23 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
-    seen_item_names = set()   
-   
+    seen_item_names = set()
+
     description = forms.ChoiceField(
         choices=[
-            (item.item_name, item.item_name)  # Only include item_name without the model name prefix
+            (item.item_name, item.item_name)  # Only include item_name as both value and label
             for item in sorted(
                 list(chain(inventory_order_items.objects.all(), inventory.objects.all())),
-                key=operator.attrgetter('item_name')
+                key=operator.attrgetter('item_name')  # Sort by item_name
             )
             if item.item_name not in seen_item_names and not seen_item_names.add(item.item_name)  # Ensure uniqueness
         ],
-
-         widget=forms.Select(attrs={
-        'class': 'form-control select2',
-        'data-minimum-input-length': '0',  # Start filtering from the first character
-        'data-placeholder': 'Select or type an item',
-        'id': 'description'
-    }),
+        widget=forms.Select(attrs={
+            'class': 'form-control select2',  # Class for Select2 widget styling
+            'data-minimum-input-length': '0',  # Start filtering from the first character
+            'data-placeholder': 'Select or type an item',  # Placeholder text
+            'id': 'description',  # HTML ID for the field
+        }),
     )
      
     no_of_unit = forms.FloatField(
