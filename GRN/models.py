@@ -128,7 +128,8 @@ class Supplier(models.Model):
     company = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.company
+
 
     
 
