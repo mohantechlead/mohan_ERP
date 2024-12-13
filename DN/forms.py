@@ -64,22 +64,21 @@ class DeliverItemForm(forms.ModelForm):
     # Use a dictionary comprehension to ensure uniqueness based on item_name
     unique_items = {item.item_name: item for item in combined_queryset}.values()
     description = forms.ChoiceField(
-    choices=[
-        (item.item_name, item.item_name)  # Only include item_name without the model name prefix
-        for item in sorted(
-            unique_items,
-            key=operator.attrgetter('item_name')
-        )
-    ],
-    widget=forms.Select(attrs={
+        choices=[
+            (item.item_name, item.item_name)  # Only include item_name without the model name prefix
+            for item in sorted(
+                list(chain(inventory_order_items.objects.all(), inventory.objects.all())),
+                key=operator.attrgetter('item_name')  # Sort by item_name
+            )
+        ],
+        widget=forms.Select(attrs={
         'class': 'form-control select2',
         'data-minimum-input-length': '0',  # Start filtering from the first character
         'data-placeholder': 'Select or type an item',
         'id': 'description'
     }),
-)
-
-    
+    )
+     
     no_of_unit = forms.FloatField(
         required = False,
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add No of Units', 'id':'no_of_unit'})
