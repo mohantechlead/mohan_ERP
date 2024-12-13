@@ -203,7 +203,7 @@ def display_goods(request):
         print(f"Updating or creating: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
 
         # Update or create in finished_goods using the group name or item_name
-        finished_goods.objects.update_or_create(
+        finished_goods.objects.update(
             item_name=group_name,  # Use group name if available, else item_name
             defaults={'quantity': result_quantity, 'no_of_unit': result_units}
         )
