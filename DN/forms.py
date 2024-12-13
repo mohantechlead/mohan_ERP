@@ -133,21 +133,35 @@ class DeliverItemForm(forms.ModelForm):
 
 
 class OrderItemForm(forms.ModelForm):
+    # Collect both querysets and ensure uniqueness of item_name values
+    inventory_items = list(chain(inventory_order_items.objects.all(), inventory.objects.all()))
+
+    # Create a set to track unique item names
+    seen_item_names = set()
+    unique_items = []
+
+    # Loop through the combined querysets and ensure uniqueness
+    for item in inventory_items:
+        if item.item_name not in seen_item_names:
+            seen_item_names.add(item.item_name)
+            unique_items.append(item)
+
+    # Now sort the unique items by item_name
+    sorted_unique_items = sorted(unique_items, key=operator.attrgetter('item_name'))
+
+    # Create the ChoiceField with sorted and unique items
     description = forms.ChoiceField(
-    choices=[
-        (item.item_name, item.item_name)  # Only include item_name without the model name prefix
-        for item in sorted(
-            chain(inventory_order_items.objects.all(), inventory.objects.all()),
-            key=operator.attrgetter('item_name')
-        )
-    ],
-    widget=forms.Select(attrs={
-        'class': 'form-control select2',
-        'data-minimum-input-length': '0',  # Start filtering from the first character
-        'data-placeholder': 'Select or type an item',
-        'id': 'description'
-    }),
-)
+        choices=[
+            (item.item_name, item.item_name)  # Only include item_name for value and label
+            for item in sorted_unique_items
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-control select2',  # Class for Select2 widget styling
+            'data-minimum-input-length': '0',  # Start filtering from the first character
+            'data-placeholder': 'Select or type an item',  # Placeholder text
+            'id': 'description',  # HTML ID for the field
+        }),
+    )
     
     no_of_unit = forms.FloatField(
         required = False,
