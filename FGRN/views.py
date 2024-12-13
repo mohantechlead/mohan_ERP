@@ -203,11 +203,11 @@ def display_goods(request):
         print(f"Updating or creating: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
 
         # Update or create in finished_goods using the group name or item_name
-        finished_goods.objects.update_or_create(
-                item_name=name,
-                defaults={'quantity': result_quantity,
-                        'no_of_unit': result_units}
-            )
+            finished_goods.objects.update_or_create(
+                    item_name=name,
+                    defaults={'quantity': result_quantity,
+                            'no_of_unit': result_units}
+                )
 
     # Render the context
     items = finished_goods.objects.all().order_by('item_name')
