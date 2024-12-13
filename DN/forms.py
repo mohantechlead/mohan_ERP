@@ -58,12 +58,18 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
-    combined_queryset = set(inventory_order_items.objects.all()) | set(inventory.objects.all())
+    combined_queryset = chain(inventory_order_items.objects.all(), inventory.objects.all())
+
+    # Extract unique item names using a set
+    unique_item_names = set(item.item_name for item in combined_queryset)
+    
+    # If you need to work with the result as a list, convert it
+    unique_item_names_list = list(unique_item_names)
     description = forms.ChoiceField(
     choices=[
         (item.item_name, item.item_name)  # Only include item_name without the model name prefix
         for item in sorted(
-            combined_queryset,
+            unique_item_names_list,
             key=operator.attrgetter('item_name')
         )
     ],
