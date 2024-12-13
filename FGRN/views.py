@@ -204,12 +204,10 @@ def display_goods(request):
 
         # Update or create in finished_goods using the group name or item_name
         finished_goods.objects.update_or_create(
-            item_name=name,
-            defaults={
-                'quantity': result_quantity,
-                'no_of_unit': result_units
-            }
-        )
+                item_name=name,
+                defaults={'quantity': result_quantity,
+                        'no_of_unit': result_units}
+            )
 
     # Render the context
     items = finished_goods.objects.all().order_by('item_name')
