@@ -148,64 +148,28 @@ document.addEventListener('DOMContentLoaded', function () {
     };
     
     
-    // function add_new_form(args) {
-    //     // Your code to add a new form here
-    //     const currentForms = document.getElementsByClassName('item-list')
-    //     let currentFormsCount = currentForms.length + 1
-    //     console.log(currentForms.length)
-    //     console.log(totalNewForms);
-    //     const copyFormTarget = document.getElementById('form-lists')
-    //     const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
-    //     copyEmptyForm.setAttribute('class', 'item-list form-group col-md-4 text-dark')
-    //     copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
-    //     // Clear input values in the cloned form
-    //     const regex = new RegExp('__prefix__', 'g')
-    //     copyEmptyForm.querySelectorAll('input').forEach(function (input) {
-    //         input.value = '';
-    //     });
-    //     copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount)
-    //     // Append the cloned form to the form list
-    //     totalNewForms.value = currentFormsCount + 1;
-    //     copyFormTarget.appendChild(copyEmptyForm);
-    // } 
-
     function add_new_form(args) {
-    // Get the list of current forms
-    const currentForms = document.getElementsByClassName('item-list');
-    let currentFormsCount = currentForms.length + 1;
+        // Your code to add a new form here
+        const currentForms = document.getElementsByClassName('item-list')
+        let currentFormsCount = currentForms.length + 1
+        console.log(currentForms.length)
+        console.log(totalNewForms);
+        const copyFormTarget = document.getElementById('form-lists')
+        const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
+        copyEmptyForm.setAttribute('class', 'item-list form-group col-md-4 text-dark')
+        copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
+        // Clear input values in the cloned form
+        const regex = new RegExp('__prefix__', 'g')
+        copyEmptyForm.querySelectorAll('input').forEach(function (input) {
+            input.value = '';
+        });
+        copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount)
+        // Append the cloned form to the form list
+        totalNewForms.value = currentFormsCount + 1;
+        copyFormTarget.appendChild(copyEmptyForm);
+    } 
+
     
-    console.log(currentForms.length);
-    console.log(currentFormsCount);
-
-    // Get the target form container
-    const copyFormTarget = document.getElementById('form-lists');
-    
-    // Clone the empty form
-    const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
-    copyEmptyForm.setAttribute('class', 'item-list form-group col-md-4 text-dark');
-    copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`);
-
-    // Clear input values in the cloned form
-    const regex = new RegExp('__prefix__', 'g');
-    copyEmptyForm.querySelectorAll('input').forEach(function (input) {
-        input.value = '';  // Reset input fields
-    });
-
-    // Update form HTML (e.g., replace prefix with the form count)
-    copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount);
-
-    // Check if totalNewForms exists before setting its value
-    const totalNewForms = document.getElementById('total-new-forms');
-    if (totalNewForms) {
-        totalNewForms.value = currentFormsCount + 1;  // Only set if element exists
-    } else {
-        console.warn("totalNewForms element not found.");
-    }
-
-    // Append the cloned form to the form list
-    copyFormTarget.appendChild(copyEmptyForm);
-}
-
 
     function updateTotalPrice(form) {
         var per_unit_kg = parseFloat(form.find('#per_unit_kg').val());
