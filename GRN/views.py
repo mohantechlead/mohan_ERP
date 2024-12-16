@@ -171,7 +171,7 @@ def create_grn_items(request):
             else:
                 print("Formset is not valid")
                 print(formset.data)
-                errors = dict(formset.errors.items())
+                errors = "Error"
                 return JsonResponse({'form_errors': errors}, status=400)
 
             pr_form = GRNForm(prefix="orders")
