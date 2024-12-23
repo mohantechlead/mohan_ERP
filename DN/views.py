@@ -221,6 +221,8 @@ def deliveries(request):
 #for creating Orders
 def input_orders(request):
     customer = Customer.objects.values_list('company', flat=True)
+    Order_instance = orders.objects.get(serial_no = order_number)
+    
     if request.method == 'POST':
         form = OrderForm(request.POST)
 
@@ -229,6 +231,8 @@ def input_orders(request):
 
         if form.is_valid():
             order_number = form.cleaned_data['serial_no']
+            Order_instance.reciveable  = form.cleaned_data['reciveable ']
+            Order_instance.withholding_amount  = form.cleaned_data['withholding_amount'] 
             form.save()
             return redirect('input_orders')
         
