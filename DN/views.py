@@ -231,9 +231,6 @@ def input_orders(request):
 
         if form.is_valid():
             order_number = form.cleaned_data['serial_no']
-            Order_instance = orders.objects.get(serial_no = order_number)
-            Order_instance.reciveable  = form.cleaned_data['reciveable ']
-            Order_instance.withholding_amount  = form.cleaned_data['withholding_amount'] 
             form.save()
             return redirect('input_orders')
         
