@@ -97,7 +97,7 @@ def create_grn(request):
     plate_no = sorted(set(GRN.objects.values_list('truck_no', flat=True)))
     store_name = sorted(set(GRN.objects.values_list('store_name', flat=True)))
     store_keeper = sorted(set(GRN.objects.values_list('store_keeper', flat=True)))
-    recieved_from = sorted(set(GRN.objects.values_list('recieved_from', flat=True)))
+    recieved_from = sorted(set(supplier.objects.values_list('company', flat=True)))
 
     if request.method == 'POST':
         form = GRNForm(request.POST)
