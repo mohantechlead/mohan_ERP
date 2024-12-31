@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
         ('DN', '0027_alter_customer_options'),
     ]
 
-   operations = [
+    operations = [
         migrations.AlterField(
             model_name="delivery",
             name="phone_number",
