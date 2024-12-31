@@ -86,7 +86,7 @@ class delivery_items(models.Model):
 class Customer(models.Model):
     customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     contact_person = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     company = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
