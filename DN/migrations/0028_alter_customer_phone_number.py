@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('DN', '0026_inventory_order_items'),
+        ('DN', '0027_alter_customer_options'),
     ]
 
    operations = [
