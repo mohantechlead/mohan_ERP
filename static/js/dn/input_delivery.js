@@ -11,43 +11,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const orderInput = document.querySelector('input[name="serial_no"]');  // The order number input field
     const descriptionSelect = document.querySelector('#description');  // The description dropdown
 
+   
+
 
     calculateTotalButton.addEventListener('click', function (event) {
         event.preventDefault();
         calculateTotalPrice();
     });
-
-   
-    if (orderInput) {
-        orderInput.addEventListener('change', function () {
-            const serialNo = orderInput.value;  // Get the order number value
-
-            // AJAX call to get items based on the serial_no
-            fetch(`/DN/get_order_items/?serial_no=${serialNo}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Clear existing options in the description field
-                    descriptionSelect.innerHTML = '';
-
-                    // Add new options to the description field based on fetched items
-                    if (data.items.length > 0) {
-                        data.items.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item;
-                            option.textContent = item;
-                            descriptionSelect.appendChild(option);
-                        });
-                    } else {
-                        // In case no items are found, display a "No items" option
-                        const option = document.createElement('option');
-                        option.value = '';
-                        option.textContent = 'No items found';
-                        descriptionSelect.appendChild(option);
-                    }
-                })
-                .catch(error => console.error('Error fetching items:', error));
-        });
-    }
 
     function calculateTotalPrice() {
         var total = 0
@@ -74,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
      
     calculateTotalPrice();
+    order_items_list();
 
     submitButton.addEventListener('click', function(event){
         event.preventDefault();
@@ -160,6 +131,41 @@ document.addEventListener('DOMContentLoaded', function () {
         totalNewForms.value = currentFormsCount + 1;
         copyFormTarget.appendChild(copyEmptyForm);
     } 
+
+    function order_items_list(){
+        const serialNoInput = document.querySelector('input[name="serial_no"]'); // Adjust based on input's name
+        const descriptionSelect = document.querySelectorAll('select[name$="-description"]'); // For all description fields in formset
+    
+        if (serialNoInput) {
+            serialNoInput.addEventListener('change', function () {
+                const serialNo = serialNoInput.value;
+    
+                // Fetch updated items based on the serial_no
+                fetch(`/DN/get_order_items/?serial_no=${serialNo}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.items) {
+                            descriptionSelect.forEach(select => {
+                                select.innerHTML = ''; // Clear existing options
+    
+                                // Add new options
+                                data.items.forEach(item => {
+                                    const option = document.createElement('option');
+                                    option.value = item;
+                                    option.textContent = item;
+                                    select.appendChild(option);
+                                });
+                            });
+                        } else {
+                            descriptionSelect.forEach(select => {
+                                select.innerHTML = '<option value="">No items available</option>';
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching items:', error));
+            });
+        }
+    }
 
     function updateTotalPrice(form) {
         var per_unit_kg = parseFloat(form.find('#per_unit_kg').val());
