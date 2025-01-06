@@ -8,11 +8,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const date = document.getElementById('date')
     addMoreBtn.addEventListener('click', add_new_form);
     const calculateTotalButton = document.querySelector('#calculate_total');
+    const orderInput = document.querySelector('input[name="serial_no"]');  // The order number input field
+    const descriptionSelect = document.querySelector('#description');  // The description dropdown
+
 
     calculateTotalButton.addEventListener('click', function (event) {
         event.preventDefault();
         calculateTotalPrice();
     });
+
+   
+    if (orderInput) {
+        orderInput.addEventListener('change', function () {
+            const serialNo = orderInput.value;  // Get the order number value
+
+            // AJAX call to get items based on the serial_no
+            fetch(`/DN/get_order_items/?serial_no=${serialNo}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing options in the description field
+                    descriptionSelect.innerHTML = '';
+
+                    // Add new options to the description field based on fetched items
+                    if (data.items.length > 0) {
+                        data.items.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item;
+                            option.textContent = item;
+                            descriptionSelect.appendChild(option);
+                        });
+                    } else {
+                        // In case no items are found, display a "No items" option
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'No items found';
+                        descriptionSelect.appendChild(option);
+                    }
+                })
+                .catch(error => console.error('Error fetching items:', error));
+        });
+    }
 
     function calculateTotalPrice() {
         var total = 0
