@@ -1081,7 +1081,11 @@ def generate_excel(request):
 
     return response
 
-
+def get_order_items(request):
+    serial_no = request.GET.get('serial_no')  # Get order number (serial_no) from the query params
+    items = set(orders_items.objects.filter(serial_no=serial_no).values_list('description', flat=True))
+    
+    return JsonResponse({'items': list(items)})
 
 
 
