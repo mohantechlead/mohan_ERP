@@ -170,37 +170,5 @@
     
 <script src="../../static/js/dn/input_delivery.js"></script>
 
-<script>
-  $(document).ready(function () {
-      $('#serial_no').on('input', function () {
-          const serialNo = $(this).val();
-
-          if (serialNo.trim() === '') {
-              $('#description').html('<option value="">Select an item</option>');
-              return;
-          }
-
-          $.ajax({
-              url: "{% url 'get_order_items' %}",
-              method: "GET",
-              data: { serial_no: serialNo },
-              success: function (response) {
-                  const descriptionField = $('#description');
-                  descriptionField.empty(); // Clear existing options
-                  descriptionField.append('<option value="">Select an item</option>');
-
-                  if (response.items.length > 0) {
-                      response.items.forEach(function (item) {
-                          descriptionField.append(`<option value="${item.name}">${item.name}</option>`);
-                      });
-                  }
-              },
-              error: function () {
-                  alert('An error occurred while fetching the items.');
-              }
-          });
-      });
-  });
-</script>
 
 {% endblock %}

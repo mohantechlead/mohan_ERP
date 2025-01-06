@@ -114,6 +114,7 @@ def input_delivery_items(request):
 
                         selected_item = form.cleaned_data['description']
                         # selected_item_description = selected_item.item_name  # Assuming item_name is the field
+                        
                     
                         form.save()
             

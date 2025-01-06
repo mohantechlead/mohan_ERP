@@ -75,28 +75,20 @@ class DeliverItemForm(forms.ModelForm):
     sorted_unique_items = sorted(unique_items, key=operator.attrgetter('item_name'))
 
     # Create the ChoiceField with sorted and unique items
-    # description = forms.ChoiceField(
-    #     choices=[
-    #         (item.item_name, item.item_name)  # Only include item_name for value and label
-    #         for item in sorted_unique_items
-    #     ],
-    #     widget=forms.Select(attrs={
-    #         'class': 'form-control select2',  # Class for Select2 widget styling
-    #         'data-minimum-input-length': '0',  # Start filtering from the first character
-    #         'data-placeholder': 'Select or type an item',  # Placeholder text
-    #         'id': 'description',  # HTML ID for the field
-    #     }),
-    # )
-    
     description = forms.ChoiceField(
-    choices=[],  # Initially empty
-    widget=forms.Select(attrs={
-        'class': 'form-control select2',
-        'data-minimum-input-length': '0',
-        'data-placeholder': 'Select or type an item',
-        'id': 'description',
-            }),
-        )
+        choices=[
+            (item.item_name, item.item_name)  # Only include item_name for value and label
+            for item in sorted_unique_items
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-control select2',  # Class for Select2 widget styling
+            'data-minimum-input-length': '0',  # Start filtering from the first character
+            'data-placeholder': 'Select or type an item',  # Placeholder text
+            'id': 'description',  # HTML ID for the field
+        }),
+    )
+    
+
     
     no_of_unit = forms.FloatField(
         required = False,
