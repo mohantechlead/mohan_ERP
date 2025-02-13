@@ -6,19 +6,23 @@
     <table class="table table-striped" id="example">
         <thead>
             <tr>
+                <th>Company</th>
                 <th>Name</th>
                 <th>Phone Number</th>
                 <th>Email</th>
-                <th>Company</th>
+                <th>Tin No</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <tbody>
             {% for supplier in suppliers %}
             <tr>
+                <td><a href="{% url 'supplier_details' supplier.company %}">{{ supplier.company }}</a></td>
                 <td>{{ supplier.contact_person }}</td>
                 <td>{{ supplier.phone_number }}</td>
-                <td>{{ supplier.email }}</td>
-                <td>{{ supplier.company }}</td>
+                <td>{{ supplier.email }}</td> 
+                <td>{{ supplier.tin_no }}</td>
+                <td>{{ supplier.remarks }}</td>
             </tr>
             {% empty %}
             <tr>

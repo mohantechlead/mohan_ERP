@@ -180,33 +180,13 @@
   <script>
 
     $(document).ready(function() {
-        $('#example tbody tr').each(function() {
-            var dateText = $(this).find('td:eq(3)').text().trim();  // Adjust column index
-            var formattedDate = convertToISO(dateText);
-            $(this).find('td:eq(3)').attr('data-order', formattedDate);
-        });
-
-        $('#example').DataTable({
+             $('#example').DataTable({
             "pageLength": 100,
-            "columnDefs": [
-                { "type": "num", "targets": 2 } // Sorting based on transformed date
-            ]
+            
         });
     });
 
-    function convertToISO(dateText) {
-        const months = { "Jan.": "01", "Feb.": "02", "Mar.": "03", "Apr.": "04",
-                        "May": "05", "Jun.": "06", "Jul.": "07", "Aug.": "08",
-                        "Sep.": "09", "Oct.": "10", "Nov.": "11", "Dec.": "12" };
-        
-        let parts = dateText.split(" ");
-        let month = months[parts[0]];
-        let day = parts[1].replace(",", "").padStart(2, '0');  // Ensure 2-digit day
-        let year = parts[2];
-
-        return `${year}-${month}-${day}`;
-    }
-
+  
    
   </script>
     

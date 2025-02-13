@@ -710,3 +710,13 @@ def display_supplier(request):
     suppliers = Supplier.objects.all()
     return render(request, 'display_supplier.html', {'suppliers': suppliers})
 
+@login_required(login_url="login_user")
+def supplier_details(request, company):
+    supplier = get_object_or_404(Supplier, company=company)
+       
+    context = {
+        'supplier': supplier,
+        
+    }
+    return render(request, 'supplier_details.html', context)
+
