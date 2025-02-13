@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'DN',
     'rest_framework',
     'members',
-    # 'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -88,7 +87,7 @@ DATABASES = {
        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'orders',
        'USER': 'postgres',
-       'PASSWORD': 'mohanPLC',
+       'PASSWORD': 'postgres',
        'HOST': '127.0.0.1', 
         'PORT': '5432',
        'DISABLE_SERVER_SIDE_CURSORS': True,
@@ -165,13 +164,4 @@ EMAIL_HOST_USER = 'tech@mohanplc.com'
 EMAIL_HOST_PASSWORD = 'llcbqsjcpgyzbqvc'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Change the broker URL as per your configuration
-# CELERY_BEAT_SCHEDULE = {
-#     'send_weekly_emails': {
-#         'task': 'your_app.tasks.send_weekly_email',
-#         'schedule': crontab(day_of_week=0, hour=8, minute=0),  # Every Monday at 8 AM
-#     },
-# }
 

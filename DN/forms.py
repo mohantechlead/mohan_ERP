@@ -237,10 +237,18 @@ class CustomerForm(forms.ModelForm):
     address = forms.CharField(
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Address'})
     )
-     
+
+    tin_no = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add TIN NO'})
+    )
+    
+    remarks = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Remarks'})
+    )
+
     class Meta:
         model = Customer
-        fields = [ 'company','contact_person', 'phone_number', 'email','address']
+        fields = [ 'company','contact_person', 'phone_number', 'email','address', 'tin_no', 'remarks']
 
 class OrderInventoryForm(forms.ModelForm):
     

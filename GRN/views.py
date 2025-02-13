@@ -12,6 +12,8 @@ from MR.models import *
 from django.utils import timezone
 from datetime import timedelta
 from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now 
 
 def is_admin(user):
     return user.is_superuser
@@ -26,19 +28,9 @@ def grn_number(request):
         formset = formset(prefix="GRN_items")
         number = request.GET['grn_number']
         names = purchase_orders.objects.all()
-        # try:
-        #     order = purchase_orders.objects.get(PR_no=number)
-        #     pr_items = PR_item.objects.all()
-        #     pr_items = pr_items.filter(PR_no=number)
-        #     print(pr_items)
-        # except purchase_orders.DoesNotExist:
-        #     # If it's not found in purchase_orders, try searching in import_PR
-           
-        #     order = None 
-        # print(pr_items,"ittt")
+     
         context = {
-            # 'order': order,
-            # 'pr_items':pr_items,
+           
             'grn_form': grn_form,
             'formset': formset,
             'names':names
@@ -271,6 +263,41 @@ def display_pr(request):
         'my_order': orders
     }
     return render(request,'display_pr.html', context)
+
+@csrf_exempt
+@login_required(login_url="login_user")
+def send_email_reminder(request):
+    if request.method == 'POST':
+        try:
+            # Get today's date and calculate the 30-day threshold
+            threshold_date = now() - timedelta(days=30)
+
+            # Filter orders with remaining > 0 and older than 30 days
+            overdue_orders = purchase_orders.objects.filter(remaining__gt=0, date__lt=threshold_date)
+
+            if not overdue_orders.exists():
+                return JsonResponse({"message": "No overdue PRs found."})
+
+            # Build email content
+            email_body = "The following PRs are overdue (remaining items & more than 30 days old):\n\n"
+            for order in overdue_orders:
+                email_body += f"PR No: {order.PR_no}, Date: {order.date}, Remaining: {order.remaining}\n"
+
+            recipient_email = "tibarek90@gmail.com"  # Replace with actual recipient email
+
+            send_mail(
+                "Overdue PR Reminder",
+                email_body,
+                "tech@mohanplc.com",
+                [recipient_email]
+            )
+
+            return JsonResponse({"message": "Reminder email sent successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @login_required(login_url="login_user")
 def search_prs(request,pr_no):
