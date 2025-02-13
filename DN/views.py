@@ -1088,6 +1088,14 @@ def get_order_items(request):
     
     return JsonResponse({'items': list(items)})
 
+@login_required(login_url="login_user")
+def customer_detail(request, company):
+    customer = get_object_or_404(Customer, company=company)
+        
+    context = {
+        'customer': customer,
+    }
+    return render(request, 'customer_details.html', context)
 
 
 

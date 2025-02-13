@@ -7,22 +7,26 @@
         <thead>
             <tr>
                 <!-- <th>Customer ID</th> -->
+                <th>Company</th>
                 <th>Name</th>
                 <th>Phone Number</th>
                 <th>Email</th>
-                <th>Company</th>
                 <th>Address</th>
+                <th>Tin No</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <tbody>
             {% for customer in customers %}
             <tr>
                 <!-- <td>{{ customer.customer_id }}</td> -->
-                <td>{{ customer.contact_person }}</td>
+                <td>  <a href="{% url 'customer_detail' customer.company %}"> {{ customer.company }} </a></td>
+                <td> {{ customer.contact_person }}</td>
                 <td>{{ customer.phone_number }}</td>
                 <td>{{ customer.email }}</td>
-                <td>{{ customer.company }}</td>
                 <td>{{ customer.address }}</td>
+                <td>{{ customer.tin_no}} </td>
+                <td> {{ customer.remarks}} </td>
             </tr>
             {% empty %}
             <tr>

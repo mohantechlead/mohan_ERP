@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from GRN import views
+
 urlpatterns = [
     # path('display_items/<str:pr_no>/', views.display_items, name='display_items'),
     # path('create_items', views.create_items, name='create_items'),
@@ -26,7 +27,9 @@ urlpatterns = [
     # path('admin/custom-report-page/', views.custom_report_page, name='custom_report_page'),
     path('search_grns', views.search_grns, name='search_grns'),
     path('create_supplier', views.create_supplier, name="create_supplier"),
-    path('display_supplier', views.display_supplier, name="display_supplier")
+    path('display_supplier', views.display_supplier, name="display_supplier"),
+    path('send_email_reminder', views.send_email_reminder, name='send_email_reminder'),
+
 ]
 
 

@@ -51,5 +51,7 @@ urlpatterns = [
     path('delivery_api/',views.delivery_list),
     path('sales_contract/',views.sales_contract),
     path('get_order_items/', views.get_order_items, name='get_order_items'),
+    path('customer/<str:company>/', views.customer_detail, name='customer_detail'),
+
 ]   
 

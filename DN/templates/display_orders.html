@@ -65,7 +65,7 @@
     <tr>
       <!-- <td><a href="#" class="order-link" data-order-id="{{ order.serial_no }}">{{ order.serial_no }}</a></td> -->
        <td><a href="/DN/display_single_order/{{ order.serial_no }}">{{ order.serial_no }}</a></td>
-      <td>{{ order.date }}</td>
+      <td data-order="{{ order.date|date:'Y-m-d' }}">{{ order.date }}</td>
       <td>{{ order.invoice }}</td>
 
       

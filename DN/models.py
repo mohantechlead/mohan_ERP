@@ -90,6 +90,8 @@ class Customer(models.Model):
     email = models.EmailField(unique=True)
     company = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
+    remarks = models.CharField(max_length=200, blank=True, null=True)
+    tin_no = models.CharField(blank=True, null=True)
 
     class Meta:
         ordering = ['company'] 
