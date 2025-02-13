@@ -29,6 +29,7 @@ urlpatterns = [
     path('create_supplier', views.create_supplier, name="create_supplier"),
     path('display_supplier', views.display_supplier, name="display_supplier"),
     path('send_email_reminder', views.send_email_reminder, name='send_email_reminder'),
+     path('supplier/<str:company>/', views.supplier_details, name='supplier_details'),
 
 ]
 

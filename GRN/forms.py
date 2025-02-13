@@ -198,9 +198,16 @@ class SupplierForm(forms.ModelForm):
         widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Address'})
     )
     
+    tin_no = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Tin No'})
+    )
+
+    remarks = forms.CharField(
+        widget = forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Add Remarks'})
+    )
     
     class Meta:
         model = Supplier
-        fields = ['company','contact_person', 'phone_number', 'email', 'address']
+        fields = ['company','contact_person', 'phone_number', 'email', 'address', 'tin_no', 'remarks']
 
 

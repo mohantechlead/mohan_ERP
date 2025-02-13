@@ -1,41 +1,41 @@
-{% extends 'deliveries_base.html' %}
+{% extends 'grn_base.html' %}
 
 {% block content %}
 <div class="container">
-    <h2>Customer Details</h2>
+    <h2>Supplier Details</h2>
     <br>
     <table class="table table-bordered">
         <tr>
             <th>Company:</th>
-            <td>{{ customer.company }}</td>
+            <td>{{ supplier.company }}</td>
         </tr>
         <tr>
             <th>Contact Person:</th>
-            <td>{{ customer.contact_person }}</td>
+            <td>{{ supplier.contact_person }}</td>
         </tr>
         <tr>
             <th>Email:</th>
-            <td>{{ customer.email }}</td>
+            <td>{{ supplier.email }}</td>
         </tr>
         <tr>
             <th>Phone:</th>
-            <td>{{ customer.phone_number }}</td>
+            <td>{{ supplier.phone_number }}</td>
         </tr>
         <tr>
             <th>Address:</th>
-            <td>{{ customer.address }}</td>
+            <td>{{ supplier.address }}</td>
         </tr>
         <tr>
             <th>TIN No:</th>
-            <td>{{ customer.tin_no }}</td>
+            <td>{{ supplier.tin_no }}</td>
         </tr>
         <tr>
             <th>Remarks:</th>
-            <td>{{ customer.remarks }}</td>
+            <td>{{ supplier.remarks }}</td>
         </tr>
     </table>
 
-    <a href="{% url 'customer_list' %}" class="btn btn-primary">Back to Customer List</a>
+    <a href="{% url 'display_supplier' %}" class="btn btn-primary">Back to Supplier List</a>
 
      
 </div>

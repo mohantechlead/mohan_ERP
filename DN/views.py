@@ -13,6 +13,7 @@ from django.contrib import messages
 from .forms import *
 from FGRN.models import finished_goods
 from MR.models import inventory
+from .models import *
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
 import plotly.graph_objs as go
@@ -1091,9 +1092,10 @@ def get_order_items(request):
 @login_required(login_url="login_user")
 def customer_detail(request, company):
     customer = get_object_or_404(Customer, company=company)
-        
+       
     context = {
         'customer': customer,
+        
     }
     return render(request, 'customer_details.html', context)
 
