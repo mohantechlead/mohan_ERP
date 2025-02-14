@@ -22,6 +22,8 @@ import openpyxl
 from django.http import HttpResponse
 from openpyxl.styles import Alignment
 from django.core.mail import send_mail
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 @api_view(['GET','POST'])
 def order_list(request):
@@ -676,61 +678,23 @@ def pivot_data(request):
 
 @login_required(login_url="login_user")
 def dashboards(request):
-    my_order = orders.objects.all()
-    limit = 10
-    chart_type = 'bar'
-    if request.method == 'GET':
-        limit = int(request.GET.get('limit', 10))
-        items = int(request.GET.get('items', 10))
-        chart_type = request.GET.get('chart_type', 'bar')
-        if limit <= 0 or items<= 0:
-            return HttpResponseBadRequest("Invalid limit value. Please provide a positive integer for the 'limit' parameter.")
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-
-    # Filter orders within the specified date range
-    if start_date and end_date:
-        my_order = my_order.filter(date__range=[start_date, end_date])
-        my_order = my_order.order_by('date')
-
-    data = orders.objects.values('customer_name').annotate(total_sales=Sum('total_price'))
-    data = sorted(data,key=lambda x:x['total_sales'],reverse = True)
-    top_customers = data[:limit]
-
-    item_data = orders.objects.values('description').annotate(total_items=Sum('order_quantity'))
-    item_data = sorted(item_data,key = lambda x:x['total_items'], reverse = True)
-    top_items = item_data[:items]
-    # Create a list of dictionaries with customer name and total sales
-    revenue_data = my_order.annotate(month=ExtractMonth('date'),week=ExtractWeek('date')).values('month', 'week').annotate(total_revenue=Sum('total_price')).order_by('month', 'week')
-    # weekly_sales = my_order.annotate(week=ExtractWeek('date')).values('week').annotate(total_sales=Sum('total_price')).order_by('week')
-    monthly_sales = my_order.annotate(month=ExtractMonth('date')).values('month').annotate(total_monthly_sales=Sum('total_price')).order_by('month')
+    # Fetch item names and their corresponding quantities
+    qs = inventory_order_items.objects.all()
     
-    # Extract data and labels
-    revenue_labels = [revenue['month'] for revenue in revenue_data]
-    revenue_data = [revenue['total_revenue'] for revenue in revenue_data]
-    # weekly_revenue_labels = [revenue['week'] for revenue in weekly_sales]
-    # weekly_revenue_data = [revenue['total_sales'] for revenue in weekly_sales]
- 
-    monthly_revenue_labels = [revenue['month'] for revenue in monthly_sales]
-    monthly_revenue_data = [revenue['total_monthly_sales'] for revenue in monthly_sales]
-   
-    chart_data = [{'customer_name': entry['customer_name'], 'total_sales': entry['total_sales']} for entry in top_customers]
-    item_chart = [{'description': entry['description'], 'total_items': entry['total_items']} for entry in top_items]
-    # Prepare data as JSON
-    
-    json_data = {
-        'labels': [entry['customer_name'] for entry in chart_data],
-        'data': [entry['total_sales'] for entry in chart_data],
-        'item_labels': [item['description'] for item in item_chart],
-        'item_data': [item['total_items'] for item in item_chart],
-        #'revenue_labels': revenue_labels,
-        'revenue_labels':revenue_labels,
-        'revenue_data': revenue_data,
-        'monthly_revenue_labels': monthly_revenue_labels,
-        'monthly_revenue_data' : monthly_revenue_data,
-        'chart_type':chart_type
+    # Prepare data for Chart.js
+    labels = [item.item_name for item in qs]  # Extract item names
+    data = [item.total_quantity for item in qs]  # Extract quantity (or any relevant field)
+
+    # Convert to JSON for use in JavaScript
+    context = {
+        "labels": json.dumps(labels, cls=DjangoJSONEncoder),
+        "data": json.dumps(data, cls=DjangoJSONEncoder),
     }
-    return render(request, 'dashboard.html', {'json_data': json_data})
+
+    return render(request, "dashboard.html", context)
+
+
+
 
 @login_required(login_url="login_user")
 def customer_table(request):
@@ -840,41 +804,25 @@ def customer_list(request):
     return render(request, 'customer_list.html', {'customers': customers})
 
 def order_chart(request):
-    # Get all finished goods to populate the selection dropdown
-    finished_items = finished_goods.objects.all()
+    # Aggregating total quantity for each customer using `orders_items`
+    customer_data = (
+        orders_items.objects
+        .values('serial_no__customer_name')  # Access customer name through `serial_no` (ForeignKey)
+        .annotate(total_quantity=Sum('quantity'))  # Sum up the quantities
+        .order_by('-total_quantity')  # Sort by quantity, descending
+    )
 
-    # Get the selected item from the request
-    selected_item = request.GET.get('item_name', None)
+    # Prepare the labels (customer names) and data (total quantity)
+    labels = [data['serial_no__customer_name'] for data in customer_data]
+    data = [data['total_quantity'] for data in customer_data]
 
-    chart_div = None
-    if selected_item:
-        # Fetch data for the selected item from orders_items
-        items = orders_items.objects.filter(description=selected_item).select_related('serial_no')
-        
-        # Prepare data for plotting
-        dates = [item.serial_no.date for item in items if item.serial_no.date]  # Assuming orders have a date field
-        quantities = [item.quantity for item in items]
-
-        # Create a Plotly line chart
-        fig = go.Figure(
-            data=[
-                go.Scatter(x=dates, y=quantities, mode='lines+markers', name=selected_item)
-            ],
-            layout=go.Layout(
-                title=f"Quantity Variation Over Time for {selected_item}",
-                xaxis_title="Date",
-                yaxis_title="Quantity"
-            )
-        )
-        
-        # Generate the plot div
-        chart_div = plot(fig, output_type='div')
-
-    # Render the template
-    return render(request, 'order_chart.html', {
-        'finished_items': finished_items,
-        'chart_div': chart_div,
-    })
+    # Pass data to the template
+    context = {
+        'labels': labels,
+        'data': data
+    }
+    
+    return render(request, 'order_chart.html', context)
 
 @login_required(login_url="login_user")
 def display_DN_items(request):

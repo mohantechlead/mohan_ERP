@@ -13,6 +13,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}">
  
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap.css">
+    <!-- <link rel="stylesheet" href="https:cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/Chart.min.css"> -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         .hidden {
             display:none
@@ -112,16 +115,10 @@
                         class="dropdown-toggle">Dashboard</a>
                     <ul class="collapse list-unstyled" id="dashboardSubmenu">
                         <li style="font-size: large;">
-                            <a href="{% url 'order_chart' %}">Orders </a>
+                            <a href="{% url 'dashboards' %}">Orders</a>
                         </li>
                         <li style="font-size: large;">
-                            <a href="{% url 'customer_list' %}">Inventory</a>
-                        </li>
-                        <li style="font-size: large;">
-                            <a href="{% url 'customer_list' %}">Delivery</a>
-                        </li>
-                        <li style="font-size: large;"></li>
-                            <a href="{% url 'customer_list' %}">Customer</a>
+                            <a href="{% url 'order_chart' %}">Customer</a>
                         </li>
                     </ul>
                 </li>
@@ -163,6 +160,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function () {
             $('#sidebarCollapse').on('click', function () {
@@ -174,6 +172,8 @@
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.13.6/sorting/date-eu.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
 
     

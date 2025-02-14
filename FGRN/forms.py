@@ -45,6 +45,7 @@ class FGRNItemForm(forms.ModelForm):
     # Collect both querysets and ensure uniqueness of item_name values
     inventory_items = list(chain(inventory_order_items.objects.all(), finished_goods.objects.all()))
 
+   
     # Create a set to track unique item names
     seen_item_names = set()
     unique_items = []
