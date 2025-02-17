@@ -20,6 +20,9 @@ from itertools import chain
 import plotly.graph_objs as go
 from plotly.offline import plot
 from DN.models import inventory_DN_items
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+from GRN.models import PR_item
 
 @login_required(login_url="login_user")
 def create_MR(request):
@@ -449,58 +452,38 @@ def stock_card(request):
     return render(request, 'stock_card.html', context)
 
 def inventory_chart(request):
-    # Fetch all inventory items for the first chart
-    inventory_items = inventory.objects.all()
+    # Fetch item names and their corresponding quantities
+    qs = inventory.objects.all()
+    
+    # Prepare data for Chart.js
+    labels = [item.item_name for item in qs]  # Extract item names
+    data = [item.quantity for item in qs]  # Extract quantity (or any relevant field)
 
-    # Prepare data for the all-items chart
-    item_names = [item.item_name for item in inventory_items]
-    quantities = [item.quantity for item in inventory_items]
+    # Convert to JSON for use in JavaScript
+    context = {
+        "labels": json.dumps(labels, cls=DjangoJSONEncoder),
+        "data": json.dumps(data, cls=DjangoJSONEncoder),
+    }
 
-    # Create a Plotly bar chart for all items
-    fig_all_items = go.Figure(
-        data=[
-            go.Bar(x=item_names, y=quantities, marker_color='blue')
-        ],
-        layout=go.Layout(
-            title="Inventory Quantities for All Items",
-            xaxis_title="Item Name",
-            yaxis_title="Quantity"
-        )
+    return render(request, "inventory_chart.html", context)
+
+def supplier_chart(request):
+    # Aggregating total quantity for each customer using `orders_items`
+    supplier_data = (
+        PR_item.objects
+        .values('PR_no__vendor_name')  # Access customer name through `serial_no` (ForeignKey)
+        .annotate(total_quantity=Sum('quantity'))  # Sum up the quantities
+        .order_by('-total_quantity')  # Sort by quantity, descending
     )
 
-    # Generate the plot div for all items
-    chart_all_items_div = plot(fig_all_items, output_type='div')
+    # Prepare the labels (customer names) and data (total quantity)
+    labels = [data['PR_no__vendor_name'] for data in supplier_data]
+    data = [data['total_quantity'] for data in supplier_data]
 
-    # Handle the quantity change chart for the selected item
-    selected_item = request.GET.get('item_name', None)
-    chart_quantity_change_div = None
-
-    if selected_item:
-        # Fetch all MR_items for the selected item
-        item_records = MR_item.objects.filter(item_name=selected_item).select_related('MR_no')
-        
-        # Prepare the data for the second chart
-        dates = [record.MR_no.date for record in item_records]
-        quantities_over_time = [record.quantity for record in item_records]
-
-        # Create a Plotly line chart for quantity change over time
-        fig_quantity_change = go.Figure(
-            data=[
-                go.Scatter(x=dates, y=quantities_over_time, mode='lines+markers', name=selected_item)
-            ],
-            layout=go.Layout(
-                title=f"Quantity Change Over Time for {selected_item}",
-                xaxis_title="Date",
-                yaxis_title="Quantity"
-            )
-        )
-
-        # Generate the plot div for quantity change
-        chart_quantity_change_div = plot(fig_quantity_change, output_type='div')
-
-    # Render the template
-    return render(request, 'inventory_chart.html', {
-        'inventory_items': inventory_items,
-        'chart_all_items_div': chart_all_items_div,
-        'chart_quantity_change_div': chart_quantity_change_div
-    })
+    # Pass data to the template
+    context = {
+        'labels': labels,
+        'data': data
+    }
+    
+    return render(request, 'supplier_chart.html', context)
