@@ -1,41 +1,59 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Charts</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-</head>
-<body>
-    <h1>Inventory Quantities for All Items</h1>
+{% load static %}
 
-    <!-- First chart for all items -->
-    <div>
-        {{ chart_all_items_div|safe }}
-    </div>
+<div>
+    <canvas id="myChart" width="400" height="400"></canvas>
 
-    <h1>Select an Inventory Item to See Quantity Used in MR Over Time</h1>
+</div>
 
-    <form method="get">
-        <select name="item_name">
-            {% for item in inventory_items %}
-            <option value="{{ item.item_name }}" {% if item.item_name == request.GET.item_name %}selected{% endif %}>
-                {{ item.item_name }}
-            </option>
-            {% endfor %}
-        </select>
-        <button type="submit">Generate Chart</button>
-    </form>
+<script>
 
-    <!-- Second chart for the quantity change over time -->
-    <h2>Quantity Change Over Time</h2>
-    {% if chart_quantity_change_div %}
-        <div>{{ chart_quantity_change_div|safe }}</div>
-    {% else %}
-        <p>Select an item to see the quantity change over time chart.</p>
-    {% endif %}
-</body>
-</html>
-{%endblock%}
+document.addEventListener("DOMContentLoaded", function() {
+            // Load data from Django context
+            var labels = JSON.parse('{{ labels|escapejs }}');
+            var data = JSON.parse('{{ data|escapejs }}');
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    
+    
+   var myChart = new Chart(ctx, {
+       type: 'bar',
+       data: {
+           labels: labels,
+           datasets: [{
+               label: 'Inventory',
+               data:data,
+               backgroundColor: [
+                   'rgba(255, 99, 132, 0.2)',
+                   'rgba(54, 162, 235, 0.2)',
+                   'rgba(255, 206, 86, 0.2)',
+                   'rgba(75, 192, 192, 0.2)',
+                   'rgba(153, 102, 255, 0.2)',
+                   'rgba(255, 159, 64, 0.2)'
+               ],
+               borderColor: [
+                   'rgba(255, 99, 132, 1)',
+                   'rgba(54, 162, 235, 1)',
+                   'rgba(255, 206, 86, 1)',
+                   'rgba(75, 192, 192, 1)',
+                   'rgba(153, 102, 255, 1)',
+                   'rgba(255, 159, 64, 1)'
+               ],
+               borderWidth: 1
+           }]
+       },
+       options: {
+           scales: {
+               y: {
+                   beginAtZero: true
+               }
+           }
+       }
+   }); 
+});
+
+   
+</script>
+{% endblock %}
