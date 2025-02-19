@@ -148,12 +148,12 @@ def create_grn_items(request):
                         no_of_unit = form.cleaned_data['no_of_unit']
 
                         try:
-                            inventory_item = inventory.objects.get(item_name=item_name)
-                            inventory_item.quantity += quantity
-                            inventory_item.no_of_unit += no_of_unit
+                            inventory_item = inventory_GRN_items.objects.get(item_name=item_name)
+                            inventory_item.total_quantity += quantity
+                            inventory_item.total_no_of_unit += no_of_unit
                             inventory_item.save()
-                        except inventory.DoesNotExist:
-                            inventory_item = inventory(item_name=item_name, quantity=-quantity)
+                        except inventory_GRN_items.DoesNotExist:
+                            inventory_item = inventory_GRN_items(item_name=item_name, total_quantity=-quantity)
                             inventory_item.save()
 
                         form.save()
