@@ -200,13 +200,27 @@ def display_goods(request):
         result_units = total_units_c - total_units_b + total_units_a
 
         # Log the group or item being updated for debugging
-        print(f"Updating or creating: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
+        print(f"Processing: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
 
-        # Update or create in finished_goods using the group name or item_name
-        finished_goods.objects.filter(item_name=group_name).update(
-            quantity=result_quantity,
-            no_of_unit=result_units
-        )
+        # Check if the item exists in the opening balance
+        exists_in_opening_balance = FGRNopening_balance.objects.filter(item_name=group_name).exists()
+
+        # If the item is in the opening balance but not in finished_goods, create it
+        if exists_in_opening_balance and not finished_goods.objects.filter(item_name=group_name).exists():
+            finished_goods.objects.create(
+                item_name=group_name,
+                quantity=result_quantity,
+                no_of_unit=result_units
+            )
+            print(f"Created new entry in finished_goods: {group_name}")
+
+        # If the item exists in finished_goods, update it
+        else:
+            finished_goods.objects.filter(item_name=group_name).update(
+                quantity=result_quantity,
+                no_of_unit=result_units
+            )
+            print(f"Updated existing entry in finished_goods: {group_name}")
 
     # Render the context
     items = finished_goods.objects.all().order_by('item_name')
