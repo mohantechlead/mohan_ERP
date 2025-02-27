@@ -278,9 +278,10 @@ def input_orders_items(request):
                         quantity = form.cleaned_data['quantity']
                         no_of_unit = form.cleaned_data['no_of_unit']
                         total_price = form.cleaned_data['total_price']
+                        unit_price = form.cleaned_data['unit_price']
                 
                         final_unit += no_of_unit
-                        vat_amount += total_price * 0.15
+                        vat_amount += unit_price* quantity * 0.15
                         Order_instance.vat_amount = vat_amount
                         final_price += total_price + vat_amount
                         Order_instance.final_price = final_price
