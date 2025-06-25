@@ -1,7 +1,7 @@
 # from django.contrib import admin
 # from django.urls import path, include
 
-# urlpatterns = [
+# urlptterns = [
 #     path('admin/', admin.site.urls),
 #     path('mr/', include('MR.urls')),
 #     path('fgrn/', include('FGRN.urls')),
