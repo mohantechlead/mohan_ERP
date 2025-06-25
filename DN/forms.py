@@ -74,7 +74,7 @@ class DeliverItemForm(forms.ModelForm):
     # Now sort the unique items by item_name
     sorted_unique_items = sorted(unique_items, key=operator.attrgetter('item_name'))
 
-    # Create the ChoiceField with sorted and unique items
+    # Create tthe ChoiceField with sorted and unique items
     description = forms.ChoiceField(
         choices=[
             (item.item_name, item.item_name)  # Only include item_name for value and label
