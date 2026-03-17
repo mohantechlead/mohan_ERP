@@ -283,7 +283,7 @@ def send_email_reminder(request):
             for order in overdue_orders:
                 email_body += f"PR No: {order.PR_no}, Date: {order.date}, Remaining: {order.remaining}\n"
 
-            recipient_email = "tibarek90@gmail.com"  # Replace with actual recipient email
+            recipient_email = "tech@mohanplc.com"  # Replace with actual recipient email
 
             send_mail(
                 "Overdue PR Reminder",
