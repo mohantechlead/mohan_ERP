@@ -3,7 +3,15 @@ from .models import *
 from FGRN.models import finished_goods
 from itertools import chain
 from MR.models import inventory
-import operator
+
+
+def _get_item_choices():
+    inventory_items = chain(
+        inventory_order_items.objects.all(),
+        inventory.objects.all(),
+    )
+    unique_item_names = sorted({item.item_name for item in inventory_items})
+    return [(item_name, item_name) for item_name in unique_item_names]
 
 class DateInput(forms.DateInput):
     input_type = 'date'
@@ -58,28 +66,8 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
-    # Collect both querysets and ensure uniqueness of item_name values
-    inventory_items = list(chain(inventory_order_items.objects.all(), inventory.objects.all()))
-
-    # Create a set to track unique item names
-    seen_item_names = set()
-    unique_items = []
-
-    # Loop through the combined querysets and ensure uniqueness
-    for item in inventory_items:
-        if item.item_name not in seen_item_names:
-            seen_item_names.add(item.item_name)
-            unique_items.append(item)
-
-    # Now sort the unique items by item_name
-    sorted_unique_items = sorted(unique_items, key=operator.attrgetter('item_name'))
-
-    # Create tthe ChoiceField with sorted and unique items
     description = forms.ChoiceField(
-        choices=[
-            (item.item_name, item.item_name)  # Only include item_name for value and label
-            for item in sorted_unique_items
-        ],
+        choices=[],
         widget=forms.Select(attrs={
             'class': 'form-control select2',  # Class for Select2 widget styling
             'data-minimum-input-length': '0',  # Start filtering from the first character
@@ -133,30 +121,14 @@ class DeliverItemForm(forms.ModelForm):
         model = delivery_items
         fields = ['description', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].choices = _get_item_choices()
+
 
 class OrderItemForm(forms.ModelForm):
-    # Collect both querysets and ensure uniqueness of item_name values
-    inventory_items = list(chain(inventory_order_items.objects.all(), inventory.objects.all()))
-
-    # Create a set to track unique item names
-    seen_item_names = set()
-    unique_items = []
-
-    # Loop through the combined querysets and ensure uniqueness
-    for item in inventory_items:
-        if item.item_name not in seen_item_names:
-            seen_item_names.add(item.item_name)
-            unique_items.append(item)
-
-    # Now sort the unique items by item_name
-    sorted_unique_items = sorted(unique_items, key=operator.attrgetter('item_name'))
-
-    # Create the ChoiceField with sorted and unique items
     description = forms.ChoiceField(
-        choices=[
-            (item.item_name, item.item_name)  # Only include item_name for value and label
-            for item in sorted_unique_items
-        ],
+        choices=[],
         widget=forms.Select(attrs={
             'class': 'form-control select2',  # Class for Select2 widget styling
             'data-minimum-input-length': '0',  # Start filtering from the first character
@@ -210,6 +182,10 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = orders_items
         fields = ['description', 'unit_price', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit', 'total_price']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['description'].choices = _get_item_choices()
 
 class OrderForm(forms.ModelForm):
     class Meta:
