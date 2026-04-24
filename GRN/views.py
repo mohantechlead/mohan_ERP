@@ -419,6 +419,12 @@ def print_pr(request, PR_no):
             orders = purchase_orders.objects.get(PR_no=pr_no)
             # Fetch the items related to this specific PR_no
             pr_items = PR_item.objects.filter(PR_no=pr_no)
+            for item in pr_items:
+                item_price = float(item.price or 0)
+                item_quantity = float(item.quantity or 0)
+                item_before_vat = float(item.before_vat or 0)
+                computed_before_vat = item_price * item_quantity
+                item.discount_deduction = round(max(0, computed_before_vat - item_before_vat), 2)
             vat = orders.PR_total_price - orders.PR_before_vat
             vat = round(vat,2)
             orders.vat = vat
