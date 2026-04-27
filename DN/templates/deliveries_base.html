@@ -72,6 +72,11 @@
                         <li style="font-size: large;">
                             <a href="{% url 'display_orders' %}">Display Orders</a>
                         </li>
+                        {% if request.user.is_superuser %}
+                        <li style="font-size: large;">
+                            <a href="{% url 'void_requests' %}">Void Requests</a>
+                        </li>
+                        {% endif %}
                          <li style="font-size: large;">
                             <a href="{% url 'display_order_items' %}">Display Order Items</a>
                         </li>
@@ -180,9 +185,23 @@
   <script>
 
     $(document).ready(function() {
-             $('#example').DataTable({
+        const table = $('#example');
+        if (!table.length) {
+            return;
+        }
+
+        const headerCount = table.find('thead th').length;
+        table.find('tbody tr').each(function() {
+            const currentCount = $(this).children('td, th').length;
+            if (currentCount < headerCount) {
+                for (let i = currentCount; i < headerCount; i += 1) {
+                    $(this).append('<td></td>');
+                }
+            }
+        });
+
+        table.DataTable({
             "pageLength": 100,
-            
         });
     });
 

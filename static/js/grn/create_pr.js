@@ -14,10 +14,34 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("try")
     const quantityFields = $('.quantity');
     const withholding_checkbox = document.getElementById("withholdingCheckbox");
-    const discount_checkbox = document.getElementById("discountCheckbox");
     const vat_checkbox = document.getElementById("vatCheckbox");
     var excise = false
-    var discount = false
+    let baseTotal = 0;
+    let baseBeforeVat = 0;
+
+    function recalculateFinalTotals() {
+        let beforeVat = baseBeforeVat;
+        let total = baseTotal;
+        if (withholding_checkbox.checked) {
+            const withholding_amount = beforeVat * 0.05;
+            total = (beforeVat + withholding_amount) + (0.15 * (beforeVat + withholding_amount));
+            excise = true;
+        } else {
+            excise = false;
+        }
+
+        let displayTotal = total;
+        if (vat_checkbox.checked) {
+            displayTotal = beforeVat;
+        }
+
+        univ_vat = beforeVat;
+        univ_total = total;
+        totalVatField.val(beforeVat.toFixed(2));
+        totalVatField.text('Before VAT Price: $' + beforeVat.toFixed(2));
+        totalPriceField.val(displayTotal.toFixed(2));
+        totalPriceField.text('Total Price: $' + displayTotal.toFixed(2));
+    }
 
     submitsButton.addEventListener('click', function (event) {
         event.preventDefault(); 
@@ -31,14 +55,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function calculateTotalPrice() {
     var total = 0
     var total_vat = 0
-    var originalTotal = 0;
-    var originalVat = 0;
 
     const formsets = $('.item-list');
     const total_price_fields = document.querySelectorAll('.total_price');
     const total_vat_fields = document.querySelectorAll('.before_vat');
-    const withholdingApplied = withholding_checkbox.checked;
-    const discountApplied = discount_checkbox.checked;
     
     $('.item-list').each(function() {
         
@@ -50,94 +70,35 @@ document.addEventListener('DOMContentLoaded', function() {
         const price = parseFloat($(this).val()) || 0;
      
         total += price;
-        originalTotal += price; 
         });
         vatFields.each(function() {
         const vat_price = parseFloat($(this).val()) || 0;
         total_vat += vat_price;
-        originalVat += vat_price;
       
         });
         
         console.log(total)
        
         // Update the total for this formset
-        univ_total = total;
-        univ_vat = total_vat;
-        totalPriceField.val(total.toFixed(2));  // Update the 'value' of the field
-        totalPriceField.text('Total Price: $' + total.toFixed(2)); 
-        totalVatField.val(total_vat.toFixed(2));  // Update the 'value' of the field
-        totalVatField.text('Before VAT Price: $' + total_vat.toFixed(2));  // Update the displayed text
+        baseTotal = total;
+        baseBeforeVat = total_vat;
     });
-    withholding_checkbox.addEventListener("change", function () {
-    console.log("The withholding checkbox was clicked.");
+    recalculateFinalTotals();
+        }
 
-    const withholdingApplied = withholding_checkbox.checked;
-    
-    if (withholdingApplied) {
-        const withholding_amount = total_vat * 0.05;
-        total = (total_vat + withholding_amount) + (0.15 * (total_vat + withholding_amount));
-        excise = true
-    } else {
-        total = originalTotal;
-        excise = false// Reset to the original total price
-    }
-    univ_total = total;
-    console.log(univ_total,total,"tots")
-
-    // Update the displayed and input fields
-    totalPriceField.val(total.toFixed(2));
-    totalPriceField.text('Total Price: $' + total.toFixed(2));
-});
-
-discount_checkbox.addEventListener("change", function () {
-    console.log("The discount checkbox was clicked.");
-
-    const discountApplied = discount_checkbox.checked;
-    console.log(total_vat)
-    if (discountApplied) {
-        const discount_amount = total_vat * 0.05;
-        total_vat = (total_vat - discount_amount) ;
-        total = (total_vat ) + (0.15 * (total_vat ))
-        discount = true
-    } else {
-        total_vat = originalVat;
-        total = originalTotal;
-        discount = false// Reset to the original total price
-    }
-    univ_vat = total_vat;
-    univ_total = total;
-    console.log(univ_vat,univ_total,"vats")
-    // Update the displayed and input fields
-    totalVatField.val(univ_vat.toFixed(2));
-    totalVatField.text('Before VAT Price: $' + univ_vat.toFixed(2));
-    totalPriceField.val(univ_total.toFixed(2));
-    totalPriceField.text('Total Price: $' + univ_total.toFixed(2));
+withholding_checkbox.addEventListener("change", function () {
+    recalculateFinalTotals();
 });
 
 vat_checkbox.addEventListener("change", function () {
     console.log("The vat checkbox was clicked.");
     vat_checked = !(vat_checked);
-    const vatApplied = vat_checkbox.checked;
-    console.log(total_vat,vat_checked)
-    if (vatApplied) {
-        const vat_removed_amount = total_vat * 0.05;
-        without_vat = univ_vat;
-        
-    } else {
-        without_vat = univ_total;
-    }
-    console.log(univ_vat,univ_total,"vats")
-    // Update the displayed and input fields
-    totalVatField.val(without_vat.toFixed(2));
-    totalVatField.text('Before VAT Price: $' + without_vat.toFixed(2));
-    totalPriceField.val(without_vat.toFixed(2));
-    totalPriceField.text('Total Price: $' + without_vat.toFixed(2));
+    recalculateFinalTotals();
 });
-        }
 
-// Call the calculation function when the page loads
-calculateTotalPrice();
+// Keep overall totals for Calculate Total button click
+totalPriceField.text('');
+totalVatField.text('');
     
     
 radioButtons.forEach(button => {
@@ -180,6 +141,7 @@ radioButtons.forEach(button => {
     }
     submitButton.addEventListener('click', function (event) {
         event.preventDefault(); // Prevent the default form submission
+        calculateTotalPrice();
         
         // Serialize form data
         const formData1 = new FormData(form1);
@@ -250,12 +212,18 @@ radioButtons.forEach(button => {
         var quantity = parseFloat(form.find('.quantity').val());
         var price = parseFloat(form.find('.price').val());
         var total = quantity * price || 0;
-        var total_price = total  + (total * 0.15)
-        form.find('.before_vat').val(total.toFixed(2));
-        form.find('.total_price').val(total_price.toFixed(2));
+        var discountDeduction = parseFloat(form.find('.item-discount-deduction').val()) || 0;
+        var beforeVatTotal = total;
+        var totalPrice = total + (total * 0.15);
+
+        beforeVatTotal = Math.max(0, beforeVatTotal - discountDeduction);
+        totalPrice = Math.max(0, totalPrice - discountDeduction);
+
+        form.find('.before_vat').val(beforeVatTotal.toFixed(2));
+        form.find('.total_price').val(totalPrice.toFixed(2));
     }
 
-    $(document).on('input', '.item-list .quantity, .item-list .price', function () {
+    $(document).on('input change keyup', '.item-list .quantity, .item-list .price, .item-list .item-discount-deduction', function () {
         var form = $(this).closest('.item-list');
         updateTotalPrice(form);
     });
@@ -284,5 +252,6 @@ radioButtons.forEach(button => {
         // Append the cloned form to the form list
         totalNewForms.value = currentFormsCount + 1;
         copyFormTarget.appendChild(copyEmptyForm);
+        updateTotalPrice($(copyEmptyForm));
                 }
             });

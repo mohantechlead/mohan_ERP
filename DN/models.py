@@ -25,6 +25,9 @@ class orders(models.Model):
     withholding_amount = models.FloatField(blank=True, null=True)
     vat_amount = models.FloatField(blank=True, null=True)
     reciveable = models.FloatField(blank=True, null=True)
+    void_requested = models.BooleanField(default=False)
+    is_void = models.BooleanField(default=False)
+    status = models.TextField(blank=True, null=True, default="active")
 
     def __str__(self):
         return self.serial_no

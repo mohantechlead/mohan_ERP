@@ -56,6 +56,8 @@
       <th>Before VAT</th>
       <th>Total Price</th>
       <th>Customer</th>
+      <th>Status</th>
+      <th>Void</th>
     </tr>
   </thead>
 
@@ -100,12 +102,110 @@
       <td>{{ order.before_vat }}</td>
       <td>{{ order.final_price }}</td>
       <td>{{ order.customer_name }}</td>
+      <td>{{ order.status|default:"active" }}</td>
+      <td>
+        {% if order.is_void %}
+          <span style="color:#dc3545; font-weight:700;">VOID</span>
+        {% elif order.void_requested %}
+          <span style="color:#f39c12; font-weight:700;">Requested</span>
+        {% else %}
+          <button
+            type="button"
+            class="btn btn-link request-void-btn"
+            data-order-no="{{ order.serial_no }}"
+            title="Request void">
+            &#128465;
+          </button>
+        {% endif %}
+      </td>
     
       
     </tr>
     {% endfor %}
   </tbody>
   </table>
+</div>
+
+<style>
+  .request-void-btn {
+    border: none;
+    background: transparent;
+    color: #dc3545;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+  }
+  .request-void-btn:hover {
+    color: #b71c1c;
+    transform: scale(1.12);
+  }
+  .request-void-btn:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  .void-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+  }
+  .void-modal-overlay.show {
+    display: flex;
+  }
+  .void-modal-card {
+    background: #fff;
+    width: min(92vw, 520px);
+    border-radius: 10px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .void-modal-header {
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: 700;
+    border-bottom: 1px solid #e9ecef;
+  }
+  .void-modal-body {
+    padding: 18px;
+    font-size: 15px;
+  }
+  .void-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 18px;
+    border-top: 1px solid #e9ecef;
+  }
+</style>
+
+<form method="post" id="voidRequestForm" style="display:none;">
+  {% csrf_token %}
+</form>
+<div id="voidModalOverlay" class="void-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="voidModalTitle">
+  <div class="void-modal-card">
+    <div class="void-modal-header" id="voidModalTitle">Request Order Void</div>
+    <div class="void-modal-body">
+      <p id="voidModalText" style="margin:0;">Are you sure you want to request void for this order?</p>
+    </div>
+    <div class="void-modal-footer">
+      <button type="button" id="voidCancelBtn" class="btn btn-default">No</button>
+      <button type="button" id="voidConfirmBtn" class="btn btn-danger">Yes</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -119,6 +219,40 @@
             const fgrnID = this.getAttribute('data-order-id');
             window.location.href = `/DN/display_single_order?serial_no=${fgrnID}`;
         });
+    });
+
+    const voidRequestForm = document.getElementById('voidRequestForm');
+    const voidModalOverlay = document.getElementById('voidModalOverlay');
+    const voidModalText = document.getElementById('voidModalText');
+    const voidCancelBtn = document.getElementById('voidCancelBtn');
+    const voidConfirmBtn = document.getElementById('voidConfirmBtn');
+    let selectedOrderNo = null;
+
+    document.addEventListener('click', function (event) {
+      const voidButton = event.target.closest('.request-void-btn');
+      if (!voidButton) return;
+      event.preventDefault();
+      selectedOrderNo = voidButton.getAttribute('data-order-no');
+      voidModalText.textContent = `Are you sure you want to request void for this order, ${selectedOrderNo}?`;
+      voidModalOverlay.classList.add('show');
+    });
+
+    voidCancelBtn.addEventListener('click', function() {
+      selectedOrderNo = null;
+      voidModalOverlay.classList.remove('show');
+    });
+
+    voidConfirmBtn.addEventListener('click', function() {
+      if (!selectedOrderNo) return;
+      voidRequestForm.action = `/DN/request_void_order/${selectedOrderNo}/`;
+      voidRequestForm.submit();
+    });
+
+    voidModalOverlay.addEventListener('click', function(event) {
+      if (event.target === voidModalOverlay) {
+        selectedOrderNo = null;
+        voidModalOverlay.classList.remove('show');
+      }
     });
 });
 </script>

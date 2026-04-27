@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
+from django.http import HttpResponseForbidden
 from django.contrib import messages
 from .forms import *
 from FGRN.models import finished_goods
@@ -16,6 +17,7 @@ from MR.models import inventory
 from .models import *
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 import plotly.graph_objs as go
 from plotly.offline import plot
 import openpyxl
@@ -24,6 +26,10 @@ from openpyxl.styles import Alignment
 from django.core.mail import send_mail
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+
+
+def is_admin(user):
+    return user.is_superuser
 
 @api_view(['GET','POST'])
 def order_list(request):
@@ -55,7 +61,7 @@ def delivery_list(request):
 
 @login_required(login_url="login_user")
 def input_delivery(request):
-    my_orders = orders.objects.all()
+    my_orders = orders.objects.filter(is_void=False).order_by('serial_no')
     truck_number = sorted(set(delivery.objects.values_list('truck_number', flat=True)))
     driver_name = sorted(set(delivery.objects.values_list('driver_name', flat=True)))
     customer = sorted(set(Customer.objects.values_list('company', flat=True)))
@@ -70,6 +76,8 @@ def input_delivery(request):
         if form.is_valid():
                 serial_no = form.cleaned_data['serial_no']
                 order = orders.objects.get(serial_no = serial_no.serial_no)       
+                if order.is_void:
+                    return JsonResponse({'form_errors': {'serial_no': ['This order is VOID and cannot be used for delivery.']}}, status=400)
                 form.save()
                 return redirect('input_delivery')
         
@@ -363,7 +371,10 @@ def display_orders(request):
                 'date': order.date,
                 'final_price': order.final_price,
                 'order_item': items,
-                'customer_name': order.customer_name 
+                'customer_name': order.customer_name,
+                'status': order.status,
+                'void_requested': order.void_requested,
+                'is_void': order.is_void,
             }
         orders_data.append(order_data)
 
@@ -375,6 +386,45 @@ def display_orders(request):
     }
 
     return render(request,'display_orders.html', context)
+
+
+@login_required(login_url="login_user")
+def request_void_order(request, serial_no):
+    if request.method != 'POST':
+        return HttpResponseForbidden("Invalid request method.")
+
+    order = get_object_or_404(orders, serial_no=serial_no)
+    if order.is_void:
+        messages.warning(request, f"Order {serial_no} is already VOID.")
+        return redirect('display_orders')
+
+    order.void_requested = True
+    order.status = "requestforvoid"
+    order.save(update_fields=['void_requested', 'status'])
+    messages.success(request, f"Void request submitted for order {serial_no}.")
+    return redirect('display_orders')
+
+
+@login_required(login_url="login_user")
+@user_passes_test(is_admin)
+def void_requests(request):
+    requested_orders = orders.objects.filter(void_requested=True, is_void=False).order_by('serial_no')
+    return render(request, 'void_requests.html', {'requested_orders': requested_orders})
+
+
+@login_required(login_url="login_user")
+@user_passes_test(is_admin)
+def approve_void_request(request, serial_no):
+    if request.method != 'POST':
+        return HttpResponseForbidden("Invalid request method.")
+
+    order = get_object_or_404(orders, serial_no=serial_no)
+    order.is_void = True
+    order.void_requested = False
+    order.status = "void"
+    order.save(update_fields=['is_void', 'void_requested', 'status'])
+    messages.success(request, f"Order {serial_no} marked as VOID.")
+    return redirect('void_requests')
 
 @login_required(login_url="login_user")
 def display_single_fgrn(request):
@@ -424,6 +474,7 @@ def display_single_order(request, serial_no):
                 context = {
                     'fgrn_item': fgrn_items,
                     'my_fgrn': fgrns,
+                    'is_void': fgrns.is_void,
                 }
                 return render(request, 'display_single_order.html', context)
             else:
@@ -431,6 +482,7 @@ def display_single_order(request, serial_no):
                 context = {
                     'fgrn_item': [],
                     'my_fgrn': fgrns,
+                    'is_void': fgrns.is_void,
                 }
                 return render(request, 'display_single_order.html', context)
         
@@ -1033,6 +1085,9 @@ def generate_excel(request):
 
 def get_order_items(request):
     serial_no = request.GET.get('serial_no')  # Get order number (serial_no) from the query params
+    order = orders.objects.filter(serial_no=serial_no).first()
+    if order and order.is_void:
+        return JsonResponse({'items': [], 'error': 'Order is VOID and cannot be used.'}, status=400)
     items = set(orders_items.objects.filter(serial_no=serial_no).values_list('description', flat=True))
     
     return JsonResponse({'items': list(items)})
