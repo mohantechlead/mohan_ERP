@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required,user_passes_test
 from django.forms import formset_factory
+from django.db import transaction
 from django.db.models import Sum
 from django.http import JsonResponse,HttpResponse
 from django.template.loader import get_template
@@ -174,12 +175,27 @@ def display_inventory(request):
             result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value - quantity_d_value
             result_units = units_c_value - units_b_value + units_a_value - units_d_value
             
-            # Save or update the result in ModelD
-            inventory.objects.update_or_create(
-                item_name=name,
-                defaults={'quantity': result_quantity,
-                        'no_of_unit': result_units}
-            )
+            # inventory.item_name is not unique; update_or_create would MultipleObjectsReturned
+            with transaction.atomic():
+                rows = list(
+                    inventory.objects.select_for_update()
+                    .filter(item_name=name)
+                    .order_by('inventory_id')
+                )
+                if rows:
+                    keep = rows[0]
+                    keep.quantity = result_quantity
+                    keep.no_of_unit = result_units
+                    keep.save(update_fields=['quantity', 'no_of_unit'])
+                    dup_ids = [r.pk for r in rows[1:]]
+                    if dup_ids:
+                        inventory.objects.filter(pk__in=dup_ids).delete()
+                else:
+                    inventory.objects.create(
+                        item_name=name,
+                        quantity=result_quantity,
+                        no_of_unit=result_units,
+                    )
 
     items = inventory.objects.all().order_by('item_name')
     print(items)

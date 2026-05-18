@@ -1,0 +1,90 @@
+{% extends "grn_base.html" %}
+{% block content %}
+{% include "vendor_payments/_messages.html" %}
+
+<div class="container" style="margin-top:16px;">
+    <div class="clearfix" style="margin-bottom:12px;">
+        <a class="btn btn-primary pull-left" href="{% url 'create_vendor_payment' %}">Create Vendor Payment</a>
+        <h3 class="text-center" style="margin-top:0;">Vendor Payments</h3>
+    </div>
+
+    {% if not grouped %}
+    <p class="text-muted">No vendor payments found.</p>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Purchase (PR)</th>
+                    <th>Supplier</th>
+                    <th class="text-right">Total paid (this list)</th>
+                    <th class="text-right">Remaining</th>
+                    <th>Completion</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in grouped %}
+                <tr>
+                    <td>
+                        <a role="button" data-toggle="collapse" href="#vp-group-{{ forloop.counter }}" aria-expanded="false">
+                            <i class="fa fa-chevron-down"></i> {{ g.purchase_number }}
+                        </a>
+                    </td>
+                    <td>{{ g.supplier_name }}</td>
+                    <td class="text-right">{{ g.total_amount|floatformat:2 }}</td>
+                    <td class="text-right">{{ g.remaining_amount|floatformat:2 }}</td>
+                    <td>{{ g.completion_status|capfirst }}</td>
+                    <td class="text-right">
+                        <a class="btn btn-xs btn-default" href="{% url 'vendor_payment_purchase_summary' g.purchase_number %}" title="Summary"><i class="fa fa-eye"></i></a>
+                        {% if g.remaining_amount > 0 %}
+                        <a class="btn btn-xs btn-success" href="{% url 'create_vendor_payment' %}?pr_no={{ g.purchase_number|urlencode }}" title="Add payment">+</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr class="collapse" id="vp-group-{{ forloop.counter }}">
+                    <td colspan="6" style="background:#fafafa;">
+                        <table class="table table-condensed table-bordered" style="margin-bottom:0;background:#fff;">
+                            <thead>
+                                <tr>
+                                    <th>Installment</th>
+                                    <th>Payment no.</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th class="text-right">Amount</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in g.payments %}
+                                <tr>
+                                    <td>{{ p.installment_number }}</td>
+                                    <td><a href="{% url 'vendor_payment_detail' p.payment_number %}">Payment {{ p.installment_number }}</a></td>
+                                    <td>{{ p.payment_date }}</td>
+                                    <td>{{ p.payment_type|capfirst }}</td>
+                                    <td class="text-right">{{ p.amount|floatformat:2 }}</td>
+                                    <td>{{ p.status|capfirst }}</td>
+                                    <td class="text-right">
+                                        <a class="btn btn-xs btn-default" href="{% url 'vendor_payment_purchase_summary' p.purchase_number %}"><i class="fa fa-eye"></i></a>
+                                        {% if p.status == 'pending' %}
+                                        <a class="btn btn-xs btn-default" href="{% url 'edit_vendor_payment' p.payment_number %}"><i class="fa fa-pencil"></i></a>
+                                        <form style="display:inline;" method="post" action="{% url 'delete_vendor_payment' p.payment_number %}" onsubmit="return confirm('Delete this vendor payment?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

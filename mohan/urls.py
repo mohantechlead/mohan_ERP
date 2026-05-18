@@ -32,6 +32,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('MR/', include('MR.urls')),
+    path('WIP/', include('wip.urls')),
     path('GRN/', include('GRN.urls')),
     path('FGRN/', include('FGRN.urls')),
     path('DN/', include('DN.urls')),

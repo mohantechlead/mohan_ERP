@@ -1,0 +1,46 @@
+{% extends "grn_base.html" %}
+{% block content %}
+{% include "vendor_payments/_messages.html" %}
+
+<div class="container" style="margin-top:16px;">
+    <p>
+        <a class="btn btn-default" href="{% url 'display_vendor_payments' %}">Back to Vendor Payments</a>
+    </p>
+    <h3>{{ title }}</h3>
+
+    {% if not detail_rows %}
+    <p class="text-muted">No records.</p>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="example">
+            <thead>
+                <tr>
+                    <th>Payment no.</th>
+                    <th>PR</th>
+                    <th>Supplier</th>
+                    <th>Date</th>
+                    <th class="text-right">Amount</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Reference / remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in detail_rows %}
+                <tr>
+                    <td><a href="{% url 'vendor_payment_detail' r.payment_number %}">{{ r.payment_number }}</a></td>
+                    <td>{{ r.purchase_number }}</td>
+                    <td>{{ r.supplier_name }}</td>
+                    <td>{{ r.payment_date }}</td>
+                    <td class="text-right">{{ r.amount|floatformat:2 }}</td>
+                    <td>{{ r.payment_type|capfirst }}</td>
+                    <td>{{ r.status|capfirst }}</td>
+                    <td>{% if list_type == 'completed' %}{{ r.reference_number|default:"—" }}{% else %}{{ r.status_remark|default:"—" }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

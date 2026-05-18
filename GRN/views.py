@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 import uuid
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.http import JsonResponse
 from MR.models import *
 from django.utils import timezone
@@ -725,4 +725,146 @@ def supplier_details(request, company):
         
     }
     return render(request, 'supplier_details.html', context)
+
+
+@login_required(login_url="login_user")
+def create_actual_purchase(request):
+    pr_numbers = purchase_orders.objects.all().order_by('PR_no')
+    prefill_pr = (request.GET.get("PR_no") or request.GET.get("pr_no") or "").strip()
+    creator_label = ((request.user.get_full_name() or "").strip() or request.user.get_username())
+
+    if request.method == 'POST':
+        pr_no = request.POST.get('PR_no')
+        date_value = request.POST.get('date')
+
+        if not pr_no:
+            messages.error(request, "PR number is required.")
+            return render(
+                request,
+                'create_actual_purchase.html',
+                {
+                    'pr_numbers': pr_numbers,
+                    'prefill_pr': (request.POST.get('PR_no') or '').strip(),
+                    'created_by_display': creator_label,
+                },
+            )
+
+        pr_instance = get_object_or_404(purchase_orders, PR_no=pr_no)
+        purchase_header = ActualPurchase.objects.create(
+            pr_no=pr_instance,
+            date=date_value or now().date(),
+            created_by=creator_label,
+        )
+
+        item_names = request.POST.getlist('item_name[]')
+        pr_item_ids = request.POST.getlist('pr_item_id[]')
+        requested_quantities = request.POST.getlist('requested_quantity[]')
+        actual_quantities = request.POST.getlist('actual_quantity[]')
+
+        for idx, item_name in enumerate(item_names):
+            requested_qty = float(requested_quantities[idx] or 0)
+            actual_qty = float(actual_quantities[idx] or 0)
+            diff_qty = actual_qty - requested_qty
+            pr_item_id = pr_item_ids[idx] if idx < len(pr_item_ids) else None
+
+            ActualPurchaseItem.objects.create(
+                actual_purchase=purchase_header,
+                pr_item_id=pr_item_id or None,
+                item_name=item_name,
+                requested_quantity=requested_qty,
+                actual_quantity=actual_qty,
+                difference_quantity=diff_qty,
+            )
+
+        linked = VendorPayment.objects.filter(
+            pr=pr_instance,
+            status="completed",
+            actual_purchase__isnull=True,
+        ).update(actual_purchase=purchase_header)
+
+        purchase_orders.objects.filter(PR_no=pr_instance.PR_no).update(
+            fully_paid_missing_actual_notified_at=None,
+        )
+
+        messages.success(
+            request,
+            f"Actual purchase saved for PR {pr_no}. Linked {linked} vendor payment(s).",
+        )
+        return redirect('create_actual_purchase')
+
+    return render(
+        request,
+        'create_actual_purchase.html',
+        {
+            'pr_numbers': pr_numbers,
+            'prefill_pr': prefill_pr,
+            'created_by_display': creator_label,
+        },
+    )
+
+
+@login_required(login_url="login_user")
+def display_actual_purchases(request):
+    rows = list(
+        ActualPurchase.objects.select_related("pr_no")
+        .prefetch_related("items", "linked_payments")
+        .order_by("-created_at")
+    )
+    for ap in rows:
+        ap.item_count = len(ap.items.all())
+        ap.linked_payment_count = len(ap.linked_payments.all())
+    return render(request, "display_actual_purchases.html", {"rows": rows})
+
+
+@login_required(login_url="login_user")
+def actual_purchase_detail(request, actual_purchase_id):
+    ap = get_object_or_404(
+        ActualPurchase.objects.select_related("pr_no"),
+        actual_purchase_id=actual_purchase_id,
+    )
+    items = ap.items.all().order_by("item_name")
+    payments = ap.linked_payments.all().order_by("installment_number")
+    return render(
+        request,
+        "actual_purchase_detail.html",
+        {"ap": ap, "items": items, "payments": payments},
+    )
+
+
+@login_required(login_url="login_user")
+def get_actual_purchase_pr_items(request):
+    pr_no = request.GET.get('pr_no')
+    if not pr_no:
+        return JsonResponse({'items': [], 'payments': []})
+
+    pr = purchase_orders.objects.filter(PR_no=pr_no).first()
+    if not pr:
+        return JsonResponse({'items': [], 'payments': [], 'error': 'PR not found'}, status=404)
+
+    items = PR_item.objects.filter(PR_no=pr_no)
+    payload = [{
+        'pr_item_id': item.id_numeric,
+        'item_name': item.item_name or '',
+        'requested_quantity': float(item.quantity or 0),
+    } for item in items]
+
+    payments_qs = VendorPayment.objects.filter(pr=pr).order_by('installment_number')
+    payments_payload = [{
+        'payment_number': p.payment_number,
+        'installment_number': p.installment_number,
+        'payment_date': str(p.payment_date),
+        'amount': float(p.amount),
+        'status': p.status,
+        'payment_type': p.payment_type,
+        'reference_number': p.reference_number or '',
+        'linked': bool(p.actual_purchase_id),
+    } for p in payments_qs]
+    return JsonResponse({'items': payload, 'payments': payments_payload})
+
+
+@login_required(login_url="login_user")
+@user_passes_test(is_admin)
+def purchase_difference(request):
+    rows = ActualPurchaseItem.objects.select_related('actual_purchase', 'actual_purchase__pr_no').exclude(difference_quantity=0)
+    return render(request, 'purchase_difference.html', {'rows': rows})
 

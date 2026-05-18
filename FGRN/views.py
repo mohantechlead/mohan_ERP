@@ -171,13 +171,13 @@ def display_goods(request):
             quantity_b = inventory_DN_items.objects.filter(item_name=item_name).first()
             quantity_c = FGRNopening_balance.objects.filter(item_name=item_name).first()
 
-            total_quantity_a = quantity_a.total_quantity if quantity_a else 0
-            total_quantity_b = quantity_b.total_quantity if quantity_b else 0
-            total_quantity_c = quantity_c.quantity if quantity_c else 0
+            total_quantity_a = (quantity_a.total_quantity or 0) if quantity_a else 0
+            total_quantity_b = (quantity_b.total_quantity or 0) if quantity_b else 0
+            total_quantity_c = (quantity_c.quantity or 0) if quantity_c else 0
 
-            total_units_a = quantity_a.total_no_of_unit if quantity_a else 0
-            total_units_b = quantity_b.total_no_of_unit if quantity_b else 0
-            total_units_c = quantity_c.no_of_unit if quantity_c else 0
+            total_units_a = (quantity_a.total_no_of_unit or 0) if quantity_a else 0
+            total_units_b = (quantity_b.total_no_of_unit or 0) if quantity_b else 0
+            total_units_c = (quantity_c.no_of_unit or 0) if quantity_c else 0
         else:
             # If group exists, calculate for the group
             for item_name_in_group in group_to_items[group_name]:
@@ -186,14 +186,14 @@ def display_goods(request):
                 quantity_c = FGRNopening_balance.objects.filter(item_name=group_name).first()
 
                 # Accumulate quantities
-                total_quantity_a += quantity_a.total_quantity if quantity_a else 0
-                total_quantity_b += quantity_b.total_quantity if quantity_b else 0
-                total_quantity_c += quantity_c.quantity if quantity_c else 0
+                total_quantity_a += (quantity_a.total_quantity or 0) if quantity_a else 0
+                total_quantity_b += (quantity_b.total_quantity or 0) if quantity_b else 0
+                total_quantity_c += (quantity_c.quantity or 0) if quantity_c else 0
 
                 # Accumulate units
-                total_units_a += quantity_a.total_no_of_unit if quantity_a else 0
-                total_units_b += quantity_b.total_no_of_unit if quantity_b else 0
-                total_units_c += quantity_c.no_of_unit if quantity_c else 0
+                total_units_a += (quantity_a.total_no_of_unit or 0) if quantity_a else 0
+                total_units_b += (quantity_b.total_no_of_unit or 0) if quantity_b else 0
+                total_units_c += (quantity_c.no_of_unit or 0) if quantity_c else 0
 
         # Calculate the final result for the group or item
         result_quantity = total_quantity_c - total_quantity_b + total_quantity_a

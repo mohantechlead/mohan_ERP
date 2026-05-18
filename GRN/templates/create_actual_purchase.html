@@ -1,0 +1,173 @@
+{% extends "grn_base.html" %}
+
+{% block content %}
+<style>
+    .actual-purchase-card {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        background: #fff;
+        margin-top: 12px;
+    }
+    .actual-purchase-title {
+        margin: 0 0 16px;
+        font-weight: 700;
+        font-size: 26px;
+    }
+    .actual-purchase-subtitle {
+        margin-bottom: 18px;
+        color: #6c757d;
+    }
+    .actual-purchase-table thead th {
+        background: #f8f9fa;
+        font-weight: 700;
+        vertical-align: middle;
+    }
+    .actual-purchase-table td {
+        vertical-align: middle;
+    }
+    .readonly-cell {
+        background: #f8f9fa;
+    }
+    .toast-wrap {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 5000;
+        min-width: 280px;
+    }
+    .toast-success .toast-header {
+        background: #d4edda;
+        color: #155724;
+    }
+    .toast-success .toast-body {
+        background: #eaf8ee;
+        color: #155724;
+    }
+    .toast-error .toast-header,
+    .toast-danger .toast-header {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    .toast-error .toast-body,
+    .toast-danger .toast-body {
+        background: #fdecee;
+        color: #721c24;
+    }
+    .toast-warning .toast-header {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .toast-warning .toast-body {
+        background: #fff8e1;
+        color: #856404;
+    }
+    .toast-info .toast-header {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    .toast-info .toast-body {
+        background: #e8f7fa;
+        color: #0c5460;
+    }
+</style>
+
+<div class="container">
+    {% if messages %}
+    <div class="toast-wrap">
+        {% for message in messages %}
+        <div class="toast toast-{{ message.tags|default:'info' }}" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3500">
+            <div class="toast-header">
+                <strong class="mr-auto">
+                    {% if message.tags == "success" %}Success{% elif message.tags == "error" %}Error{% else %}Notice{% endif %}
+                </strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">{{ message }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="actual-purchase-card">
+        <p style="margin-bottom: 12px;">
+            <a href="{% url 'display_actual_purchases' %}" class="btn btn-default">Display Actual Purchases</a>
+        </p>
+        <h2 class="actual-purchase-title">Actual Purchase</h2>
+        <p class="actual-purchase-subtitle">Select a purchase request to auto-populate items. Update only actual quantities and save.</p>
+
+        <form method="post" id="actualPurchaseForm">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-sm-4 form-group">
+                    <label>PR No</label>
+                    <input type="text" list="pr_numbers" id="actual_pr_no" name="PR_no" class="form-control" required value="{{ prefill_pr|default:'' }}">
+                    <datalist id="pr_numbers">
+                        {% for pr in pr_numbers %}
+                        <option value="{{ pr.PR_no }}"></option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="col-sm-4 form-group">
+                    <label>Date</label>
+                    <input type="date" name="date" class="form-control">
+                </div>
+                <div class="col-sm-4 form-group">
+                    <label>Created By</label>
+                    <input type="text" class="form-control readonly-cell" readonly style="background:#f5f5f5;" value="{{ created_by_display }}">
+                </div>
+            </div>
+
+            <div class="table-responsive" style="margin-top: 10px;">
+                <table class="table table-bordered table-hover actual-purchase-table" id="actual_purchase_items_table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45%;">Item</th>
+                            <th style="width: 25%;">Requested Qty</th>
+                            <th style="width: 30%;">Actual Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="actual_purchase_items_body">
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Select PR to auto-populate items.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 style="margin-top: 24px;">Vendor payments for this PR</h4>
+            <p class="text-muted small" id="actual_purchase_payments_hint">Select a PR to load vendor payments.</p>
+            <div class="table-responsive" id="actual_purchase_payments_section" style="display: none;">
+                <table class="table table-bordered table-condensed actual-purchase-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Payment no.</th>
+                            <th>Date</th>
+                            <th class="text-right">Amount</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Ref.</th>
+                            <th>Linked</th>
+                        </tr>
+                    </thead>
+                    <tbody id="actual_purchase_payments_body"></tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 16px; text-align: right;">
+                <button type="submit" class="btn btn-primary btn-lg">Save Actual Purchase</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../../static/js/grn/actual_purchase.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.toast').toast('show');
+    });
+</script>
+{% endblock %}

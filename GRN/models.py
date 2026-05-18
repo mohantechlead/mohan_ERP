@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 import uuid
 # Create your models here.
@@ -17,6 +18,7 @@ class purchase_orders(models.Model):
     remaining = models.FloatField(blank=True, null=True)
     vat = models.FloatField(blank=True, null=True)
     excise_tax = models.FloatField(blank=True, null=True)
+    fully_paid_missing_actual_notified_at = models.DateTimeField(blank=True, null=True)
 
 class PR_item(models.Model):
     PR_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='pr_no',blank=True, null=True)
@@ -133,7 +135,100 @@ class Supplier(models.Model):
         return self.company
 
 
-    
+class ActualPurchase(models.Model):
+    actual_purchase_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    pr_no = models.ForeignKey('purchase_orders', on_delete=models.CASCADE, db_column='pr_no')
+    date = models.DateField(blank=True, null=True)
+    created_by = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Actual Purchase - {self.pr_no_id}"
 
 
-    
+class ActualPurchaseItem(models.Model):
+    actual_purchase = models.ForeignKey('ActualPurchase', on_delete=models.CASCADE, related_name='items')
+    pr_item = models.ForeignKey('PR_item', on_delete=models.SET_NULL, blank=True, null=True)
+    item_name = models.TextField(blank=True, null=True)
+    requested_quantity = models.FloatField(blank=True, null=True)
+    actual_quantity = models.FloatField(blank=True, null=True)
+    difference_quantity = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['item_name']
+
+    def __str__(self):
+        return f"{self.item_name} ({self.actual_purchase.pr_no_id})"
+
+
+class VendorPayment(models.Model):
+    PAYMENT_TYPE_CHOICES = (
+        ("partial", "Partial"),
+        ("full", "Full"),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    payment_number = models.CharField(max_length=255, unique=True)
+    installment_number = models.PositiveIntegerField(default=1)
+    payment_date = models.DateField()
+    pr = models.ForeignKey(
+        "purchase_orders",
+        on_delete=models.CASCADE,
+        db_column="pr_no",
+        related_name="vendor_payments",
+    )
+    supplier_name = models.CharField(max_length=255)
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=14, decimal_places=2)
+    remark = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, default="pending")
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="approved_vendor_payments",
+    )
+    approval_date = models.DateTimeField(null=True, blank=True)
+    completed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="completed_vendor_payments",
+    )
+    completed_date = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="cancelled_vendor_payments",
+    )
+    cancelled_date = models.DateTimeField(null=True, blank=True)
+    reference_number = models.CharField(max_length=255, blank=True, null=True)
+    status_remark = models.TextField(blank=True, null=True)
+    actual_purchase = models.ForeignKey(
+        "ActualPurchase",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="linked_payments",
+    )
+
+    class Meta:
+        ordering = ["-payment_date", "-installment_number"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["pr", "installment_number"],
+                name="uniq_vendor_payment_installment_per_pr",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.payment_number} ({self.pr_id})"
+
+

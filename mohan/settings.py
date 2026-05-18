@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'MR',
+    'wip',
     'FGRN',
     'GRN',
     'DN',
@@ -63,7 +64,7 @@ ROOT_URLCONF = 'mohan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,9 +86,9 @@ WSGI_APPLICATION = 'mohan.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'orders',
+        'NAME': 'mohanplc',
        'USER': 'postgres',
-       'PASSWORD': 'mohanPLC',
+       'PASSWORD': 'tsedi',
        'HOST': '127.0.0.1', 
         'PORT': '5432',
        'DISABLE_SERVER_SIDE_CURSORS': True,
@@ -165,3 +166,12 @@ EMAIL_HOST_PASSWORD = 'llcbqsjcpgyzbqvc'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+FULLY_PAID_MISSING_ACTUAL_REMINDER_EMAIL = os.environ.get(
+    "FULLY_PAID_MISSING_ACTUAL_REMINDER_EMAIL",
+    "mekdi1610@gmail.com",
+)
+FULLY_PAID_MISSING_ACTUAL_GRACE_DAYS = int(
+    os.environ.get("FULLY_PAID_MISSING_ACTUAL_GRACE_DAYS", "2")
+)

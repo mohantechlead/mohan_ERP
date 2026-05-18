@@ -1,0 +1,147 @@
+{% load i18n static %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:'en-us' }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<head>
+<title>{% block title %}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% block stylesheet %}{% static 'admin/css/base.css' %}{% endblock %}">
+{% block dark-mode-vars %}{% endblock %}
+{% block extrastyle %}{% endblock %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static 'admin/css/rtl.css' %}">{% endif %}
+{% block extrahead %}{% endblock %}
+{% block responsive %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'admin/css/responsive.css' %}">
+  {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static 'admin/css/responsive_rtl.css' %}">{% endif %}
+{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
+
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" data-admin-utc-offset="{% now 'Z' %}">
+<a href="#content-start" class="skip-to-content-link">{% translate 'Skip to main content' %}</a>
+
+<div class="admin-layout{% if not has_permission or is_popup %} admin-layout-public{% endif %}" id="adminLayout">
+  {% if not is_popup and has_permission %}
+  <aside class="modern-admin-sidebar" id="modernAdminSidebar">
+    <div class="modern-admin-brand">
+      <div class="modern-admin-logo">M</div>
+      <div>
+        <div class="modern-admin-brand-title">Mohan PLC</div>
+        <div class="modern-admin-brand-subtitle">Administration</div>
+      </div>
+    </div>
+
+    <nav class="modern-admin-nav" aria-label="{% translate 'Admin navigation' %}">
+      <a class="modern-admin-nav-link modern-admin-nav-link-primary" href="{% url 'admin:index' %}">Dashboard</a>
+
+      <div class="modern-admin-section-title">Applications</div>
+      {% for app in available_apps %}
+      <details class="modern-admin-nav-group">
+        <summary>{{ app.name }}</summary>
+        <div class="modern-admin-nav-children">
+          {% for model in app.models %}
+            {% if model.admin_url %}
+            <a href="{{ model.admin_url }}">{{ model.name }}</a>
+            {% else %}
+            <span>{{ model.name }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </details>
+      {% endfor %}
+
+      <details class="modern-admin-nav-group">
+        <summary>ERP Modules</summary>
+        <div class="modern-admin-nav-children">
+          <a href="{% url 'create_grn' %}">GRN</a>
+          <a href="{% url 'create_MR' %}">MR</a>
+          <a href="{% url 'create_fgrn' %}">FGRN</a>
+          <a href="{% url 'create_WIP' %}">WIP</a>
+          <a href="{% url 'input_delivery' %}">DN</a>
+        </div>
+      </details>
+    </nav>
+  </aside>
+  {% endif %}
+
+  <div class="modern-admin-main">
+    {% if not is_popup and has_permission %}
+    <header class="modern-admin-topbar">
+      <div class="modern-admin-topbar-left">
+        <button type="button" class="modern-admin-sidebar-toggle" id="modernAdminSidebarToggle" aria-label="{% translate 'Toggle sidebar' %}">
+          <span></span><span></span><span></span>
+        </button>
+        <div>
+          <div class="modern-admin-page-kicker">Admin Console</div>
+          <div class="modern-admin-page-title">{% if title %}{{ title }}{% else %}Dashboard{% endif %}</div>
+        </div>
+      </div>
+      <div class="modern-admin-topbar-right">
+        {% block usertools %}
+        <span class="modern-admin-user">{% translate 'Welcome,' %} <strong>{% firstof user.get_short_name user.get_username %}</strong></span>
+        {% if user.has_usable_password %}
+          <a class="modern-admin-ghost-link" href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a>
+        {% endif %}
+        <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="modern-admin-button">{% translate 'Logout' %}</button>
+        </form>
+        {% endblock %}
+      </div>
+    </header>
+    {% endif %}
+
+    {% block nav-breadcrumbs %}
+    {% if not is_popup and has_permission %}
+    <nav aria-label="{% translate 'Breadcrumbs' %}" class="modern-admin-breadcrumb-wrap">
+      {% block breadcrumbs %}
+      <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+        {% if title %} &rsaquo; {{ title }}{% endif %}
+      </div>
+      {% endblock %}
+    </nav>
+    {% endif %}
+    {% endblock %}
+
+    <main id="content-start" class="modern-admin-content" tabindex="-1">
+      {% block messages %}
+        {% if messages %}
+          <ul class="messagelist">{% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+          {% endfor %}</ul>
+        {% endif %}
+      {% endblock messages %}
+
+      <section id="content-admin" class="modern-admin-card {% block coltype %}colM{% endblock %}">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+        {% block content %}
+          {% block object-tools %}{% endblock %}
+          {{ content }}
+        {% endblock %}
+        {% block sidebar %}{% endblock %}
+        <br class="clear">
+      </section>
+      {% block footer %}<div id="footer"></div>{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const toggle = document.getElementById('modernAdminSidebarToggle');
+    const layout = document.getElementById('adminLayout');
+    if (toggle && layout) {
+      toggle.addEventListener('click', function () {
+        layout.classList.toggle('admin-sidebar-collapsed');
+      });
+    }
+  })();
+</script>
+</body>
+</html>
