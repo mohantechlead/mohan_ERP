@@ -151,6 +151,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 django_heroku.settings(locals())
 
 LOGOUT_REDIRECT_URL = 'login_user'
+LOGIN_REDIRECT_URL = 'create_grn'
 
 
 
