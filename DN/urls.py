@@ -32,7 +32,6 @@ urlpatterns = [
     path('input_delivery_items/',views.input_delivery_items, name='input_delivery_items'),
      path('display_order_items/',views.display_order_items, name='display_order_items'),
     path('input_orders/', views.input_orders, name='input_orders'),
-    path('input_delivery', views.input_delivery, name='input_delivery'),
     path('display_delivery/', views.display_delivery, name='display_delivery'),
     path('deliveries/', views.deliveries, name='deliveries'),   
     path('search_orders/', views.search_orders, name='search_orders'),
@@ -55,6 +54,16 @@ urlpatterns = [
     path('sales_contract/',views.sales_contract),
     path('get_order_items/', views.get_order_items, name='get_order_items'),
     path('customer/<str:company>/', views.customer_detail, name='customer_detail'),
+    path(
+        'inventory/inventory-order-items/manage',
+        views.manage_dn_inventory_order_items,
+        name='manage_dn_inventory_order_items',
+    ),
+    path(
+        'inventory/inventory-order-items/manage/add',
+        views.manage_dn_inventory_order_items_add,
+        name='manage_dn_inventory_order_items_add',
+    ),
 
 ]   
 

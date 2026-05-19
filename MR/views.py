@@ -5,6 +5,7 @@ from .forms import *
 from django.shortcuts import render, redirect,get_object_or_404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib import messages
 from django.forms import formset_factory
 from django.db import transaction
 from django.db.models import Sum
@@ -503,3 +504,29 @@ def supplier_chart(request):
     }
     
     return render(request, 'supplier_chart.html', context)
+
+
+# --- inventory_MR_items (list + add only; Display Inventory section) ---
+from common.line_portals import make_portal_add_view, make_portal_list_view
+
+_MR_BASE = "base.html"
+
+manage_inventory_mr_items = make_portal_list_view(
+    queryset_fn=lambda: inventory_MR_items.objects.all().order_by("item_name"),
+    headers=["Item", "Total units", "Total qty", "Branch"],
+    row_builder=lambda o: [
+        o.item_name,
+        o.total_no_of_unit,
+        o.total_quantity,
+        o.branch,
+    ],
+    title="Inventory MR items",
+    add_url_name="manage_inventory_mr_items_add",
+    base_template=_MR_BASE,
+)
+manage_inventory_mr_items_add = make_portal_add_view(
+    Form=MRInventoryRolledStandaloneForm,
+    redirect_url_name="manage_inventory_mr_items",
+    base_template=_MR_BASE,
+    title="Add inventory MR item",
+)

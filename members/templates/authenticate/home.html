@@ -1,5 +1,125 @@
-<html>
-    <body>
-        <h1>Home</h1>
-    </body>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mohan ERP — Home</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    body { background: #f4f6f9; padding-bottom: 40px; }
+    .hub-header {
+      background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+      color: #fff;
+      padding: 22px 0;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .hub-header h1 { margin: 0; font-size: 26px; font-weight: 600; }
+    .hub-header p { margin: 8px 0 0; opacity: .9; font-size: 14px; }
+    .hub-panel { margin-bottom: 20px; }
+    .hub-panel .panel-heading { font-weight: 600; font-size: 15px; }
+    .hub-links { list-style: none; padding: 0; margin: 0; }
+    .hub-links li { border-bottom: 1px solid #eee; }
+    .hub-links li:last-child { border-bottom: 0; }
+    .hub-links a {
+      display: block;
+      padding: 10px 12px;
+      color: #2c5282;
+      font-weight: 500;
+    }
+    .hub-links a:hover { background: #f0f5fb; text-decoration: none; color: #1a365d; }
+    .hub-meta { font-size: 12px; color: #718096; padding: 0 12px 10px; }
+  </style>
+</head>
+<body>
+  <div class="hub-header">
+    <div class="container">
+      <div class="pull-right" style="margin-top: 4px;">
+        {% if user.is_staff %}
+        <a class="btn btn-default btn-sm" href="{% url 'admin:index' %}">Django admin</a>
+        {% endif %}
+        <form action="{% url 'logout' %}" method="post" style="display: inline-block; margin-left: 8px;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-default btn-sm">Log out</button>
+        </form>
+      </div>
+      <h1>Mohan ERP</h1>
+      <p>Signed in as <strong>{{ user.get_username }}</strong> — quick links to add records (all roles).</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+
+      <div class="col-md-4 col-sm-6">
+        <div class="panel panel-default hub-panel">
+          <div class="panel-heading">GRN &amp; purchasing</div>
+          <ul class="hub-links">
+            <li><a href="{% url 'create_grn' %}">Create local GRN</a></li>
+            <li><a href="{% url 'create_grn_items' %}">Add GRN line items</a></li>
+            <li><a href="{% url 'create_import_grn' %}">Create import GRN</a></li>
+            <li><a href="{% url 'create_import_grn_items' %}">Add import GRN items</a></li>
+            <li><a href="{% url 'create_pr' %}">Create purchase request (PR)</a></li>
+            <li><a href="{% url 'create_items' %}">Add PR line items</a></li>
+            <li><a href="{% url 'create_vendor_payment' %}">Create vendor payment</a></li>
+            <li><a href="{% url 'create_actual_purchase' %}">Create actual purchase</a></li>
+            <li><a href="{% url 'display_actual_purchases' %}">Display actual purchases</a></li>
+          </ul>
+          <p class="hub-meta">Module base: <code>/GRN/</code></p>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="panel panel-default hub-panel">
+          <div class="panel-heading">Material request (MR)</div>
+          <ul class="hub-links">
+            <li><a href="{% url 'create_MR' %}">Create MR (with items)</a></li>
+            <li><a href="{% url 'opening_balances' %}">MR opening balance items</a></li>
+          </ul>
+          <p class="hub-meta">Module base: <code>/MR/</code></p>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="panel panel-default hub-panel">
+          <div class="panel-heading">Finished goods (FGRN)</div>
+          <ul class="hub-links">
+            <li><a href="{% url 'create_fgrn' %}">Create FGRN (with items)</a></li>
+            <li><a href="{% url 'fgrn_opening_balance' %}">FGRN opening balance items</a></li>
+          </ul>
+          <p class="hub-meta">Module base: <code>/FGRN/</code></p>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="panel panel-default hub-panel">
+          <div class="panel-heading">WIP</div>
+          <ul class="hub-links">
+            <li><a href="{% url 'create_WIP' %}">Create WIP (with items)</a></li>
+          </ul>
+          <p class="hub-meta">Module base: <code>/WIP/</code></p>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="panel panel-default hub-panel">
+          <div class="panel-heading">Delivery &amp; orders (DN)</div>
+          <ul class="hub-links">
+            <li><a href="{% url 'input_orders' %}">Create / input order</a></li>
+            <li><a href="{% url 'input_orders_items' %}">Add order line items</a></li>
+            <li><a href="{% url 'input_delivery' %}">Record delivery</a></li>
+            <li><a href="{% url 'input_delivery_items' %}">Add delivery line items</a></li>
+            <li><a href="{% url 'create_customer' %}">Create customer</a></li>
+          </ul>
+          <p class="hub-meta">Module base: <code>/DN/</code></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
 </html>

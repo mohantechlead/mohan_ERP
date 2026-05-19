@@ -1104,3 +1104,30 @@ def customer_detail(request, company):
 
 
 
+# --- Inventory order items (list + add; shared line_portal templates) ---
+from common.line_portals import make_portal_add_view, make_portal_list_view
+
+from .line_portal_forms import InventoryOrderItemsPortalForm
+
+_DN_INV_BASE = "deliveries_base.html"
+
+manage_dn_inventory_order_items = make_portal_list_view(
+    queryset_fn=lambda: inventory_order_items.objects.all().order_by("item_name"),
+    headers=["Item", "Total units", "Total qty", "Branch", "Group"],
+    row_builder=lambda o: [
+        o.item_name,
+        o.total_no_of_unit,
+        o.total_quantity,
+        o.branch,
+        o.group,
+    ],
+    title="Inventory order items",
+    add_url_name="manage_dn_inventory_order_items_add",
+    base_template=_DN_INV_BASE,
+)
+manage_dn_inventory_order_items_add = make_portal_add_view(
+    Form=InventoryOrderItemsPortalForm,
+    redirect_url_name="manage_dn_inventory_order_items",
+    base_template=_DN_INV_BASE,
+    title="Add inventory order item",
+)

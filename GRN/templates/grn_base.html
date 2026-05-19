@@ -62,7 +62,7 @@
                         </li>
                         <li style="font-size: large;">
                             <a href="{% url 'display_pr' %}">Display PR</a>
-                        </li>                     
+                        </li>
                         {% if request.user.is_superuser %}
                         <li style="font-size: large;">
                             <a href="{% url 'purchase_difference' %}">Purchase Difference</a>
@@ -113,7 +113,6 @@
                         <li style="font-size:larger; font-weight: 500;">
                             <a href="{% url 'display_grn' %}">Display GRN</a>
                         </li>
-                        
                      
                     </ul>
                 </li>
@@ -126,6 +125,9 @@
                     <ul class="collapse list-unstyled" id="itempageSubmenu">
                         <li style="font-size:larger; font-weight: 500;">
                             <a href="{% url 'display_grn_item' %}">Display GRN Item</a>
+                        </li>
+                        <li style="font-size: large;">
+                            <a href="{% url 'manage_inventory_grn_items' %}">Add inventory GRN items</a>
                         </li>
                     </ul>
                 </li>

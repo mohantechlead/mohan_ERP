@@ -103,6 +103,16 @@
                 </li> 
                 
                 <li style="font-size:larger; font-weight: 500;">
+                    <a href="#dnInventorySubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle">Inventory</a>
+                    <ul class="collapse list-unstyled" id="dnInventorySubmenu">
+                        <li class="{% if request.resolver_match %}{% if request.resolver_match.url_name == 'manage_dn_inventory_order_items' or request.resolver_match.url_name == 'manage_dn_inventory_order_items_add' %}active{% endif %}{% endif %}" style="font-size: large;">
+                            <a href="{% url 'manage_dn_inventory_order_items' %}">Inventory order items</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li style="font-size:larger; font-weight: 500;">
                     <a href="#customerSubmenu" data-toggle="collapse" aria-expanded="false"
                         class="dropdown-toggle">Customer</a>
                     <ul class="collapse list-unstyled" id="customerSubmenu">

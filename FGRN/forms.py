@@ -153,5 +153,3 @@ class InventoryItemForm(forms.ModelForm):
    
         model = finished_goods
         fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
-
-       

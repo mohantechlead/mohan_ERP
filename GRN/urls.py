@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from GRN import views
 from GRN import vendor_payment_views
+from GRN import line_portal_views
 
 urlpatterns = [
     # path('display_items/<str:pr_no>/', views.display_items, name='display_items'),
@@ -30,6 +31,8 @@ urlpatterns = [
     path('create_import_grn', views.create_import_grn, name='create_import_grn'),
     path('create_import_grn_items', views.create_import_grn_items, name='create_import_grn_items'),
     path('grn_number', views.grn_number, name='grn_number'),
+    path('portal/inventory-grn-items/manage', line_portal_views.manage_inventory_grn_items, name='manage_inventory_grn_items'),
+    path('portal/inventory-grn-items/manage/add', line_portal_views.manage_inventory_grn_items_add, name='manage_inventory_grn_items_add'),
     # path('admin/custom-report-page/', views.custom_report_page, name='custom_report_page'),
     path('search_grns', views.search_grns, name='search_grns'),
     path('create_supplier', views.create_supplier, name="create_supplier"),
