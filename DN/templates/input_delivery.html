@@ -1,6 +1,39 @@
 {% extends 'deliveries_base.html' %}
+{% load static %}
 
 {% block content %}
+<style>
+  .item-description-combobox { position: relative; }
+  .item-description-suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+  .item-description-suggestions li {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .item-description-suggestions li:hover,
+  .item-description-suggestions li.active {
+    background: #e8f0fe;
+  }
+  .item-description-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+  }
+</style>
     <h1>Input Delivery Information</h1>
     <div id="error-container" style="height:50px;">
       <!-- Errors will be displayed here -->
@@ -112,6 +145,8 @@
       
     </form>
       
+    {{ item_descriptions|json_script:"item-descriptions-data" }}
+
     <div class="col-sm-12" style="margin-top: 10px;">
   <form method="post" action="{% url 'input_delivery_items' %}" id="form2">
         {% csrf_token %}
@@ -122,15 +157,15 @@
             {% for form in formset %}
   
             <div class="card-body row item-list form-group col-md-4">
-  
-                {{form.as_p}}
-  
+                {% include 'dn/_delivery_item_fields.html' with form=form %}
             </div>
   
             {% endfor %}
         </div>
   
-        <div id="empty-form" class="hidden"> {{ formset.empty_form.as_p}}</div>
+        <div id="empty-form" class="hidden">
+          {% include 'dn/_delivery_item_fields.html' with form=formset.empty_form %}
+        </div>
         <button id="add-more" class="btn btn-primary" type="button"
             style="background-image:url('../static/back1.PNG');color: aliceblue;">Add
             Item</button>
@@ -168,7 +203,7 @@
   </div>
    
     
-<script src="../../static/js/dn/input_delivery.js"></script>
-
+<script src="{% static 'js/dn/item_combobox.js' %}?v=1"></script>
+<script src="{% static 'js/dn/input_delivery.js' %}?v=3"></script>
 
 {% endblock %}

@@ -1,0 +1,43 @@
+<div class="form-group">
+  <label for="{{ form.description.id_for_label }}">Item description</label>
+  <div class="item-description-combobox">
+    <input type="text"
+           name="{{ form.description.html_name }}"
+           id="{{ form.description.id_for_label }}"
+           value="{{ form.description.value|default_if_none:'' }}"
+           class="form-control item-description-input"
+           placeholder="Type to search items…"
+           autocomplete="off">
+    <ul class="item-description-suggestions" hidden></ul>
+  </div>
+  <p class="item-description-hint">Type to filter; click a suggestion or enter your own text.</p>
+  {% if form.description.errors %}<span class="text-danger">{{ form.description.errors }}</span>{% endif %}
+</div>
+<div class="form-group">
+  <label for="{{ form.unit_price.id_for_label }}">{{ form.unit_price.label }}</label>
+  {{ form.unit_price }}
+</div>
+<div class="form-group">
+  <label for="{{ form.no_of_unit.id_for_label }}">{{ form.no_of_unit.label }}</label>
+  {{ form.no_of_unit }}
+</div>
+<div class="form-group">
+  <label for="{{ form.unit_type.id_for_label }}">{{ form.unit_type.label }}</label>
+  {{ form.unit_type }}
+</div>
+<div class="form-group">
+  <label for="{{ form.per_unit_kg.id_for_label }}">{{ form.per_unit_kg.label }}</label>
+  {{ form.per_unit_kg }}
+</div>
+<div class="form-group">
+  <label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label>
+  {{ form.quantity }}
+</div>
+<div class="form-group">
+  <label for="{{ form.measurement_unit.id_for_label }}">{{ form.measurement_unit.label }}</label>
+  {{ form.measurement_unit }}
+</div>
+<div class="form-group">
+  <label for="{{ form.total_price.id_for_label }}">{{ form.total_price.label }}</label>
+  {{ form.total_price }}
+</div>

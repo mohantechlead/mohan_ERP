@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from django.http import HttpResponseForbidden
 from django.contrib import messages
 from .forms import *
+from .forms import _get_item_choices
 from FGRN.models import finished_goods
 from MR.models import inventory
 from .models import *
@@ -59,12 +60,40 @@ def delivery_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
+def _input_delivery_page_context(*, formset=None, form=None):
+    """Shared template context for Create Delivery."""
+    if form is None:
+        form = DeliveryForm()
+    if formset is None:
+        formset = formset_factory(DeliverItemForm, extra=1)(prefix="items")
+    return {
+        'form': form,
+        'formset': formset,
+        'my_orders': orders.objects.filter(is_void=False).order_by('serial_no'),
+        'truck_number': sorted(set(delivery.objects.values_list('truck_number', flat=True))),
+        'driver_name': sorted(set(delivery.objects.values_list('driver_name', flat=True))),
+        'my_customer': sorted(set(Customer.objects.values_list('company', flat=True))),
+        'item_descriptions': [name for name, _ in _get_item_choices()],
+    }
+
+
+def _input_orders_page_context(*, formset=None, form=None):
+    """Shared template context for Order Confirmation."""
+    if form is None:
+        form = OrderForm()
+    if formset is None:
+        formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
+    return {
+        'form': form,
+        'formset': formset,
+        'my_goods': finished_goods.objects.all(),
+        'my_customer': Customer.objects.values_list('company', flat=True),
+        'item_descriptions': [name for name, _ in _get_item_choices()],
+    }
+
+
 @login_required(login_url="login_user")
 def input_delivery(request):
-    my_orders = orders.objects.filter(is_void=False).order_by('serial_no')
-    truck_number = sorted(set(delivery.objects.values_list('truck_number', flat=True)))
-    driver_name = sorted(set(delivery.objects.values_list('driver_name', flat=True)))
-    customer = sorted(set(Customer.objects.values_list('company', flat=True)))
 
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
@@ -89,16 +118,7 @@ def input_delivery(request):
             
         
    
-    form = DeliveryForm()
-    formset = formset_factory(DeliverItemForm, extra= 1)
-    formset = formset(prefix="items")
-
-    return render(request, 'input_delivery.html', {'form': form,
-                                                   'my_orders':my_orders, 
-                                                   'formset':formset, 
-                                                   'truck_number': truck_number, 
-                                                   'my_customer': customer, 
-                                                   'driver_name': driver_name,})
+    return render(request, 'input_delivery.html', _input_delivery_page_context())
 
 @login_required(login_url="login_user")
 def input_delivery_items(request):
@@ -193,24 +213,8 @@ def input_delivery_items(request):
                 errors = dict(formset.errors.items())
                 return JsonResponse({'form_errors': errors}, status=400)
         
-            order_form = DeliveryForm(prefix="orders")
-            formset = formset_factory(DeliverItemForm, extra=1)
-            formset = formset(prefix="items")
-
-            context = {
-                'order_form': order_form,
-                'formset': formset,
-            }
-            return render(request, 'input_delivery.html', context)
-    else:
-       
-        formset = formset_factory(DeliverItemForm, extra=1)
-        formset = formset(prefix="items")
-
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'input_delivery.html', context)
+            return redirect('input_delivery')
+    return redirect('input_delivery')
 
 @login_required(login_url="login_user")
 #To display the delivery notes for a specific order number
@@ -231,9 +235,6 @@ def deliveries(request):
 @login_required(login_url="login_user")
 #for creating Orders
 def input_orders(request):
-    customer = Customer.objects.values_list('company', flat=True)
-    
-    
     if request.method == 'POST':
         form = OrderForm(request.POST)
 
@@ -251,12 +252,9 @@ def input_orders(request):
             print(errors,"errors")
             return JsonResponse({'form_errors': errors}, status=400)
         
-    my_goods = finished_goods.objects.all()
     form = OrderForm()
-    formset = formset_factory(OrderItemForm, extra= 1)
-    formset = formset(prefix="items")
-    context = {'form': form ,'my_goods': my_goods, 'formset': formset, 'my_customer':customer}
-    return render(request, 'input_orders.html', context)
+    formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
+    return render(request, 'input_orders.html', _input_orders_page_context(form=form, formset=formset))
 
 @login_required(login_url="login_user")
 def input_orders_items(request):
@@ -314,25 +312,12 @@ def input_orders_items(request):
                 errors = dict(formset.errors.items())
                 return JsonResponse({'form_errors': errors}, status=400)
         
-            order_form = OrderForm(prefix="orders")
-            formset = formset_factory(OrderItemForm, extra=1)
-            formset = formset(prefix="items")
-
-            context = {
-                'order_form': order_form,
-                'formset': formset,
-                # 'message':success_message,
-            }
-            return render(request, 'input_orders.html', context)
+            formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
+            return render(request, 'input_orders.html', _input_orders_page_context(formset=formset))
     else:
-       
-        formset = formset_factory(OrderItemForm, extra=1)
-        formset = formset(prefix="items")
+        formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
 
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'input_orders.html', context)
+    return render(request, 'input_orders.html', _input_orders_page_context(formset=formset))
 
 
 @login_required(login_url="login_user")

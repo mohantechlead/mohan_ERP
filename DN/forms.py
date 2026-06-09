@@ -66,13 +66,13 @@ class DeliveryForm(forms.ModelForm):
         fields = ['serial_no','delivery_number','delivery_date','truck_number','driver_name','recipient_name','delivery_comment']
 
 class DeliverItemForm(forms.ModelForm):
-    description = forms.ChoiceField(
-        choices=[],
-        widget=forms.Select(attrs={
-            'class': 'form-control select2',  # Class for Select2 widget styling
-            'data-minimum-input-length': '0',  # Start filtering from the first character
-            'data-placeholder': 'Select or type an item',  # Placeholder text
-            'id': 'description',  # HTML ID for the field
+    description = forms.CharField(
+        label='Item description',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control delivery-item-description',
+            'placeholder': 'Type to search items…',
+            'autocomplete': 'off',
         }),
     )
     
@@ -121,19 +121,15 @@ class DeliverItemForm(forms.ModelForm):
         model = delivery_items
         fields = ['description', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit']
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['description'].choices = _get_item_choices()
-
 
 class OrderItemForm(forms.ModelForm):
-    description = forms.ChoiceField(
-        choices=[],
-        widget=forms.Select(attrs={
-            'class': 'form-control select2',  # Class for Select2 widget styling
-            'data-minimum-input-length': '0',  # Start filtering from the first character
-            'data-placeholder': 'Select or type an item',  # Placeholder text
-            'id': 'description',  # HTML ID for the field
+    description = forms.CharField(
+        label='Item description',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control item-description-input',
+            'placeholder': 'Type to search items…',
+            'autocomplete': 'off',
         }),
     )
     
@@ -182,10 +178,6 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = orders_items
         fields = ['description', 'unit_price', 'no_of_unit', 'unit_type','per_unit_kg', 'quantity', 'measurement_unit', 'total_price']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['description'].choices = _get_item_choices()
 
 class OrderForm(forms.ModelForm):
     class Meta:

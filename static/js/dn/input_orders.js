@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const recieved_by = document.getElementById('recieved_by')
     const date = document.getElementById('date')
     addMoreBtn.addEventListener('click', add_new_form);
+    if (window.initItemDescriptionComboboxes) {
+        window.initItemDescriptionComboboxes();
+    }
     const calculateTotalButton = document.querySelector('#calculate_total');
 
     calculateTotalButton.addEventListener('click', function (event) {
@@ -115,25 +118,25 @@ document.addEventListener('DOMContentLoaded', function () {
       
             });
     
-    function add_new_form(args) {
-        // Your code to add a new form here
-        const currentForms = document.getElementsByClassName('item-list')
-        let currentFormsCount = currentForms.length + 1
-        console.log(currentForms.length)
-        console.log(totalNewForms);
-        const copyFormTarget = document.getElementById('form-lists')
+    function add_new_form() {
+        const currentForms = document.getElementsByClassName('item-list');
+        const newIndex = currentForms.length;
+        const copyFormTarget = document.getElementById('form-lists');
         const copyEmptyForm = document.getElementById('empty-form').cloneNode(true);
-        copyEmptyForm.setAttribute('class', 'item-list form-group col-md-4 text-dark')
-        copyEmptyForm.setAttribute('id', `form-${currentFormsCount}`)
-        // Clear input values in the cloned form
-        const regex = new RegExp('__prefix__', 'g')
+        copyEmptyForm.classList.remove('hidden');
+        copyEmptyForm.classList.add('item-list', 'form-group', 'col-md-4', 'text-dark');
+        copyEmptyForm.id = 'form-' + (newIndex + 1);
+        const regex = new RegExp('__prefix__', 'g');
         copyEmptyForm.querySelectorAll('input').forEach(function (input) {
             input.value = '';
+            delete input.dataset.comboboxInit;
         });
-        copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, currentFormsCount)
-        // Append the cloned form to the form list
-        totalNewForms.value = currentFormsCount + 1;
+        copyEmptyForm.innerHTML = copyEmptyForm.innerHTML.replace(regex, newIndex);
+        totalNewForms.value = newIndex + 1;
         copyFormTarget.appendChild(copyEmptyForm);
+        if (window.initItemDescriptionComboboxes) {
+            window.initItemDescriptionComboboxes(copyEmptyForm);
+        }
     } 
 
     function updateTotalPrice(form) {
