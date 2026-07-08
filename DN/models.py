@@ -45,6 +45,7 @@ class orders_items(models.Model):
     per_unit_kg = models.FloatField(blank=True, null=True)
     unit_price = models.FloatField(blank=True, null=True)
     total_price = models.FloatField(blank=True, null=True)  
+    measurement_unit = models.TextField(blank=True, null=True)
     remaining_quantity =  models.FloatField(blank=True, null=True) 
     remaining_unit = models.FloatField(blank=True, null=True)
 
