@@ -5,7 +5,9 @@ from .forms import *
 from django.shortcuts import render, redirect,get_object_or_404
 from django.conf import settings
 from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib import messages
 from django.forms import formset_factory
+from django.db import transaction
 from django.db.models import Sum
 from django.http import JsonResponse,HttpResponse
 from django.template.loader import get_template
@@ -20,6 +22,9 @@ from itertools import chain
 import plotly.graph_objs as go
 from plotly.offline import plot
 from DN.models import inventory_DN_items
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+from GRN.models import PR_item
 
 @login_required(login_url="login_user")
 def create_MR(request):
@@ -158,32 +163,48 @@ def display_inventory(request):
 
     for name in all_names:
         # Get the quantity from each model
-        quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
-        quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
-        quantity_c = opening_balance.objects.filter(item_name=name).first()
-        quantity_d = inventory_DN_items.objects.filter(item_name = name).first()
+        if name in mr_names:
+            quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
+            quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
+            quantity_c = opening_balance.objects.filter(item_name=name).first()
+            quantity_d = inventory_DN_items.objects.filter(item_name = name).first()
 
-        # Initialize the quantities or set to 0 if not found
-        quantity_a_value = quantity_a.total_quantity if quantity_a else 0
-        quantity_b_value = quantity_b.total_quantity if quantity_b else 0
-        quantity_c_value = quantity_c.quantity if quantity_c else 0
-        quantity_d_value = quantity_d.total_quantity if quantity_d else 0
+            # Initialize the quantities or set to 0 if not found
+            quantity_a_value = quantity_a.total_quantity if quantity_a else 0
+            quantity_b_value = quantity_b.total_quantity if quantity_b else 0
+            quantity_c_value = quantity_c.quantity if quantity_c else 0
+            quantity_d_value = quantity_d.total_quantity if quantity_d else 0
 
-        units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
-        units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
-        units_c_value = quantity_c.no_of_unit if quantity_c else 0
-        units_d_value = quantity_d.total_no_of_unit if quantity_d else 0
-        
-        # Calculate the result: Subtract ModelB and add ModelA (and include openings and DN)
-        result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value - quantity_d_value
-        result_units = units_c_value - units_b_value + units_a_value - units_d_value
-        
-        # Save or update the result in ModelD (ensure inventory table includes all aggregated names)
-        inventory.objects.update_or_create(
-            item_name=name,
-            defaults={'quantity': result_quantity,
-                      'no_of_unit': result_units}
-        )
+            units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
+            units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
+            units_c_value = quantity_c.no_of_unit if quantity_c else 0
+            units_d_value = quantity_d.total_no_of_unit if quantity_d else 0
+            
+            # Calculate the result: Subtract ModelA and ModelC, and add ModelB
+            result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value - quantity_d_value
+            result_units = units_c_value - units_b_value + units_a_value - units_d_value
+            
+            # inventory.item_name is not unique; update_or_create would MultipleObjectsReturned
+            with transaction.atomic():
+                rows = list(
+                    inventory.objects.select_for_update()
+                    .filter(item_name=name)
+                    .order_by('inventory_id')
+                )
+                if rows:
+                    keep = rows[0]
+                    keep.quantity = result_quantity
+                    keep.no_of_unit = result_units
+                    keep.save(update_fields=['quantity', 'no_of_unit'])
+                    dup_ids = [r.pk for r in rows[1:]]
+                    if dup_ids:
+                        inventory.objects.filter(pk__in=dup_ids).delete()
+                else:
+                    inventory.objects.create(
+                        item_name=name,
+                        quantity=result_quantity,
+                        no_of_unit=result_units,
+                    )
 
     items = inventory.objects.all().order_by('item_name')
     print(items)
@@ -456,58 +477,64 @@ def stock_card(request):
     return render(request, 'stock_card.html', context)
 
 def inventory_chart(request):
-    # Fetch all inventory items for the first chart
-    inventory_items = inventory.objects.all()
+    # Fetch item names and their corresponding quantities
+    qs = inventory.objects.all()
+    
+    # Prepare data for Chart.js
+    labels = [item.item_name for item in qs]  # Extract item names
+    data = [item.quantity for item in qs]  # Extract quantity (or any relevant field)
 
-    # Prepare data for the all-items chart
-    item_names = [item.item_name for item in inventory_items]
-    quantities = [item.quantity for item in inventory_items]
+    # Convert to JSON for use in JavaScript
+    context = {
+        "labels": json.dumps(labels, cls=DjangoJSONEncoder),
+        "data": json.dumps(data, cls=DjangoJSONEncoder),
+    }
 
-    # Create a Plotly bar chart for all items
-    fig_all_items = go.Figure(
-        data=[
-            go.Bar(x=item_names, y=quantities, marker_color='blue')
-        ],
-        layout=go.Layout(
-            title="Inventory Quantities for All Items",
-            xaxis_title="Item Name",
-            yaxis_title="Quantity"
-        )
+    return render(request, "inventory_chart.html", context)
+
+def supplier_chart(request):
+    # Aggregating total quantity for each customer using `orders_items`
+    supplier_data = (
+        PR_item.objects
+        .values('PR_no__vendor_name')  # Access customer name through `serial_no` (ForeignKey)
+        .annotate(total_quantity=Sum('quantity'))  # Sum up the quantities
+        .order_by('-total_quantity')  # Sort by quantity, descending
     )
 
-    # Generate the plot div for all items
-    chart_all_items_div = plot(fig_all_items, output_type='div')
+    # Prepare the labels (customer names) and data (total quantity)
+    labels = [data['PR_no__vendor_name'] for data in supplier_data]
+    data = [data['total_quantity'] for data in supplier_data]
 
-    # Handle the quantity change chart for the selected item
-    selected_item = request.GET.get('item_name', None)
-    chart_quantity_change_div = None
+    # Pass data to the template
+    context = {
+        'labels': labels,
+        'data': data
+    }
+    
+    return render(request, 'supplier_chart.html', context)
 
-    if selected_item:
-        # Fetch all MR_items for the selected item
-        item_records = MR_item.objects.filter(item_name=selected_item).select_related('MR_no')
-        
-        # Prepare the data for the second chart
-        dates = [record.MR_no.date for record in item_records]
-        quantities_over_time = [record.quantity for record in item_records]
 
-        # Create a Plotly line chart for quantity change over time
-        fig_quantity_change = go.Figure(
-            data=[
-                go.Scatter(x=dates, y=quantities_over_time, mode='lines+markers', name=selected_item)
-            ],
-            layout=go.Layout(
-                title=f"Quantity Change Over Time for {selected_item}",
-                xaxis_title="Date",
-                yaxis_title="Quantity"
-            )
-        )
+# --- inventory_MR_items (list + add only; Display Inventory section) ---
+from common.line_portals import make_portal_add_view, make_portal_list_view
 
-        # Generate the plot div for quantity change
-        chart_quantity_change_div = plot(fig_quantity_change, output_type='div')
+_MR_BASE = "base.html"
 
-    # Render the template
-    return render(request, 'inventory_chart.html', {
-        'inventory_items': inventory_items,
-        'chart_all_items_div': chart_all_items_div,
-        'chart_quantity_change_div': chart_quantity_change_div
-    })
+manage_inventory_mr_items = make_portal_list_view(
+    queryset_fn=lambda: inventory_MR_items.objects.all().order_by("item_name"),
+    headers=["Item", "Total units", "Total qty", "Branch"],
+    row_builder=lambda o: [
+        o.item_name,
+        o.total_no_of_unit,
+        o.total_quantity,
+        o.branch,
+    ],
+    title="Inventory MR items",
+    add_url_name="manage_inventory_mr_items_add",
+    base_template=_MR_BASE,
+)
+manage_inventory_mr_items_add = make_portal_add_view(
+    Form=MRInventoryRolledStandaloneForm,
+    redirect_url_name="manage_inventory_mr_items",
+    base_template=_MR_BASE,
+    title="Add inventory MR item",
+)

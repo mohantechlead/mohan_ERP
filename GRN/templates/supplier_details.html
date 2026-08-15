@@ -1,0 +1,42 @@
+{% extends 'grn_base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Supplier Details</h2>
+    <br>
+    <table class="table table-bordered">
+        <tr>
+            <th>Company:</th>
+            <td>{{ supplier.company }}</td>
+        </tr>
+        <tr>
+            <th>Contact Person:</th>
+            <td>{{ supplier.contact_person }}</td>
+        </tr>
+        <tr>
+            <th>Email:</th>
+            <td>{{ supplier.email }}</td>
+        </tr>
+        <tr>
+            <th>Phone:</th>
+            <td>{{ supplier.phone_number }}</td>
+        </tr>
+        <tr>
+            <th>Address:</th>
+            <td>{{ supplier.address }}</td>
+        </tr>
+        <tr>
+            <th>TIN No:</th>
+            <td>{{ supplier.tin_no }}</td>
+        </tr>
+        <tr>
+            <th>Remarks:</th>
+            <td>{{ supplier.remarks }}</td>
+        </tr>
+    </table>
+
+    <a href="{% url 'display_supplier' %}" class="btn btn-primary">Back to Supplier List</a>
+
+     
+</div>
+{% endblock %}

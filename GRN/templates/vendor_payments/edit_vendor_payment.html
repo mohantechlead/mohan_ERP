@@ -1,0 +1,66 @@
+{% extends "grn_base.html" %}
+{% block content %}
+{% include "vendor_payments/_messages.html" %}
+
+<div class="container" style="margin-top:16px;">
+    <h3>Edit vendor payment</h3>
+    <p class="text-muted">Only pending payments can be edited. Maximum partial amount (including this line): {{ max_for_partial|floatformat:2 }}</p>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="payment_date">Payment date *</label>
+                            <input type="date" class="form-control" name="payment_date" id="payment_date" required value="{{ detail.payment_date|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="payment_type">Payment type *</label>
+                            <select class="form-control" name="payment_type" id="payment_type" required>
+                                <option value="partial" {% if detail.payment_type == 'partial' %}selected{% endif %}>Partial</option>
+                                <option value="full" {% if detail.payment_type == 'full' %}selected{% endif %}>Full</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="amount">Amount *</label>
+                            <input type="number" step="0.01" min="0" class="form-control" name="amount" id="amount" value="{{ detail.amount }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="remark">Remark</label>
+                            <textarea class="form-control" name="remark" id="remark" rows="3">{{ detail.remark|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a class="btn btn-default" href="{% url 'vendor_payment_detail' detail.payment_number %}">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var ptype = document.getElementById('payment_type');
+    var amount = document.getElementById('amount');
+    function sync() {
+        if (ptype.value === 'full') {
+            amount.setAttribute('readonly', 'readonly');
+        } else {
+            amount.removeAttribute('readonly');
+        }
+    }
+    ptype.addEventListener('change', sync);
+    sync();
+})();
+</script>
+{% endblock %}

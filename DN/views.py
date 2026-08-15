@@ -9,18 +9,28 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import JsonResponse
+from django.http import HttpResponseForbidden
 from django.contrib import messages
 from .forms import *
+from .forms import _get_item_choices
 from FGRN.models import finished_goods
 from MR.models import inventory
+from .models import *
 from django.forms import formset_factory
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 import plotly.graph_objs as go
 from plotly.offline import plot
 import openpyxl
 from django.http import HttpResponse
 from openpyxl.styles import Alignment
 from django.core.mail import send_mail
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
+
+def is_admin(user):
+    return user.is_superuser
 
 @api_view(['GET','POST'])
 def order_list(request):
@@ -50,12 +60,40 @@ def delivery_list(request):
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)
 
+def _input_delivery_page_context(*, formset=None, form=None):
+    """Shared template context for Create Delivery."""
+    if form is None:
+        form = DeliveryForm()
+    if formset is None:
+        formset = formset_factory(DeliverItemForm, extra=1)(prefix="items")
+    return {
+        'form': form,
+        'formset': formset,
+        'my_orders': orders.objects.filter(is_void=False).order_by('serial_no'),
+        'truck_number': sorted(set(delivery.objects.values_list('truck_number', flat=True))),
+        'driver_name': sorted(set(delivery.objects.values_list('driver_name', flat=True))),
+        'my_customer': sorted(set(Customer.objects.values_list('company', flat=True))),
+        'item_descriptions': [name for name, _ in _get_item_choices()],
+    }
+
+
+def _input_orders_page_context(*, formset=None, form=None):
+    """Shared template context for Order Confirmation."""
+    if form is None:
+        form = OrderForm()
+    if formset is None:
+        formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
+    return {
+        'form': form,
+        'formset': formset,
+        'my_goods': finished_goods.objects.all(),
+        'my_customer': Customer.objects.values_list('company', flat=True),
+        'item_descriptions': [name for name, _ in _get_item_choices()],
+    }
+
+
 @login_required(login_url="login_user")
 def input_delivery(request):
-    my_orders = orders.objects.all()
-    truck_number = sorted(set(delivery.objects.values_list('truck_number', flat=True)))
-    driver_name = sorted(set(delivery.objects.values_list('driver_name', flat=True)))
-    customer = sorted(set(Customer.objects.values_list('company', flat=True)))
 
     if request.method == 'POST':
         form = DeliveryForm(request.POST)
@@ -67,6 +105,8 @@ def input_delivery(request):
         if form.is_valid():
                 serial_no = form.cleaned_data['serial_no']
                 order = orders.objects.get(serial_no = serial_no.serial_no)       
+                if order.is_void:
+                    return JsonResponse({'form_errors': {'serial_no': ['This order is VOID and cannot be used for delivery.']}}, status=400)
                 form.save()
                 return redirect('input_delivery')
         
@@ -78,16 +118,7 @@ def input_delivery(request):
             
         
    
-    form = DeliveryForm()
-    formset = formset_factory(DeliverItemForm, extra= 1)
-    formset = formset(prefix="items")
-
-    return render(request, 'input_delivery.html', {'form': form,
-                                                   'my_orders':my_orders, 
-                                                   'formset':formset, 
-                                                   'truck_number': truck_number, 
-                                                   'my_customer': customer, 
-                                                   'driver_name': driver_name,})
+    return render(request, 'input_delivery.html', _input_delivery_page_context())
 
 @login_required(login_url="login_user")
 def input_delivery_items(request):
@@ -114,6 +145,7 @@ def input_delivery_items(request):
 
                         selected_item = form.cleaned_data['description']
                         # selected_item_description = selected_item.item_name  # Assuming item_name is the field
+                        
                     
                         form.save()
             
@@ -161,8 +193,7 @@ def input_delivery_items(request):
                                 subject = 'Over Delivery Notification'
                                 message = f'The order with Order ID {serial_no} has been over delivered by {order_item.quantity} on delivery number {delivery_no}'
                                 from_email = 'tech@mohanplc.com'
-                                recipient_list = ['tibarek90@gmail.com', 'harsh@mohanplc.com', 'mayuraddis@gmail.com', 
-                                                 'amritakaur2612@gmail.com', 'rupaladdis@gmail.com']
+                                recipient_list = ['harsh@mohanplc.com', 'mayuraddis@gmail.com', 'amritakaur2612@gmail.com', 'rupaladdis@gmail.com']
 
                                 send_mail(subject, message, from_email, recipient_list, fail_silently= False)
 
@@ -182,24 +213,8 @@ def input_delivery_items(request):
                 errors = dict(formset.errors.items())
                 return JsonResponse({'form_errors': errors}, status=400)
         
-            order_form = DeliveryForm(prefix="orders")
-            formset = formset_factory(DeliverItemForm, extra=1)
-            formset = formset(prefix="items")
-
-            context = {
-                'order_form': order_form,
-                'formset': formset,
-            }
-            return render(request, 'input_delivery.html', context)
-    else:
-       
-        formset = formset_factory(DeliverItemForm, extra=1)
-        formset = formset(prefix="items")
-
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'input_delivery.html', context)
+            return redirect('input_delivery')
+    return redirect('input_delivery')
 
 @login_required(login_url="login_user")
 #To display the delivery notes for a specific order number
@@ -220,7 +235,6 @@ def deliveries(request):
 @login_required(login_url="login_user")
 #for creating Orders
 def input_orders(request):
-    customer = Customer.objects.values_list('company', flat=True)
     if request.method == 'POST':
         form = OrderForm(request.POST)
 
@@ -238,12 +252,9 @@ def input_orders(request):
             print(errors,"errors")
             return JsonResponse({'form_errors': errors}, status=400)
         
-    my_goods = finished_goods.objects.all()
     form = OrderForm()
-    formset = formset_factory(OrderItemForm, extra= 1)
-    formset = formset(prefix="items")
-    context = {'form': form ,'my_goods': my_goods, 'formset': formset, 'my_customer':customer}
-    return render(request, 'input_orders.html', context)
+    formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
+    return render(request, 'input_orders.html', _input_orders_page_context(form=form, formset=formset))
 
 @login_required(login_url="login_user")
 def input_orders_items(request):
@@ -272,20 +283,23 @@ def input_orders_items(request):
                         quantity = form.cleaned_data['quantity']
                         no_of_unit = form.cleaned_data['no_of_unit']
                         total_price = form.cleaned_data['total_price']
+                        unit_price = form.cleaned_data['unit_price']
                 
                         final_unit += no_of_unit
-                        vat_amount += total_price * 0.15
+                        vat_amount += unit_price* quantity * 0.15
                         Order_instance.vat_amount = vat_amount
                         final_price += total_price + vat_amount
                         Order_instance.final_price = final_price
                         before_vat += total_price  
                         Order_instance.before_vat = before_vat
                         
+                        
                         form.instance.remaining_quantity = quantity
                         form.instance.remaining_unit = no_of_unit
                         form.save()
             
                         Order_instance.save()
+                                    
                 except orders.DoesNotExist:
                     print(f"Order with Order_no {order_number} does not exist.")
                     return JsonResponse({'error': 'Invalid Order_no'}, status=400)
@@ -298,25 +312,12 @@ def input_orders_items(request):
                 errors = dict(formset.errors.items())
                 return JsonResponse({'form_errors': errors}, status=400)
         
-            order_form = OrderForm(prefix="orders")
-            formset = formset_factory(OrderItemForm, extra=1)
-            formset = formset(prefix="items")
-
-            context = {
-                'order_form': order_form,
-                'formset': formset,
-                # 'message':success_message,
-            }
-            return render(request, 'input_orders.html', context)
+            formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
+            return render(request, 'input_orders.html', _input_orders_page_context(formset=formset))
     else:
-       
-        formset = formset_factory(OrderItemForm, extra=1)
-        formset = formset(prefix="items")
+        formset = formset_factory(OrderItemForm, extra=1)(prefix="items")
 
-    context = {
-        'formset': formset,
-    }
-    return render(request, 'input_orders.html', context)
+    return render(request, 'input_orders.html', _input_orders_page_context(formset=formset))
 
 
 @login_required(login_url="login_user")
@@ -355,7 +356,10 @@ def display_orders(request):
                 'date': order.date,
                 'final_price': order.final_price,
                 'order_item': items,
-                'customer_name': order.customer_name 
+                'customer_name': order.customer_name,
+                'status': order.status,
+                'void_requested': order.void_requested,
+                'is_void': order.is_void,
             }
         orders_data.append(order_data)
 
@@ -367,6 +371,45 @@ def display_orders(request):
     }
 
     return render(request,'display_orders.html', context)
+
+
+@login_required(login_url="login_user")
+def request_void_order(request, serial_no):
+    if request.method != 'POST':
+        return HttpResponseForbidden("Invalid request method.")
+
+    order = get_object_or_404(orders, serial_no=serial_no)
+    if order.is_void:
+        messages.warning(request, f"Order {serial_no} is already VOID.")
+        return redirect('display_orders')
+
+    order.void_requested = True
+    order.status = "requestforvoid"
+    order.save(update_fields=['void_requested', 'status'])
+    messages.success(request, f"Void request submitted for order {serial_no}.")
+    return redirect('display_orders')
+
+
+@login_required(login_url="login_user")
+@user_passes_test(is_admin)
+def void_requests(request):
+    requested_orders = orders.objects.filter(void_requested=True, is_void=False).order_by('serial_no')
+    return render(request, 'void_requests.html', {'requested_orders': requested_orders})
+
+
+@login_required(login_url="login_user")
+@user_passes_test(is_admin)
+def approve_void_request(request, serial_no):
+    if request.method != 'POST':
+        return HttpResponseForbidden("Invalid request method.")
+
+    order = get_object_or_404(orders, serial_no=serial_no)
+    order.is_void = True
+    order.void_requested = False
+    order.status = "void"
+    order.save(update_fields=['is_void', 'void_requested', 'status'])
+    messages.success(request, f"Order {serial_no} marked as VOID.")
+    return redirect('void_requests')
 
 @login_required(login_url="login_user")
 def display_single_fgrn(request):
@@ -416,6 +459,7 @@ def display_single_order(request, serial_no):
                 context = {
                     'fgrn_item': fgrn_items,
                     'my_fgrn': fgrns,
+                    'is_void': fgrns.is_void,
                 }
                 return render(request, 'display_single_order.html', context)
             else:
@@ -423,6 +467,7 @@ def display_single_order(request, serial_no):
                 context = {
                     'fgrn_item': [],
                     'my_fgrn': fgrns,
+                    'is_void': fgrns.is_void,
                 }
                 return render(request, 'display_single_order.html', context)
         
@@ -670,61 +715,23 @@ def pivot_data(request):
 
 @login_required(login_url="login_user")
 def dashboards(request):
-    my_order = orders.objects.all()
-    limit = 10
-    chart_type = 'bar'
-    if request.method == 'GET':
-        limit = int(request.GET.get('limit', 10))
-        items = int(request.GET.get('items', 10))
-        chart_type = request.GET.get('chart_type', 'bar')
-        if limit <= 0 or items<= 0:
-            return HttpResponseBadRequest("Invalid limit value. Please provide a positive integer for the 'limit' parameter.")
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-
-    # Filter orders within the specified date range
-    if start_date and end_date:
-        my_order = my_order.filter(date__range=[start_date, end_date])
-        my_order = my_order.order_by('date')
-
-    data = orders.objects.values('customer_name').annotate(total_sales=Sum('total_price'))
-    data = sorted(data,key=lambda x:x['total_sales'],reverse = True)
-    top_customers = data[:limit]
-
-    item_data = orders.objects.values('description').annotate(total_items=Sum('order_quantity'))
-    item_data = sorted(item_data,key = lambda x:x['total_items'], reverse = True)
-    top_items = item_data[:items]
-    # Create a list of dictionaries with customer name and total sales
-    revenue_data = my_order.annotate(month=ExtractMonth('date'),week=ExtractWeek('date')).values('month', 'week').annotate(total_revenue=Sum('total_price')).order_by('month', 'week')
-    # weekly_sales = my_order.annotate(week=ExtractWeek('date')).values('week').annotate(total_sales=Sum('total_price')).order_by('week')
-    monthly_sales = my_order.annotate(month=ExtractMonth('date')).values('month').annotate(total_monthly_sales=Sum('total_price')).order_by('month')
+    # Fetch item names and their corresponding quantities
+    qs = inventory_order_items.objects.all()
     
-    # Extract data and labels
-    revenue_labels = [revenue['month'] for revenue in revenue_data]
-    revenue_data = [revenue['total_revenue'] for revenue in revenue_data]
-    # weekly_revenue_labels = [revenue['week'] for revenue in weekly_sales]
-    # weekly_revenue_data = [revenue['total_sales'] for revenue in weekly_sales]
- 
-    monthly_revenue_labels = [revenue['month'] for revenue in monthly_sales]
-    monthly_revenue_data = [revenue['total_monthly_sales'] for revenue in monthly_sales]
-   
-    chart_data = [{'customer_name': entry['customer_name'], 'total_sales': entry['total_sales']} for entry in top_customers]
-    item_chart = [{'description': entry['description'], 'total_items': entry['total_items']} for entry in top_items]
-    # Prepare data as JSON
-    
-    json_data = {
-        'labels': [entry['customer_name'] for entry in chart_data],
-        'data': [entry['total_sales'] for entry in chart_data],
-        'item_labels': [item['description'] for item in item_chart],
-        'item_data': [item['total_items'] for item in item_chart],
-        #'revenue_labels': revenue_labels,
-        'revenue_labels':revenue_labels,
-        'revenue_data': revenue_data,
-        'monthly_revenue_labels': monthly_revenue_labels,
-        'monthly_revenue_data' : monthly_revenue_data,
-        'chart_type':chart_type
+    # Prepare data for Chart.js
+    labels = [item.item_name for item in qs]  # Extract item names
+    data = [item.total_quantity for item in qs]  # Extract quantity (or any relevant field)
+
+    # Convert to JSON for use in JavaScript
+    context = {
+        "labels": json.dumps(labels, cls=DjangoJSONEncoder),
+        "data": json.dumps(data, cls=DjangoJSONEncoder),
     }
-    return render(request, 'dashboard.html', {'json_data': json_data})
+
+    return render(request, "dashboard.html", context)
+
+
+
 
 @login_required(login_url="login_user")
 def customer_table(request):
@@ -834,41 +841,25 @@ def customer_list(request):
     return render(request, 'customer_list.html', {'customers': customers})
 
 def order_chart(request):
-    # Get all finished goods to populate the selection dropdown
-    finished_items = finished_goods.objects.all()
+    # Aggregating total quantity for each customer using `orders_items`
+    customer_data = (
+        orders_items.objects
+        .values('serial_no__customer_name')  # Access customer name through `serial_no` (ForeignKey)
+        .annotate(total_quantity=Sum('quantity'))  # Sum up the quantities
+        .order_by('-total_quantity')  # Sort by quantity, descending
+    )
 
-    # Get the selected item from the request
-    selected_item = request.GET.get('item_name', None)
+    # Prepare the labels (customer names) and data (total quantity)
+    labels = [data['serial_no__customer_name'] for data in customer_data]
+    data = [data['total_quantity'] for data in customer_data]
 
-    chart_div = None
-    if selected_item:
-        # Fetch data for the selected item from orders_items
-        items = orders_items.objects.filter(description=selected_item).select_related('serial_no')
-        
-        # Prepare data for plotting
-        dates = [item.serial_no.date for item in items if item.serial_no.date]  # Assuming orders have a date field
-        quantities = [item.quantity for item in items]
-
-        # Create a Plotly line chart
-        fig = go.Figure(
-            data=[
-                go.Scatter(x=dates, y=quantities, mode='lines+markers', name=selected_item)
-            ],
-            layout=go.Layout(
-                title=f"Quantity Variation Over Time for {selected_item}",
-                xaxis_title="Date",
-                yaxis_title="Quantity"
-            )
-        )
-        
-        # Generate the plot div
-        chart_div = plot(fig, output_type='div')
-
-    # Render the template
-    return render(request, 'order_chart.html', {
-        'finished_items': finished_items,
-        'chart_div': chart_div,
-    })
+    # Pass data to the template
+    context = {
+        'labels': labels,
+        'data': data
+    }
+    
+    return render(request, 'order_chart.html', context)
 
 @login_required(login_url="login_user")
 def display_DN_items(request):
@@ -1077,8 +1068,51 @@ def generate_excel(request):
 
     return response
 
+def get_order_items(request):
+    serial_no = request.GET.get('serial_no')  # Get order number (serial_no) from the query params
+    order = orders.objects.filter(serial_no=serial_no).first()
+    if order and order.is_void:
+        return JsonResponse({'items': [], 'error': 'Order is VOID and cannot be used.'}, status=400)
+    items = set(orders_items.objects.filter(serial_no=serial_no).values_list('description', flat=True))
+    
+    return JsonResponse({'items': list(items)})
+
+@login_required(login_url="login_user")
+def customer_detail(request, company):
+    customer = get_object_or_404(Customer, company=company)
+       
+    context = {
+        'customer': customer,
+        
+    }
+    return render(request, 'customer_details.html', context)
 
 
 
+# --- Inventory order items (list + add; shared line_portal templates) ---
+from common.line_portals import make_portal_add_view, make_portal_list_view
 
+from .line_portal_forms import InventoryOrderItemsPortalForm
 
+_DN_INV_BASE = "deliveries_base.html"
+
+manage_dn_inventory_order_items = make_portal_list_view(
+    queryset_fn=lambda: inventory_order_items.objects.all().order_by("item_name"),
+    headers=["Item", "Total units", "Total qty", "Branch", "Group"],
+    row_builder=lambda o: [
+        o.item_name,
+        o.total_no_of_unit,
+        o.total_quantity,
+        o.branch,
+        o.group,
+    ],
+    title="Inventory order items",
+    add_url_name="manage_dn_inventory_order_items_add",
+    base_template=_DN_INV_BASE,
+)
+manage_dn_inventory_order_items_add = make_portal_add_view(
+    Form=InventoryOrderItemsPortalForm,
+    redirect_url_name="manage_dn_inventory_order_items",
+    base_template=_DN_INV_BASE,
+    title="Add inventory order item",
+)

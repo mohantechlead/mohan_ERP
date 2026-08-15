@@ -1,7 +1,7 @@
-# from django.contrib import admin
+# from djngo.contrib import admin
 # from django.urls import path, include
 
-# urlpatterns = [
+# urlptterns = [
 #     path('admin/', admin.site.urls),
 #     path('mr/', include('MR.urls')),
 #     path('fgrn/', include('FGRN.urls')),
@@ -32,6 +32,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('MR/', include('MR.urls')),
+    path('WIP/', include('wip.urls')),
     path('GRN/', include('GRN.urls')),
     path('FGRN/', include('FGRN.urls')),
     path('DN/', include('DN.urls')),

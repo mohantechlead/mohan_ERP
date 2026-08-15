@@ -1,0 +1,57 @@
+{% extends "grn_base.html" %}
+{% block content %}
+{% include "vendor_payments/_messages.html" %}
+
+<div class="container" style="margin-top:16px;">
+    <p>
+        <a class="btn btn-default" href="{% url 'display_vendor_payments' %}">Back</a>
+    </p>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title" style="font-weight:600;">Vendor payment summary — PR {{ pr.PR_no }}</h3></div>
+        <div class="panel-body">
+            <p><strong>Vendor:</strong> {{ pr.vendor_name|default:"—" }}</p>
+            <p><strong>PR before VAT (total):</strong> {{ purchase_total|floatformat:2 }}</p>
+            <p><strong>Applied (pending + approved + completed):</strong> {{ total_applied|floatformat:2 }}</p>
+            <p><strong>Remaining:</strong> {{ remaining|floatformat:2 }}</p>
+            <p><strong>Completion:</strong> {{ completion|capfirst }}</p>
+            {% if remaining > 0 %}
+            <p><a class="btn btn-primary btn-sm" href="{% url 'create_vendor_payment' %}?pr_no={{ pr.PR_no|urlencode }}">Add payment</a></p>
+            {% endif %}
+        </div>
+    </div>
+
+    <h4>Installments</h4>
+    {% if not detail_rows %}
+    <p class="text-muted">No payments for this PR.</p>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Payment no.</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th class="text-right">Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in detail_rows %}
+                <tr>
+                    <td>{{ r.installment_number }}</td>
+                    <td><a href="{% url 'vendor_payment_detail' r.payment_number %}">{{ r.payment_number }}</a></td>
+                    <td>{{ r.payment_date }}</td>
+                    <td>{{ r.payment_type|capfirst }}</td>
+                    <td class="text-right">{{ r.amount|floatformat:2 }}</td>
+                    <td>{{ r.status|capfirst }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

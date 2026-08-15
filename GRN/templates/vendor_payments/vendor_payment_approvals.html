@@ -1,0 +1,127 @@
+{% extends "grn_base.html" %}
+{% block content %}
+{% include "vendor_payments/_messages.html" %}
+
+<div class="container" style="margin-top:16px;">
+    <p><a class="btn btn-default" href="{% url 'display_vendor_payments' %}">Back to vendor payments</a></p>
+    <h3>Vendor payment approvals</h3>
+    <p class="text-muted">Pending installments are grouped by PR. Expand a group, use <strong>Select all</strong>, then <strong>Approve selected</strong>.</p>
+
+    {% if not approval_groups %}
+    <p>No pending vendor payments.</p>
+    {% else %}
+    <div class="panel-group" id="approvals-accordion" style="max-width: 1100px;">
+        {% for g in approval_groups %}
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix" style="padding: 10px 15px;">
+                <div class="row" style="margin: 0;">
+                    <div class="col-xs-9" style="padding-left: 0;">
+                        <a role="button" data-toggle="collapse" href="#vp-ap-{{ forloop.counter }}"
+                           class="collapsed"
+                           aria-expanded="false"
+                           style="text-decoration: none; font-weight: 600;">
+                            <span class="glyphicon glyphicon-chevron-right" style="margin-right: 6px;"></span>
+                            {{ g.purchase_number }}
+                            <span class="text-muted" style="font-weight: normal;"> — {{ g.supplier_name }}</span>
+                        </a>
+                    </div>
+                    <div class="col-xs-3 text-right" style="padding-right: 0;">
+                        <span class="label label-warning">{{ g.count }} pending</span>
+                        <span class="text-muted small" style="margin-left: 8px;">Total {{ g.total_amount|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+            <div id="vp-ap-{{ forloop.counter }}" class="panel-collapse collapse">
+                <div class="panel-body" style="padding: 0;">
+                    <form class="vp-bulk-approve-form" method="post" action="{% url 'approve_vendor_payments_bulk' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="purchase_number" value="{{ g.purchase_number }}">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-condensed" style="margin: 0;">
+                                <thead>
+                                    <tr style="background: #f9f9f9;">
+                                        <th style="width: 40px; text-align: center;" title="Select all for this PR">
+                                            <input type="checkbox" class="vp-select-all" aria-label="Select all for this PR">
+                                        </th>
+                                        <th>Installment</th>
+                                        <th>Payment no.</th>
+                                        <th>Date</th>
+                                        <th class="text-right">Amount</th>
+                                        <th>Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in g.payments %}
+                                    <tr>
+                                        <td style="text-align: center;">
+                                            <input type="checkbox" name="payment_number" value="{{ r.payment_number }}" class="vp-pay-cb" title="Select for bulk approve">
+                                        </td>
+                                        <td>{{ r.installment_number }}</td>
+                                        <td><a href="{% url 'vendor_payment_detail' r.payment_number %}">{{ r.payment_number }}</a></td>
+                                        <td>{{ r.payment_date }}</td>
+                                        <td class="text-right">{{ r.amount|floatformat:2 }}</td>
+                                        <td>{{ r.payment_type|capfirst }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="padding: 8px 12px; background: #fafafa; border-top: 1px solid #ddd;" class="clearfix">
+                            <a class="btn btn-xs btn-default" href="{% url 'vendor_payment_purchase_summary' g.purchase_number %}">
+                                <span class="glyphicon glyphicon-list-alt"></span> PR summary
+                            </a>
+                            <button type="submit" class="btn btn-sm btn-success pull-right vp-approve-selected" disabled>Approve selected</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<script>
+(function () {
+  var root = document.getElementById('approvals-accordion');
+  if (!root || typeof jQuery === 'undefined') return;
+  var $root = jQuery(root);
+  $root.on('show.bs.collapse', function (e) {
+    jQuery(e.target).prev('.panel-heading').find('.glyphicon-chevron-right')
+      .removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+  });
+  $root.on('hide.bs.collapse', function (e) {
+    jQuery(e.target).prev('.panel-heading').find('.glyphicon-chevron-down')
+      .removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
+  });
+
+  function refreshBulkButton(form) {
+    var n = form.querySelectorAll('.vp-pay-cb:checked').length;
+    var btn = form.querySelector('.vp-approve-selected');
+    if (btn) btn.disabled = n === 0;
+  }
+
+  root.querySelectorAll('.vp-bulk-approve-form').forEach(function (form) {
+    var master = form.querySelector('.vp-select-all');
+    var cbs = function () { return form.querySelectorAll('.vp-pay-cb'); };
+    if (master) {
+      master.addEventListener('change', function () {
+        cbs().forEach(function (cb) { cb.checked = master.checked; });
+        refreshBulkButton(form);
+      });
+    }
+    cbs().forEach(function (cb) {
+      cb.addEventListener('change', function () {
+        if (master) {
+          var all = form.querySelectorAll('.vp-pay-cb');
+          var on = form.querySelectorAll('.vp-pay-cb:checked').length;
+          master.checked = on > 0 && on === all.length;
+          master.indeterminate = on > 0 && on < all.length;
+        }
+        refreshBulkButton(form);
+      });
+    });
+    refreshBulkButton(form);
+  });
+})();
+</script>
+{% endblock %}

@@ -58,6 +58,7 @@ class MRItemForm(forms.ModelForm):
         model = MR_item
         fields = ['item_name','no_of_unit','unit_type','per_unit_kg','quantity','measurement_unit','remarks']
    
+
 class InventoryItemForm(forms.ModelForm):
     
     class Meta:
@@ -94,4 +95,20 @@ class OpeningBalanceItemForm(forms.ModelForm):
    
         model = opening_balance
         fields = ['item_name','quantity','no_of_unit','measurement_type','unit_type']
-   
+
+
+_fc = {'class': 'form-control'}
+
+
+class MRInventoryRolledStandaloneForm(forms.ModelForm):
+    """Add-only portal for `inventory_MR_items` (rolled MR stock totals)."""
+
+    class Meta:
+        model = inventory_MR_items
+        fields = ['item_name', 'total_no_of_unit', 'total_quantity', 'branch']
+        widgets = {
+            'item_name': forms.TextInput(attrs=_fc),
+            'total_no_of_unit': forms.TextInput(attrs=_fc),
+            'total_quantity': forms.TextInput(attrs=_fc),
+            'branch': forms.TextInput(attrs=_fc),
+        }

@@ -1,0 +1,77 @@
+{% extends "wip/wip_base.html" %}
+{% block content %}
+<section class="intro">
+  <div class="gradient-custom h-100">
+    <div class="mask d-flex align-items-center h-100">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 style="font-weight: 700; margin-top: 0;">WIP records</h1>
+            <div style="margin-bottom: 16px;">
+              <a href="{% url 'create_WIP' %}" class="btn btn-primary">Create WIP</a>
+            </div>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-12">
+            <div id="datatable">
+              <table class="table table-striped table-bordered" id="example">
+                <thead>
+                  <tr>
+                    <th>WIP Number</th>
+                    <th>Date</th>
+                    <th>Work center</th>
+                    <th>Items</th>
+                    <th>Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for order in my_order %}
+                  <tr>
+                    <td>{{ order.WIP_no }}</td>
+                    <td>{{ order.date }}</td>
+                    <td>{{ order.work_center|default:"-" }}</td>
+                    <td>
+                      {% for item in order.wip_items %}
+                          {{ item.item_name }}
+                          {% if not forloop.last %}<br>{% endif %}
+                      {% empty %}-{% endfor %}
+                    </td>
+                    <td>
+                      {% for item in order.wip_items %}
+                          {{ item.quantity }}
+                          {% if not forloop.last %}<br>{% endif %}
+                      {% empty %}-{% endfor %}
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="5">No WIP records yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block page_js %}
+<script>
+(function () {
+  var el = document.getElementById('example');
+  if (!el) return;
+  var theadRow = el.querySelector('thead tr');
+  if (!theadRow) return;
+  var headCells = theadRow.querySelectorAll('th, td');
+  var bodyRow = el.querySelector('tbody tr');
+  if (!bodyRow || headCells.length === 0) return;
+  var bodyCells = bodyRow.querySelectorAll('td, th');
+  if (headCells.length !== bodyCells.length) return;
+  if (typeof DataTable !== 'undefined') {
+    new DataTable('#example', { pageLength: 100 });
+  }
+})();
+</script>
+{% endblock %}

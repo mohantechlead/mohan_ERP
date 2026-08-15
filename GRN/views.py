@@ -6,12 +6,14 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 import uuid
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.http import JsonResponse
 from MR.models import *
 from django.utils import timezone
 from datetime import timedelta
 from django.core.mail import send_mail
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now 
 
 def is_admin(user):
     return user.is_superuser
@@ -26,19 +28,9 @@ def grn_number(request):
         formset = formset(prefix="GRN_items")
         number = request.GET['grn_number']
         names = purchase_orders.objects.all()
-        # try:
-        #     order = purchase_orders.objects.get(PR_no=number)
-        #     pr_items = PR_item.objects.all()
-        #     pr_items = pr_items.filter(PR_no=number)
-        #     print(pr_items)
-        # except purchase_orders.DoesNotExist:
-        #     # If it's not found in purchase_orders, try searching in import_PR
-           
-        #     order = None 
-        # print(pr_items,"ittt")
+     
         context = {
-            # 'order': order,
-            # 'pr_items':pr_items,
+           
             'grn_form': grn_form,
             'formset': formset,
             'names':names
@@ -97,7 +89,7 @@ def create_grn(request):
     plate_no = sorted(set(GRN.objects.values_list('truck_no', flat=True)))
     store_name = sorted(set(GRN.objects.values_list('store_name', flat=True)))
     store_keeper = sorted(set(GRN.objects.values_list('store_keeper', flat=True)))
-    recieved_from = sorted(set(GRN.objects.values_list('recieved_from', flat=True)))
+    recieved_from = sorted(set(Supplier.objects.values_list('company', flat=True)))
 
     if request.method == 'POST':
         form = GRNForm(request.POST)
@@ -156,12 +148,12 @@ def create_grn_items(request):
                         no_of_unit = form.cleaned_data['no_of_unit']
 
                         try:
-                            inventory_item = inventory.objects.get(item_name=item_name)
-                            inventory_item.quantity += quantity
-                            inventory_item.no_of_unit += no_of_unit
+                            inventory_item = inventory_GRN_items.objects.get(item_name=item_name)
+                            inventory_item.total_quantity += quantity
+                            inventory_item.total_no_of_unit += no_of_unit
                             inventory_item.save()
-                        except inventory.DoesNotExist:
-                            inventory_item = inventory(item_name=item_name, quantity=-quantity)
+                        except inventory_GRN_items.DoesNotExist:
+                            inventory_item = inventory_GRN_items(item_name=item_name, total_quantity=-quantity)
                             inventory_item.save()
 
                         form.save()
@@ -271,6 +263,41 @@ def display_pr(request):
         'my_order': orders
     }
     return render(request,'display_pr.html', context)
+
+@csrf_exempt
+@login_required(login_url="login_user")
+def send_email_reminder(request):
+    if request.method == 'POST':
+        try:
+            # Get today's date and calculate the 30-day threshold
+            threshold_date = now() - timedelta(days=30)
+
+            # Filter orders with remaining > 0 and older than 30 days
+            overdue_orders = purchase_orders.objects.filter(remaining__gt=0, date__lt=threshold_date)
+
+            if not overdue_orders.exists():
+                return JsonResponse({"message": "No overdue PRs found."})
+
+            # Build email content
+            email_body = "The following PRs are overdue (remaining items & more than 30 days old):\n\n"
+            for order in overdue_orders:
+                email_body += f"PR No: {order.PR_no}, Date: {order.date}, Remaining: {order.remaining}\n"
+
+            recipient_email = "tech@mohanplc.com"  # Replace with actual recipient email
+
+            send_mail(
+                "Overdue PR Reminder",
+                email_body,
+                "tech@mohanplc.com",
+                [recipient_email]
+            )
+
+            return JsonResponse({"message": "Reminder email sent successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @login_required(login_url="login_user")
 def search_prs(request,pr_no):
@@ -392,6 +419,12 @@ def print_pr(request, PR_no):
             orders = purchase_orders.objects.get(PR_no=pr_no)
             # Fetch the items related to this specific PR_no
             pr_items = PR_item.objects.filter(PR_no=pr_no)
+            for item in pr_items:
+                item_price = float(item.price or 0)
+                item_quantity = float(item.quantity or 0)
+                item_before_vat = float(item.before_vat or 0)
+                computed_before_vat = item_price * item_quantity
+                item.discount_deduction = round(max(0, computed_before_vat - item_before_vat), 2)
             vat = orders.PR_total_price - orders.PR_before_vat
             vat = round(vat,2)
             orders.vat = vat
@@ -682,4 +715,156 @@ def create_supplier(request):
 def display_supplier(request):
     suppliers = Supplier.objects.all()
     return render(request, 'display_supplier.html', {'suppliers': suppliers})
+
+@login_required(login_url="login_user")
+def supplier_details(request, company):
+    supplier = get_object_or_404(Supplier, company=company)
+       
+    context = {
+        'supplier': supplier,
+        
+    }
+    return render(request, 'supplier_details.html', context)
+
+
+@login_required(login_url="login_user")
+def create_actual_purchase(request):
+    pr_numbers = purchase_orders.objects.all().order_by('PR_no')
+    prefill_pr = (request.GET.get("PR_no") or request.GET.get("pr_no") or "").strip()
+    creator_label = ((request.user.get_full_name() or "").strip() or request.user.get_username())
+
+    if request.method == 'POST':
+        pr_no = request.POST.get('PR_no')
+        date_value = request.POST.get('date')
+
+        if not pr_no:
+            messages.error(request, "PR number is required.")
+            return render(
+                request,
+                'create_actual_purchase.html',
+                {
+                    'pr_numbers': pr_numbers,
+                    'prefill_pr': (request.POST.get('PR_no') or '').strip(),
+                    'created_by_display': creator_label,
+                },
+            )
+
+        pr_instance = get_object_or_404(purchase_orders, PR_no=pr_no)
+        purchase_header = ActualPurchase.objects.create(
+            pr_no=pr_instance,
+            date=date_value or now().date(),
+            created_by=creator_label,
+        )
+
+        item_names = request.POST.getlist('item_name[]')
+        pr_item_ids = request.POST.getlist('pr_item_id[]')
+        requested_quantities = request.POST.getlist('requested_quantity[]')
+        actual_quantities = request.POST.getlist('actual_quantity[]')
+
+        for idx, item_name in enumerate(item_names):
+            requested_qty = float(requested_quantities[idx] or 0)
+            actual_qty = float(actual_quantities[idx] or 0)
+            diff_qty = actual_qty - requested_qty
+            pr_item_id = pr_item_ids[idx] if idx < len(pr_item_ids) else None
+
+            ActualPurchaseItem.objects.create(
+                actual_purchase=purchase_header,
+                pr_item_id=pr_item_id or None,
+                item_name=item_name,
+                requested_quantity=requested_qty,
+                actual_quantity=actual_qty,
+                difference_quantity=diff_qty,
+            )
+
+        linked = VendorPayment.objects.filter(
+            pr=pr_instance,
+            status="completed",
+            actual_purchase__isnull=True,
+        ).update(actual_purchase=purchase_header)
+
+        purchase_orders.objects.filter(PR_no=pr_instance.PR_no).update(
+            fully_paid_missing_actual_notified_at=None,
+        )
+
+        messages.success(
+            request,
+            f"Actual purchase saved for PR {pr_no}. Linked {linked} vendor payment(s).",
+        )
+        return redirect('create_actual_purchase')
+
+    return render(
+        request,
+        'create_actual_purchase.html',
+        {
+            'pr_numbers': pr_numbers,
+            'prefill_pr': prefill_pr,
+            'created_by_display': creator_label,
+        },
+    )
+
+
+@login_required(login_url="login_user")
+def display_actual_purchases(request):
+    rows = list(
+        ActualPurchase.objects.select_related("pr_no")
+        .prefetch_related("items", "linked_payments")
+        .order_by("-created_at")
+    )
+    for ap in rows:
+        ap.item_count = len(ap.items.all())
+        ap.linked_payment_count = len(ap.linked_payments.all())
+    return render(request, "display_actual_purchases.html", {"rows": rows})
+
+
+@login_required(login_url="login_user")
+def actual_purchase_detail(request, actual_purchase_id):
+    ap = get_object_or_404(
+        ActualPurchase.objects.select_related("pr_no"),
+        actual_purchase_id=actual_purchase_id,
+    )
+    items = ap.items.all().order_by("item_name")
+    payments = ap.linked_payments.all().order_by("installment_number")
+    return render(
+        request,
+        "actual_purchase_detail.html",
+        {"ap": ap, "items": items, "payments": payments},
+    )
+
+
+@login_required(login_url="login_user")
+def get_actual_purchase_pr_items(request):
+    pr_no = request.GET.get('pr_no')
+    if not pr_no:
+        return JsonResponse({'items': [], 'payments': []})
+
+    pr = purchase_orders.objects.filter(PR_no=pr_no).first()
+    if not pr:
+        return JsonResponse({'items': [], 'payments': [], 'error': 'PR not found'}, status=404)
+
+    items = PR_item.objects.filter(PR_no=pr_no)
+    payload = [{
+        'pr_item_id': item.id_numeric,
+        'item_name': item.item_name or '',
+        'requested_quantity': float(item.quantity or 0),
+    } for item in items]
+
+    payments_qs = VendorPayment.objects.filter(pr=pr).order_by('installment_number')
+    payments_payload = [{
+        'payment_number': p.payment_number,
+        'installment_number': p.installment_number,
+        'payment_date': str(p.payment_date),
+        'amount': float(p.amount),
+        'status': p.status,
+        'payment_type': p.payment_type,
+        'reference_number': p.reference_number or '',
+        'linked': bool(p.actual_purchase_id),
+    } for p in payments_qs]
+    return JsonResponse({'items': payload, 'payments': payments_payload})
+
+
+@login_required(login_url="login_user")
+@user_passes_test(is_admin)
+def purchase_difference(request):
+    rows = ActualPurchaseItem.objects.select_related('actual_purchase', 'actual_purchase__pr_no').exclude(difference_quantity=0)
+    return render(request, 'purchase_difference.html', {'rows': rows})
 

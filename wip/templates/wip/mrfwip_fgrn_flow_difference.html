@@ -1,0 +1,355 @@
+{% extends "wip/wip_base.html" %}
+{% block content %}
+<style>
+  .item-suggest-wrap { position: relative; }
+  .item-suggest-dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 2px;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 1050;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+  .item-suggest-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .item-suggest-dropdown button:hover,
+  .item-suggest-dropdown button.is-active {
+    background: #f0f7ff;
+  }
+</style>
+<section class="intro">
+  <div class="gradient-custom h-100">
+    <div class="mask d-flex align-items-center h-100">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <h1 style="font-weight: 700; margin-top: 0;">MR → WIP → FGRN variance</h1>
+            <p style="max-width: 52em;">
+              Each card is one <strong>item</strong> with <strong>MR</strong>, <strong>WIP</strong>, and <strong>FGRN</strong> quantities—by default, totals across all documents.
+              Enter a document number to limit that category, or use <strong>Item</strong> for a case-insensitive partial name; after three characters, pick a suggestion or press <strong>Enter</strong>.
+              Document filters run when you leave the field; item names ignore case, and duplicate lines on the same document are summed.
+            </p>
+          </div>
+        </div>
+
+        <div class="row" style="margin-bottom: 20px;">
+          <div class="col-sm-12">
+            <form id="flow-filter-form" method="get" action="{% url 'mrfwip_fgrn_flow_difference' %}" class="form-inline" style="flex-wrap: wrap; align-items: flex-end;"
+              data-item-suggest-url="{% url 'mrfwip_flow_item_suggestions' %}">
+              <div class="form-group" style="margin-right: 12px; margin-bottom: 8px;">
+                <label for="id_mr">MR No.</label>
+                <input id="id_mr" name="mr" value="{{ mr_no }}" class="form-control" list="mr-options"
+                  autocomplete="off" placeholder="e.g. MR-001" style="min-width: 180px;">
+                <datalist id="mr-options">
+                  {% for n in mr_list %}<option value="{{ n }}">{% endfor %}
+                </datalist>
+              </div>
+              <div class="form-group" style="margin-right: 12px; margin-bottom: 8px;">
+                <label for="id_wip">WIP No.</label>
+                <input id="id_wip" name="wip" value="{{ wip_no }}" class="form-control" list="wip-options"
+                  autocomplete="off" placeholder="e.g. WIP-001" style="min-width: 180px;">
+                <datalist id="wip-options">
+                  {% for n in wip_list %}<option value="{{ n }}">{% endfor %}
+                </datalist>
+              </div>
+              <div class="form-group" style="margin-right: 12px; margin-bottom: 8px;">
+                <label for="id_fgrn">FGRN No.</label>
+                <input id="id_fgrn" name="fgrn" value="{{ fgrn_no }}" class="form-control" list="fgrn-options"
+                  autocomplete="off" placeholder="e.g. FGRN-001" style="min-width: 180px;">
+                <datalist id="fgrn-options">
+                  {% for n in fgrn_list %}<option value="{{ n }}">{% endfor %}
+                </datalist>
+              </div>
+              <div class="form-group item-suggest-wrap" style="margin-right: 12px; margin-bottom: 8px;">
+                <label for="id_item">Item</label>
+                <input id="id_item" name="item" value="{{ item_q }}" class="form-control"
+                  autocomplete="off" placeholder="Type 3+ characters…" style="min-width: 200px;">
+                <div id="item-suggest-dropdown" class="item-suggest-dropdown" style="display: none;" role="listbox" aria-label="Item suggestions"></div>
+              </div>
+              <span class="text-muted" style="margin-left: 8px; margin-bottom: 8px; display: inline-block; vertical-align: bottom;">Filters apply when a field changes</span>
+            </form>
+          </div>
+        </div>
+
+        {% if errors %}
+        <div class="alert alert-danger">
+          {% for e in errors %}<div>{{ e }}</div>{% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div style="margin-bottom: 16px; color: #555;">
+              {% if use_global %}
+              <span><strong>Scope:</strong> all MR, WIP, and FGRN line items (totals by item)</span>
+              {% else %}
+              <span><strong>Scope:</strong></span>
+              {% if mr_obj %}<span style="margin-left: 0.5em;"><strong>MR</strong> {{ mr_obj.MR_no }}</span>{% endif %}
+              {% if wip_obj %}<span style="margin-left: 0.5em;"><strong>WIP</strong> {{ wip_obj.WIP_no }}</span>{% endif %}
+              {% if fgrn_obj %}<span style="margin-left: 0.5em;"><strong>FGRN</strong> {{ fgrn_obj.FGRN_no }}</span>{% endif %}
+              {% endif %}
+              {% if item_q %}<span style="margin-left: 0.5em;">| <strong>Item contains:</strong> {{ item_q }}</span>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          {% for row in rows %}
+          <div class="col-sm-6 col-md-4" style="margin-bottom: 20px;">
+            <div class="panel panel-default" style="margin-bottom: 0;">
+              <div class="panel-heading">
+                <strong style="font-size: 15px;">{{ row.item }}</strong>
+              </div>
+              <table class="table table-bordered table-condensed" style="margin-bottom: 0;">
+                <thead>
+                  <tr>
+                    <th style="width: 45%;">Category</th>
+                    <th>Quantity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>MR</td>
+                    <td>{% if row.mr_qty != None %}{{ row.mr_qty|floatformat:2 }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                  </tr>
+                  <tr>
+                    <td>WIP</td>
+                    <td>{% if row.wip_qty != None %}{{ row.wip_qty|floatformat:2 }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                  </tr>
+                  <tr>
+                    <td>FGRN</td>
+                    <td>{% if row.fgrn_qty != None %}{{ row.fgrn_qty|floatformat:2 }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="panel-footer" style="padding: 8px 12px; font-size: 12px; background: #f9f9f9;">
+                <div><strong>Differences</strong> <span class="text-muted">(MR−WIP, WIP−FGRN)</span></div>
+                <table class="table table-condensed" style="margin-bottom: 0; font-size: 12px;">
+                  <tbody>
+                    <tr>
+                      <td style="border-top: none; padding: 4px 8px 2px 0;">MR − WIP</td>
+                      <td style="border-top: none; padding: 4px 0 2px 0;">
+                        {% if row.d_mr_wip != None %}
+                          {% if row.d_mr_wip > 0 %}
+                          <span style="color:#d35400;font-weight:700;">+{{ row.d_mr_wip|floatformat:2 }}</span>
+                          {% elif row.d_mr_wip < 0 %}
+                          <span style="color:#c0392b;font-weight:700;">{{ row.d_mr_wip|floatformat:2 }}</span>
+                          {% else %}
+                          {{ row.d_mr_wip|floatformat:2 }}
+                          {% endif %}
+                        {% else %}<span class="text-muted">—</span>{% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 2px 8px 4px 0;">WIP − FGRN</td>
+                      <td style="padding: 2px 0 4px 0;">
+                        {% if row.d_wip_fgrn != None %}
+                          {% if row.d_wip_fgrn > 0 %}
+                          <span style="color:#d35400;font-weight:700;">+{{ row.d_wip_fgrn|floatformat:2 }}</span>
+                          {% elif row.d_wip_fgrn < 0 %}
+                          <span style="color:#c0392b;font-weight:700;">{{ row.d_wip_fgrn|floatformat:2 }}</span>
+                          {% else %}
+                          {{ row.d_wip_fgrn|floatformat:2 }}
+                          {% endif %}
+                        {% else %}<span class="text-muted">—</span>{% endif %}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-sm-12">
+            <p class="text-muted">
+              {% if item_q %}No items match “{{ item_q }}”.
+              {% elif use_global %}No line items found in MR, WIP, or FGRN.
+              {% else %}No line items match the selected document(s).{% endif %}
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block page_js %}
+<script>
+(function () {
+  var form = document.getElementById('flow-filter-form');
+  if (!form) return;
+  function submitForm() {
+    form.submit();
+  }
+  form.querySelectorAll('input[name="mr"], input[name="wip"], input[name="fgrn"]').forEach(function (el) {
+    el.addEventListener('change', submitForm);
+  });
+
+  var suggestUrl = form.getAttribute('data-item-suggest-url');
+  var itemInput = form.querySelector('input[name="item"]');
+  var itemDropdown = document.getElementById('item-suggest-dropdown');
+  if (!itemInput || !itemDropdown || !suggestUrl) {
+    if (itemInput) {
+      itemInput.addEventListener('change', submitForm);
+      itemInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitForm();
+        }
+      });
+    }
+    return;
+  }
+
+  var activeIdx = -1;
+  var lastItems = [];
+  var debounceTimer = null;
+  var fetchController = null;
+
+  function hideDropdown() {
+    itemDropdown.style.display = 'none';
+    itemDropdown.innerHTML = '';
+    activeIdx = -1;
+    lastItems = [];
+  }
+
+  function setActive(idx) {
+    var btns = itemDropdown.querySelectorAll('button[type="button"]');
+    activeIdx = idx;
+    btns.forEach(function (b, i) {
+      b.classList.toggle('is-active', i === activeIdx);
+    });
+  }
+
+  function chooseLabel(label) {
+    itemInput.value = label;
+    hideDropdown();
+    submitForm();
+  }
+
+  function renderItems(items) {
+    lastItems = items.slice();
+    itemDropdown.innerHTML = '';
+    if (!items.length) {
+      itemDropdown.style.display = 'none';
+      return;
+    }
+    items.forEach(function (label) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('role', 'option');
+      btn.textContent = label;
+      btn.addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        chooseLabel(label);
+      });
+      itemDropdown.appendChild(btn);
+    });
+    itemDropdown.style.display = 'block';
+    setActive(-1);
+  }
+
+  function runFetch() {
+    var q = itemInput.value.trim();
+    if (q.length < 3) {
+      if (fetchController) fetchController.abort();
+      hideDropdown();
+      return;
+    }
+    if (fetchController) fetchController.abort();
+    fetchController = new AbortController();
+    var params = new URLSearchParams();
+    params.set('q', q);
+    ['mr', 'wip', 'fgrn'].forEach(function (n) {
+      var el = form.querySelector('[name="' + n + '"]');
+      if (el && el.value.trim()) params.set(n, el.value.trim());
+    });
+    fetch(suggestUrl + '?' + params.toString(), {
+      signal: fetchController.signal,
+      headers: { Accept: 'application/json' },
+      credentials: 'same-origin',
+    })
+      .then(function (r) {
+        if (!r.ok) return { items: [] };
+        var ct = r.headers.get('content-type') || '';
+        if (ct.indexOf('application/json') === -1) return { items: [] };
+        return r.json();
+      })
+      .then(function (data) {
+        renderItems(Array.isArray(data.items) ? data.items : []);
+      })
+      .catch(function (e) {
+        if (e.name === 'AbortError') return;
+        hideDropdown();
+      });
+  }
+
+  itemInput.addEventListener('input', function () {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(runFetch, 250);
+  });
+
+  itemInput.addEventListener('focus', function () {
+    if (itemInput.value.trim().length >= 3) runFetch();
+  });
+
+  itemInput.addEventListener('change', submitForm);
+
+  itemInput.addEventListener('keydown', function (e) {
+    var open = itemDropdown.style.display === 'block' && lastItems.length > 0;
+    if (e.key === 'ArrowDown') {
+      if (open) {
+        e.preventDefault();
+        setActive(Math.min(activeIdx + 1, lastItems.length - 1));
+      }
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      if (open && activeIdx > -1) {
+        e.preventDefault();
+        setActive(Math.max(activeIdx - 1, -1));
+      }
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (open) {
+        e.preventDefault();
+        hideDropdown();
+      }
+      return;
+    }
+    if (e.key === 'Enter') {
+      if (open && activeIdx >= 0 && lastItems[activeIdx]) {
+        e.preventDefault();
+        chooseLabel(lastItems[activeIdx]);
+      } else {
+        e.preventDefault();
+        hideDropdown();
+        submitForm();
+      }
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!itemInput.contains(e.target) && !itemDropdown.contains(e.target)) {
+      hideDropdown();
+    }
+  });
+})();
+</script>
+{% endblock %}

@@ -25,6 +25,9 @@ class orders(models.Model):
     withholding_amount = models.FloatField(blank=True, null=True)
     vat_amount = models.FloatField(blank=True, null=True)
     reciveable = models.FloatField(blank=True, null=True)
+    void_requested = models.BooleanField(default=False)
+    is_void = models.BooleanField(default=False)
+    status = models.TextField(blank=True, null=True, default="active")
 
     def __str__(self):
         return self.serial_no
@@ -42,6 +45,7 @@ class orders_items(models.Model):
     per_unit_kg = models.FloatField(blank=True, null=True)
     unit_price = models.FloatField(blank=True, null=True)
     total_price = models.FloatField(blank=True, null=True)  
+    measurement_unit = models.TextField(blank=True, null=True)
     remaining_quantity =  models.FloatField(blank=True, null=True) 
     remaining_unit = models.FloatField(blank=True, null=True)
 
@@ -86,10 +90,12 @@ class delivery_items(models.Model):
 class Customer(models.Model):
     customer_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     contact_person = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     company = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
+    remarks = models.CharField(max_length=200, blank=True, null=True)
+    tin_no = models.CharField(blank=True, null=True)
 
     class Meta:
         ordering = ['company'] 

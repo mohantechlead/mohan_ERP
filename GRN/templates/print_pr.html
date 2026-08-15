@@ -144,6 +144,7 @@
                                             <th>Item</th>
                                             <th>Price</th>
                                             <th>Quantity</th>
+                                            <th>Discount</th>
                                             <th class="text-end" style="width: 120px;">Total</th>
                                         </tr>
                                     </thead><!-- end thead -->
@@ -162,10 +163,24 @@
                                             {% if my_order.country %}
                                             <td> ${{delivery.price}}</td>
                                             <td>{{delivery.quantity}}</td>
+                                            <td>
+                                                {% if delivery.discount_deduction > 0 %}
+                                                    ${{delivery.discount_deduction}}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
                                             <td> ${{delivery.total_price}} </td>
                                             {% else %}
                                             <td> {{delivery.price}}</td>
                                             <td>{{delivery.quantity}}</td>
+                                            <td>
+                                                {% if delivery.discount_deduction > 0 %}
+                                                    {{delivery.discount_deduction}}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
                                             <td> {{delivery.before_vat}} </td>
                                             {% endif %}
                                         </tr>

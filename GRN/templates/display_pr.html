@@ -60,10 +60,29 @@
 
   </table>
 
+  <button class="btn btn-danger" id="send-email-btn">Send Reminder Email</button>
+  
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    const sendEmailBtn = document.getElementById('send-email-btn');
+
+    sendEmailBtn.addEventListener('click', function () {
+        fetch('send_email_reminder', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        })
+        .catch(error => console.error('Error:', error));
+    });
+    
       const orderLinks = document.querySelectorAll('.order-link');
       console.log("p1")
       orderLinks.forEach(function (link) {

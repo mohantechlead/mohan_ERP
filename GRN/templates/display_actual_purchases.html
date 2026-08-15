@@ -1,0 +1,48 @@
+{% extends "grn_base.html" %}
+{% block content %}
+
+<div class="container" style="margin-top:16px;">
+    <div class="clearfix" style="margin-bottom:12px;">
+        <a class="btn btn-primary pull-left" href="{% url 'create_actual_purchase' %}">Create Actual Purchase</a>
+        <h3 class="text-center" style="margin-top:0;">Display Actual Purchases</h3>
+    </div>
+
+    {% if not rows %}
+    <p class="text-muted">No actual purchase records found.</p>
+    {% else %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="example">
+            <thead>
+                <tr>
+                    <th>PR</th>
+                    <th>Date</th>
+                    <th>Created by</th>
+                    <th>Recorded</th>
+                    <th class="text-right">Items</th>
+                    <th class="text-right">Linked payments</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ap in rows %}
+                <tr>
+                    <td>
+                        <a href="{% url 'print_pr' ap.pr_no.PR_no %}">{{ ap.pr_no.PR_no }}</a>
+                    </td>
+                    <td>{{ ap.date|default:"—" }}</td>
+                    <td>{{ ap.created_by|default:"—" }}</td>
+                    <td>{{ ap.created_at }}</td>
+                    <td class="text-right">{{ ap.item_count }}</td>
+                    <td class="text-right">{{ ap.linked_payment_count }}</td>
+                    <td>
+                        <a class="btn btn-xs btn-default" href="{% url 'actual_purchase_detail' ap.actual_purchase_id %}">View</a>
+                        <a class="btn btn-xs btn-default" href="{% url 'vendor_payment_purchase_summary' ap.pr_no.PR_no %}">Vendor pay.</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends base_template %}
+{% block content %}
+<div class="container-fluid" style="max-width: 1200px;">
+  <h2>{{ title }}</h2>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+  <p>
+    <a class="btn btn-primary" href="{% url add_url_name %}">Add</a>
+  </p>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-condensed">
+      <thead>
+        <tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>{% for cell in row %}<td>{{ cell|default:"" }}</td>{% endfor %}</tr>
+        {% empty %}
+        <tr><td colspan="{{ headers|length }}" class="text-muted">No records yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

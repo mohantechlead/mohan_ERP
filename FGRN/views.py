@@ -41,12 +41,12 @@ def create_fgrn(request):
 
                     if description:
                         try:
-                            inventory_item = finished_goods.objects.get(item_name=description)
-                            inventory_item.quantity += quantity
-                            inventory_item.no_of_unit += no_of_unit
+                            inventory_item = inventory_FGRN_items.objects.get(item_name=description)
+                            inventory_item.total_quantity += quantity
+                            inventory_item.total_no_of_unit += no_of_unit
                             inventory_item.save()
-                        except finished_goods.DoesNotExist:
-                            inventory_item = finished_goods(item_name=description, quantity=quantity)
+                        except inventory_FGRN_items.DoesNotExist:
+                            inventory_item = inventory_FGRN_items(item_name=description, total_quantity=quantity)
                             inventory_item.save()
 
                         # Save each MRItem form with the corresponding MR instance
@@ -171,13 +171,13 @@ def display_goods(request):
             quantity_b = inventory_DN_items.objects.filter(item_name=item_name).first()
             quantity_c = FGRNopening_balance.objects.filter(item_name=item_name).first()
 
-            total_quantity_a = quantity_a.total_quantity if quantity_a else 0
-            total_quantity_b = quantity_b.total_quantity if quantity_b else 0
-            total_quantity_c = quantity_c.quantity if quantity_c else 0
+            total_quantity_a = (quantity_a.total_quantity or 0) if quantity_a else 0
+            total_quantity_b = (quantity_b.total_quantity or 0) if quantity_b else 0
+            total_quantity_c = (quantity_c.quantity or 0) if quantity_c else 0
 
-            total_units_a = quantity_a.total_no_of_unit if quantity_a else 0
-            total_units_b = quantity_b.total_no_of_unit if quantity_b else 0
-            total_units_c = quantity_c.no_of_unit if quantity_c else 0
+            total_units_a = (quantity_a.total_no_of_unit or 0) if quantity_a else 0
+            total_units_b = (quantity_b.total_no_of_unit or 0) if quantity_b else 0
+            total_units_c = (quantity_c.no_of_unit or 0) if quantity_c else 0
         else:
             # If group exists, calculate for the group
             for item_name_in_group in group_to_items[group_name]:
@@ -186,27 +186,41 @@ def display_goods(request):
                 quantity_c = FGRNopening_balance.objects.filter(item_name=group_name).first()
 
                 # Accumulate quantities
-                total_quantity_a += quantity_a.total_quantity if quantity_a else 0
-                total_quantity_b += quantity_b.total_quantity if quantity_b else 0
-                total_quantity_c += quantity_c.quantity if quantity_c else 0
+                total_quantity_a += (quantity_a.total_quantity or 0) if quantity_a else 0
+                total_quantity_b += (quantity_b.total_quantity or 0) if quantity_b else 0
+                total_quantity_c += (quantity_c.quantity or 0) if quantity_c else 0
 
                 # Accumulate units
-                total_units_a += quantity_a.total_no_of_unit if quantity_a else 0
-                total_units_b += quantity_b.total_no_of_unit if quantity_b else 0
-                total_units_c += quantity_c.no_of_unit if quantity_c else 0
+                total_units_a += (quantity_a.total_no_of_unit or 0) if quantity_a else 0
+                total_units_b += (quantity_b.total_no_of_unit or 0) if quantity_b else 0
+                total_units_c += (quantity_c.no_of_unit or 0) if quantity_c else 0
 
         # Calculate the final result for the group or item
         result_quantity = total_quantity_c - total_quantity_b + total_quantity_a
         result_units = total_units_c - total_units_b + total_units_a
 
         # Log the group or item being updated for debugging
-        print(f"Updating or creating: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
+        print(f"Processing: {group_name} with result_quantity: {result_quantity} and result_units: {result_units}")
 
-        # Update or create in finished_goods using the group name or item_name
-        finished_goods.objects.filter(item_name=group_name).update(
-            quantity=result_quantity,
-            no_of_unit=result_units
-        )
+        # Check if the item exists in the opening balance
+        exists_in_opening_balance = FGRNopening_balance.objects.filter(item_name=group_name).exists()
+
+        # If the item is in the opening balance but not in finished_goods, create it
+        if exists_in_opening_balance and not finished_goods.objects.filter(item_name=group_name).exists():
+            finished_goods.objects.create(
+                item_name=group_name,
+                quantity=result_quantity,
+                no_of_unit=result_units
+            )
+            print(f"Created new entry in finished_goods: {group_name}")
+
+        # If the item exists in finished_goods, update it
+        else:
+            finished_goods.objects.filter(item_name=group_name).update(
+                quantity=result_quantity,
+                no_of_unit=result_units
+            )
+            print(f"Updated existing entry in finished_goods: {group_name}")
 
     # Render the context
     items = finished_goods.objects.all().order_by('item_name')

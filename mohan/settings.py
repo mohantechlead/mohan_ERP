@@ -41,12 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'MR',
+    'wip',
     'FGRN',
     'GRN',
     'DN',
     'rest_framework',
     'members',
-    # 'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -64,7 +64,7 @@ ROOT_URLCONF = 'mohan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,9 +86,9 @@ WSGI_APPLICATION = 'mohan.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'orders',
+        'NAME': 'mohanplc',
        'USER': 'postgres',
-       'PASSWORD': 'mohanPLC',
+       'PASSWORD': 'tsedi',
        'HOST': '127.0.0.1', 
         'PORT': '5432',
        'DISABLE_SERVER_SIDE_CURSORS': True,
@@ -151,6 +151,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 django_heroku.settings(locals())
 
 LOGOUT_REDIRECT_URL = 'login_user'
+LOGIN_REDIRECT_URL = 'create_grn'
 
 
 
@@ -166,12 +167,12 @@ EMAIL_HOST_PASSWORD = 'llcbqsjcpgyzbqvc'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Change the broker URL as per your configuration
-# CELERY_BEAT_SCHEDULE = {
-#     'send_weekly_emails': {
-#         'task': 'your_app.tasks.send_weekly_email',
-#         'schedule': crontab(day_of_week=0, hour=8, minute=0),  # Every Monday at 8 AM
-#     },
-# }
-
+FULLY_PAID_MISSING_ACTUAL_REMINDER_EMAIL = os.environ.get(
+    "FULLY_PAID_MISSING_ACTUAL_REMINDER_EMAIL",
+    "mekdi1610@gmail.com,Harsh@mohanplc.com",
+)
+FULLY_PAID_MISSING_ACTUAL_GRACE_DAYS = int(
+    os.environ.get("FULLY_PAID_MISSING_ACTUAL_GRACE_DAYS", "2")
+)

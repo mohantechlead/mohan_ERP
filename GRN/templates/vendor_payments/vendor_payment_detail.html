@@ -1,0 +1,50 @@
+{% extends "grn_base.html" %}
+{% block content %}
+{% include "vendor_payments/_messages.html" %}
+
+<div class="container" style="margin-top:16px;">
+    <p>
+        <a class="btn btn-default" href="{% url 'display_vendor_payments' %}">Back to list</a>
+        {% if detail.status == 'pending' %}
+        <a class="btn btn-primary" href="{% url 'edit_vendor_payment' detail.payment_number %}">Edit</a>
+        {% endif %}
+    </p>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><h3 class="panel-title" style="font-weight:600;">{{ detail.payment_number }}</h3></div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>PR:</strong> <a href="{% url 'vendor_payment_purchase_summary' detail.purchase_number %}">{{ detail.purchase_number }}</a></p>
+                    <p><strong>Supplier:</strong> {{ detail.supplier_name }}</p>
+                    <p><strong>Installment:</strong> {{ detail.installment_number }}</p>
+                    <p><strong>Payment date:</strong> {{ detail.payment_date }}</p>
+                    <p><strong>Type:</strong> {{ detail.payment_type|capfirst }}</p>
+                    <p><strong>Amount:</strong> {{ detail.amount|floatformat:2 }}</p>
+                    <p><strong>Status:</strong> {{ detail.status|capfirst }}</p>
+                    <p><strong>Remark:</strong> {{ detail.remark|default:"—" }}</p>
+                    {% if detail.linked_actual_purchase_id %}
+                    <p><strong>Linked Actual Purchase:</strong> <code>{{ detail.linked_actual_purchase_id }}</code></p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Purchase total (before VAT):</strong> {{ detail.purchase_total|floatformat:2 }}</p>
+                    <p><strong>Applied toward PR (incl. this installment):</strong> {{ detail.total_paid|floatformat:2 }}</p>
+                    <p><strong>Remaining after this installment:</strong> {{ detail.remaining_amount|floatformat:2 }}</p>
+                    <p><strong>Completion:</strong> {{ detail.payment_completion_status|capfirst }}</p>
+                    <hr>
+                    <p><strong>Approved by:</strong> {{ detail.approved_by|default:"—" }}</p>
+                    <p><strong>Approval date:</strong> {{ detail.approval_date|default:"—" }}</p>
+                    <p><strong>Completed by:</strong> {{ detail.completed_by|default:"—" }}</p>
+                    <p><strong>Completed date:</strong> {{ detail.completed_date|default:"—" }}</p>
+                    <p><strong>Reference:</strong> {{ detail.reference_number|default:"—" }}</p>
+                    <p><strong>Cancelled by:</strong> {{ detail.cancelled_by|default:"—" }}</p>
+                    <p><strong>Cancelled date:</strong> {{ detail.cancelled_date|default:"—" }}</p>
+                    <p><strong>Status remark:</strong> {{ detail.status_remark|default:"—" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
