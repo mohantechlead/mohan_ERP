@@ -47,19 +47,27 @@ def create_MR(request):
                     if form_item.instance.pk:
                         form_item.instance.delete()
                 else:
-                    item_name = form_item.cleaned_data.get('item_name')
-                    quantity = form_item.cleaned_data.get('quantity')
-                    no_of_unit = form_item.cleaned_data.get('no_of_unit')
+                    item_field = form_item.cleaned_data.get('item_name')
+                    quantity = form_item.cleaned_data.get('quantity') or 0
+                    no_of_unit = form_item.cleaned_data.get('no_of_unit') or 0
 
-                    if item_name:
-                        try:
-                            inventory_item = inventory_MR_items.objects.get(item_name=item_name)
-                            inventory_item.total_quantity -= quantity
-                            inventory_item.total_no_of_unit -= no_of_unit
-                            inventory_item.save()
-                        except inventory_MR_items.DoesNotExist:
-                            inventory_item = inventory_MR_items(item_name=item_name, total_quantity=-quantity)
-                            inventory_item.save()
+                    if item_field:
+                        # `item_field` may be an `inventory` instance (ModelChoiceField)
+                        # or a plain string (if a string value is submitted). Handle both.
+                        if isinstance(item_field, inventory):
+                            inv_obj = item_field
+                            inv_obj.quantity = (inv_obj.quantity or 0) - quantity
+                            inv_obj.no_of_unit = (inv_obj.no_of_unit or 0) - no_of_unit
+                            inv_obj.save()
+                        else:
+                            try:
+                                inv_obj = inventory.objects.get(item_name=item_field)
+                                inv_obj.quantity = (inv_obj.quantity or 0) - quantity
+                                inv_obj.no_of_unit = (inv_obj.no_of_unit or 0) - no_of_unit
+                                inv_obj.save()
+                            except inventory.DoesNotExist:
+                                inv_obj = inventory(item_name=item_field, quantity=-quantity, no_of_unit=-no_of_unit)
+                                inv_obj.save()
 
                         # Save each MRItem form with the corresponding MR instance
                         form_item.instance.MR_no = MR_instance
