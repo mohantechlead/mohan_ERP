@@ -42,19 +42,27 @@ def create_MR(request):
                     if form_item.instance.pk:
                         form_item.instance.delete()
                 else:
-                    item_name = form_item.cleaned_data.get('item_name')
-                    quantity = form_item.cleaned_data.get('quantity')
-                    no_of_unit = form_item.cleaned_data.get('no_of_unit')
+                    item_field = form_item.cleaned_data.get('item_name')
+                    quantity = form_item.cleaned_data.get('quantity') or 0
+                    no_of_unit = form_item.cleaned_data.get('no_of_unit') or 0
 
-                    if item_name:
-                        try:
-                            inventory_item = inventory.objects.get(item_name=item_name)
-                            inventory_item.quantity -= quantity
-                            inventory_item.no_of_unit -= no_of_unit
-                            inventory_item.save()
-                        except inventory.DoesNotExist:
-                            inventory_item = inventory(item_name=item_name, quantity=-quantity)
-                            inventory_item.save()
+                    if item_field:
+                        # `item_field` may be an `inventory` instance (ModelChoiceField)
+                        # or a plain string (if a string value is submitted). Handle both.
+                        if isinstance(item_field, inventory):
+                            inv_obj = item_field
+                            inv_obj.quantity = (inv_obj.quantity or 0) - quantity
+                            inv_obj.no_of_unit = (inv_obj.no_of_unit or 0) - no_of_unit
+                            inv_obj.save()
+                        else:
+                            try:
+                                inv_obj = inventory.objects.get(item_name=item_field)
+                                inv_obj.quantity = (inv_obj.quantity or 0) - quantity
+                                inv_obj.no_of_unit = (inv_obj.no_of_unit or 0) - no_of_unit
+                                inv_obj.save()
+                            except inventory.DoesNotExist:
+                                inv_obj = inventory(item_name=item_field, quantity=-quantity, no_of_unit=-no_of_unit)
+                                inv_obj.save()
 
                         # Save each MRItem form with the corresponding MR instance
                         form_item.instance.MR_no = MR_instance
@@ -150,33 +158,32 @@ def display_inventory(request):
 
     for name in all_names:
         # Get the quantity from each model
-        if name in mr_names:
-            quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
-            quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
-            quantity_c = opening_balance.objects.filter(item_name=name).first()
-            quantity_d = inventory_DN_items.objects.filter(item_name = name).first()
+        quantity_a = inventory_GRN_items.objects.filter(item_name=name).first()
+        quantity_b = inventory_MR_items.objects.filter(item_name=name).first()
+        quantity_c = opening_balance.objects.filter(item_name=name).first()
+        quantity_d = inventory_DN_items.objects.filter(item_name = name).first()
 
-            # Initialize the quantities or set to 0 if not found
-            quantity_a_value = quantity_a.total_quantity if quantity_a else 0
-            quantity_b_value = quantity_b.total_quantity if quantity_b else 0
-            quantity_c_value = quantity_c.quantity if quantity_c else 0
-            quantity_d_value = quantity_d.total_quantity if quantity_d else 0
+        # Initialize the quantities or set to 0 if not found
+        quantity_a_value = quantity_a.total_quantity if quantity_a else 0
+        quantity_b_value = quantity_b.total_quantity if quantity_b else 0
+        quantity_c_value = quantity_c.quantity if quantity_c else 0
+        quantity_d_value = quantity_d.total_quantity if quantity_d else 0
 
-            units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
-            units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
-            units_c_value = quantity_c.no_of_unit if quantity_c else 0
-            units_d_value = quantity_d.total_no_of_unit if quantity_d else 0
-            
-            # Calculate the result: Subtract ModelA and ModelC, and add ModelB
-            result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value - quantity_d_value
-            result_units = units_c_value - units_b_value + units_a_value - units_d_value
-            
-            # Save or update the result in ModelD
-            inventory.objects.update_or_create(
-                item_name=name,
-                defaults={'quantity': result_quantity,
-                        'no_of_unit': result_units}
-            )
+        units_a_value = quantity_a.total_no_of_unit if quantity_a else 0
+        units_b_value = quantity_b.total_no_of_unit if quantity_b else 0
+        units_c_value = quantity_c.no_of_unit if quantity_c else 0
+        units_d_value = quantity_d.total_no_of_unit if quantity_d else 0
+        
+        # Calculate the result: Subtract ModelB and add ModelA (and include openings and DN)
+        result_quantity =  quantity_c_value - quantity_b_value +  quantity_a_value - quantity_d_value
+        result_units = units_c_value - units_b_value + units_a_value - units_d_value
+        
+        # Save or update the result in ModelD (ensure inventory table includes all aggregated names)
+        inventory.objects.update_or_create(
+            item_name=name,
+            defaults={'quantity': result_quantity,
+                      'no_of_unit': result_units}
+        )
 
     items = inventory.objects.all().order_by('item_name')
     print(items)
